@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+        "label": "Build with Makefile (MSYS2)",
+        "type": "shell",
+        "command": "make",
+        "options": {
+            "env": {
+            "PATH": "C:/msys64/mingw64/bin;${env:PATH}"
+            }
+        },
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": ["$gcc"],
+        "detail": "Build the project using MSYS2's make and g++"
+        },
+        
+        {
+        "label": "Run sudoku_game.exe",
+        "type": "shell",
+        "command": "./sudoku_game.exe",
+        "group": {
+            "kind": "test",
+            "isDefault": true
+        },
+        "dependsOn": ["Build with Makefile (MSYS2)"]
+        }
+    ]
+}
+
+
