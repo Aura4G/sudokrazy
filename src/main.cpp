@@ -10,8 +10,7 @@
 #include "commands.hpp"
 
 int main() {
-    std::vector<Button> numberChangers;
-    numberChangers.reserve(9);
+    Button numberChangers[9];
 
     sf::RenderWindow window(sf::VideoMode(600, 800), "Sudoku", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
@@ -52,12 +51,13 @@ int main() {
     Button hardSwitch(200.0f, 100.0f, 200.0f, 550.0f, HARD_BUTTON, "Hard", globalFont);
  
     //Sudoku Grid
-    Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
+    Grid grid(sf::Vector2f(50.f, 150.f), 500.f, globalFont);
 
     //Number selection buttons
     int number = 1;
     for (int i = 0; i < 9; ++i) {
-        numberChangers.emplace_back(45.f, 60.f, 50 + (55*i), 680.f, REGULAR_BUTTON, std::to_string(i+1), globalFont);
+        Button button(45.f, 60.f, 50 + 55.f*i, 680.f, REGULAR_BUTTON, std::to_string(i+1), globalFont);
+        numberChangers[i] = button;
     }
 
     // Load a music to play
@@ -102,10 +102,11 @@ int main() {
                     if (button.frame.getGlobalBounds().contains(mousePos)) {
                         if (button.isActive()) {
                             changeNumber(button, number);
-                            std::cout << "numberChangers size: " << numberChangers.size() << "\n";
                         }
                     }
                 }
+
+                grid.updateNumbers(mousePos, number);
             }
         }
 
@@ -178,15 +179,16 @@ int main() {
             hardSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         } else {
             for (int i = 0; i < 9; i++) {
-                numberChangers.at(i).updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+                numberChangers[i].updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             }
+            grid.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         }
 
         easySwitch.update(deltaTime);
         mediumSwitch.update(deltaTime);
         hardSwitch.update(deltaTime);
         for (int i = 0; i < 9; i++) {
-            numberChangers.at(i).update(deltaTime);
+            numberChangers[i].update(deltaTime);
         }
 
         //Draw everything necessary

@@ -10,6 +10,14 @@ const ButtonTheme MEDIUM_BUTTON =  {{255,255,0},  {127,127,0},  {64,64,0}};
 const ButtonTheme HARD_BUTTON =    {{255,0,0},    {127,0,0},    {80,0,0}};
 
 //Method declarations for Button class
+Button::Button() {
+    width = 0;
+    height = 0;
+    x = 0;
+    y = 0;
+    theme = REGULAR_BUTTON;
+}
+
 Button::Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont)
     : width(width), height(height), x(x), y(y), theme(theme)
     {
@@ -31,6 +39,11 @@ Button::Button(float width, float height, float x, float y, const ButtonTheme& t
 
 void Button::setColor(const sf::Color& col) {
     frame.setFillColor(col);
+}
+
+void Button::setText(const std::string& newText) {
+    text.setString(newText);
+    fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
 }
 
 float Button::getWidth() {

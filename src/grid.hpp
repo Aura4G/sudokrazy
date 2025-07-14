@@ -3,15 +3,19 @@
 
 #include <SFML/Graphics.hpp>
 #include "sudoku.hpp"
+#include "button.hpp"
 
 class Grid {
 public:
-    Grid(sf::Vector2f position, float size);
+    Grid(sf::Vector2f position, float size, const sf::Font& sharedFont);
     void display(sf::RenderWindow& window);
+    void update(float deltaTime);
+    void updateHover(const sf::Vector2f& mousePos);
+    void updateNumbers(const sf::Vector2f& mousePos, int number);
 
 private:
     sf::RectangleShape back;
-    sf::RectangleShape whiteBlocks[9];
+    Button whiteBlocks[81];
 };
 
 #endif

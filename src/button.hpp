@@ -14,9 +14,11 @@ public:
     sf::RectangleShape frame;
     sf::Text text;
 
+    Button();
     Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont);
 
     void setColor(const sf::Color& col);
+    void setText(const std::string& newText);
     float getWidth();
     float getHeight();
     sf::Vector2f getOriginalPos();
