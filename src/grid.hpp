@@ -12,6 +12,8 @@ public:
     void update(float deltaTime);
     void updateHover(const sf::Vector2f& mousePos);
     void updateNumbers(const sf::Vector2f& mousePos, int number);
+    void activate();
+    void deactivate();
 
 private:
     sf::RectangleShape back;

@@ -52,6 +52,7 @@ int main() {
  
     //Sudoku Grid
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f, globalFont);
+    grid.deactivate();
 
     //Number selection buttons
     int number = 1;
@@ -139,6 +140,8 @@ int main() {
             for (Button& button : numberChangers) {
                 button.activate();
             }
+
+            grid.activate();
         } else {
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -153,6 +156,8 @@ int main() {
             for (Button& button : numberChangers) {
                 button.deactivate();
             }
+
+            grid.deactivate();
         }
 
         //move panels to the right
