@@ -8,8 +8,6 @@
 #include "button.hpp"
 
 Grid::Grid(sf::Vector2f position, float size, const sf::Font& sharedFont) {
-    Board finalBoard;
-    Board playersBoard = finalBoard;
     playersBoard.removeNumbers();
 
     const float PADDING = 2.5f;
@@ -42,15 +40,15 @@ Grid::Grid(sf::Vector2f position, float size, const sf::Font& sharedFont) {
         }
 
         std::string input;
-        if (playersBoard.grid[y][x] == 0) {
+        if (playersBoard.getNumber(y,x) == 0) {
             input = "";
         } else {
-            input = std::to_string(playersBoard.grid[y][x]);
+            input = std::to_string(playersBoard.getNumber(y,x));
         }
 
         sf::Vector2f whiteBlockPos(additiveX + position.x + PADDING/2.f, additiveY + position.y + PADDING/2.f);
         Button block(size/9.f - PADDING*2.f, size/9.f - PADDING*2.f, whiteBlockPos.x, whiteBlockPos.y, REGULAR_BUTTON, input, sharedFont);
-        if (playersBoard.grid[y][x] != 0) {
+        if (playersBoard.getNumber(y,x) != 0) {
             block.deactivate();
         }
         whiteBlocks[i] = block;
@@ -79,13 +77,16 @@ void Grid::updateHover(const sf::Vector2f& mousePos) {
 }
 
 void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
+    int counter = 0;
     for (Button& block : whiteBlocks) {
         if (block.frame.getGlobalBounds().contains(mousePos)) {
             if (block.isActive()) {
                 std::string newText = std::to_string(number);
                 block.setText(newText);
+                playersBoard.setNumber(counter / 9, counter % 9, number);
             }
         }
+        counter++;
     }
 }
 
@@ -101,4 +102,13 @@ void Grid::deactivate() {
     for (Button& block : whiteBlocks) {
         block.deactivate();
     }
+}
+
+bool Grid::check() {
+    for (int i = 0; i < 81; i++) {
+        if (finalBoard.getNumber(i/9, i%9) != playersBoard.getNumber(i/9, i%9)) {
+            return false;
+        }
+    }
+    return true;
 }

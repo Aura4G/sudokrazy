@@ -1,11 +1,10 @@
 #ifndef __MAIN_HPP__
 #define __MAIN_HPP__
 
-enum GameState {
-    STATE_HOME,
-    STATE_EASY,
-    STATE_MEDIUM,
-    STATE_HARD
-};
+#include "sudoku.hpp"
+#include "grid.hpp"
+#include "button.hpp"
+
+void changeNumber(Button& button, int& number);
 
 #endif

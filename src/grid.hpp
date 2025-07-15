@@ -8,16 +8,20 @@
 class Grid {
 public:
     Grid(sf::Vector2f position, float size, const sf::Font& sharedFont);
+    bool check();
     void display(sf::RenderWindow& window);
     void update(float deltaTime);
     void updateHover(const sf::Vector2f& mousePos);
     void updateNumbers(const sf::Vector2f& mousePos, int number);
     void activate();
     void deactivate();
+    
 
 private:
     sf::RectangleShape back;
     Button whiteBlocks[81];
+    Board finalBoard;
+    Board playersBoard = finalBoard;
 };
 
 #endif

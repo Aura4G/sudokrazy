@@ -63,19 +63,14 @@ bool Board::fillBoard() {
     return true;
 }
 
-void Board::removeNumbers(int difficulty) {
-    if (difficulty < 1 || difficulty > 3) {
-        std::cerr << "This number option is not allowed.\n";
-        exit(-1);
-    }
-
+void Board::removeNumbers(GameState difficulty) {
     int countdown = 0;
 
-    if (difficulty == 1) {
+    if (difficulty == STATE_EASY) {
         countdown = rand() % 10 + 10;
-    } else if (difficulty == 2) {
+    } else if (difficulty == STATE_MEDIUM) {
         countdown = rand() % 20 + 20;
-    } else if (difficulty == 3) {
+    } else if (difficulty == STATE_HARD) {
         countdown = rand() % 15 + 40;
     }
 
@@ -107,4 +102,12 @@ void Board::printBoard(){
         }
         std::cout << std::endl << "-------------------------------------" << std::endl;
     }
+}
+
+void Board::setNumber(int y, int x, int number) {
+    grid[y][x] = number;
+}
+
+int Board::getNumber(int y, int x) {
+    return grid[y][x];
 }

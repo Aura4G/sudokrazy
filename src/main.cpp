@@ -7,7 +7,15 @@
 #include "grid.hpp"
 #include "main.hpp"
 #include "button.hpp"
-#include "commands.hpp"
+
+void changeNumber(Button& button, int& number) {    
+    try {
+        number = std::stoi(button.text.getString().toAnsiString());
+        // use value
+    } catch (const std::exception& e) {
+        std::cerr << "Error converting text to int: " << e.what() << std::endl;
+    }
+}
 
 int main() {
     Button numberChangers[9];
@@ -60,6 +68,8 @@ int main() {
         Button button(45.f, 60.f, 50 + 55.f*i, 680.f, REGULAR_BUTTON, std::to_string(i+1), globalFont);
         numberChangers[i] = button;
     }
+    Button* chosenNumber = &numberChangers[0];
+    chosenNumber->deactivate();
 
     // Load a music to play
     //sf::Music music;
@@ -103,11 +113,17 @@ int main() {
                     if (button.frame.getGlobalBounds().contains(mousePos)) {
                         if (button.isActive()) {
                             changeNumber(button, number);
+                            chosenNumber->activate();
+                            chosenNumber = &button;
+                            chosenNumber->deactivate();
                         }
                     }
                 }
 
                 grid.updateNumbers(mousePos, number);
+                if (grid.check()) {
+                    stateFlag = STATE_HOME;
+                }
             }
         }
 
@@ -138,7 +154,9 @@ int main() {
 
             //activating number choice buttons
             for (Button& button : numberChangers) {
-                button.activate();
+                if (&button != chosenNumber) {
+                    button.activate();
+                }
             }
 
             grid.activate();
@@ -183,8 +201,10 @@ int main() {
             mediumSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             hardSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         } else {
-            for (int i = 0; i < 9; i++) {
-                numberChangers[i].updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+            for (Button& button : numberChangers) {
+                if (button.isActive()) {
+                    button.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+                }
             }
             grid.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         }
