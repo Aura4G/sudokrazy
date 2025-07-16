@@ -9,7 +9,7 @@ OBJ = $(SRC:.cpp=.o)
 TARGET = sudoku_game.exe
 
 # Linker flags and libraries
-LDFLAGS = -L/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system -lm
+LDFLAGS = -L/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system -lm -mwindows
 
 # Default rule
 all: $(TARGET)
