@@ -70,7 +70,7 @@ int main() {
     //Number selection buttons
     int number = 1;
     for (int i = 0; i < 9; ++i) {
-        Button button(45.f, 60.f, 50 + 55.f*i, 680.f, REGULAR_BUTTON, std::to_string(i+1), gameFont);
+        Button button(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), gameFont);
         numberChangers[i] = button;
     }
     Button* chosenNumber = &numberChangers[0];
@@ -82,8 +82,8 @@ int main() {
         std::cerr << "Error finding music file";
         return -1;
     }
-    music.setLoop(true);
-    music.play();
+    //music.setLoop(true);
+    //music.play();
 
     const Theme* currentTheme = &HOME_THEME;
 
@@ -241,6 +241,6 @@ int main() {
         hardSwitch.display(window);
         window.display();
     }
-    music.stop();
+    //music.stop();
     return 0;
 }
