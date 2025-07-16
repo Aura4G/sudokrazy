@@ -8,7 +8,6 @@
 #include "button.hpp"
 
 Grid::Grid(sf::Vector2f position, float size, const sf::Font& sharedFont) {
-    playersBoard.removeNumbers();
 
     const float PADDING = 2.5f;
     back.setSize(sf::Vector2f(size + PADDING*2, size + PADDING*2));
@@ -111,4 +110,18 @@ bool Grid::check() {
         }
     }
     return true;
+}
+
+void Grid::appropriate(GameState difficulty) {
+    finalBoard.reset();
+    playersBoard = finalBoard;
+    playersBoard.removeNumbers(difficulty);
+
+    for (int i = 0; i < 81; i++) {
+        if (playersBoard.getNumber(i/9,i%9) == 0) {
+            whiteBlocks[i].setText("");
+        } else {
+            whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
+        }
+    }
 }

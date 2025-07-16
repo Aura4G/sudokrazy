@@ -15,7 +15,7 @@ public:
     void updateNumbers(const sf::Vector2f& mousePos, int number);
     void activate();
     void deactivate();
-    
+    void appropriate(GameState difficulty);
 
 private:
     sf::RectangleShape back;

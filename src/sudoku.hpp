@@ -16,6 +16,7 @@ public:
     void printBoard();
     void removeNumbers(GameState difficulty = STATE_MEDIUM);
     void setNumber(int y, int x, int number);
+    void reset();
     int getNumber(int y, int x);
 
 private:

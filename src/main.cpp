@@ -98,14 +98,17 @@ int main() {
                 if (easySwitch.frame.getGlobalBounds().contains(mousePos)) {
                     if (easySwitch.isActive()) {
                         stateFlag = STATE_EASY;
+                        grid.appropriate(stateFlag);
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) {
                     if (mediumSwitch.isActive()) {
                         stateFlag = STATE_MEDIUM;
+                        grid.appropriate(stateFlag);
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) {
                     if (hardSwitch.isActive()) {
                         stateFlag = STATE_HARD;
+                        grid.appropriate(stateFlag);
                     }
                 }
 

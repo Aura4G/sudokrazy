@@ -111,3 +111,12 @@ void Board::setNumber(int y, int x, int number) {
 int Board::getNumber(int y, int x) {
     return grid[y][x];
 }
+
+void Board::reset() {
+    for (int y = 0; y < 9; y++) {
+        for (int x = 0; x < 9; x++) {
+            grid[y][x] = 0;
+        }
+    }
+    fillBoard();
+}
