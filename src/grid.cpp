@@ -104,12 +104,7 @@ void Grid::deactivate() {
 }
 
 bool Grid::check() {
-    for (int i = 0; i < 81; i++) {
-        if (finalBoard.getNumber(i/9, i%9) != playersBoard.getNumber(i/9, i%9)) {
-            return false;
-        }
-    }
-    return true;
+    return finalBoard == playersBoard;
 }
 
 void Grid::appropriate(GameState difficulty) {

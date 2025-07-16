@@ -120,3 +120,12 @@ void Board::reset() {
     }
     fillBoard();
 }
+
+bool operator== (Board& grid1, Board& grid2) {
+    for (int i = 0; i < 81; i++) {
+        if (grid1.getNumber(i/9, i%9) != grid2.getNumber(i/9, i%9)) {
+            return false;
+        }
+    }
+    return true;
+}

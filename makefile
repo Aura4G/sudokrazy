@@ -10,7 +10,7 @@ RES = $(SRC_DIR)/resource.o
 TARGET = sudoku_game.exe
 
 # Linker flags and libraries
-LDFLAGS = -L/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system -lm -mwindows
+LDFLAGS = -L/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lm -mwindows
 
 # Default rule
 all: $(TARGET)

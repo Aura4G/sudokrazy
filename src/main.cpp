@@ -24,12 +24,17 @@ int main() {
     window.setFramerateLimit(60);
 
     // Create a graphical text to display
-    sf::Font globalFont;
-    if (!globalFont.loadFromFile("media/fonts/LoveDays.ttf")) {
+    sf::Font homeFont;
+    if (!homeFont.loadFromFile("media/fonts/LoveDays.ttf")) {
         std::cerr << "Failed to load font.\n";
         return 1;
     }
 
+    sf::Font gameFont;
+    if (!gameFont.loadFromFile("media/fonts/Quicksand_Book.otf")) {
+        std::cerr << "Failed to load font.\n";
+        return 1;
+    }
 
     /* Dynamic Background */
     //Define size of each coloured background panel
@@ -48,37 +53,37 @@ int main() {
 
     // Title Text
     sf::Text titleText;
-    titleText.setFont(globalFont);
+    titleText.setFont(homeFont);
     titleText.setString("Sudoku!!");
     titleText.setCharacterSize(100); // in pixels, not points
     titleText.setPosition(sf::Vector2f(120.f, 50.f));
 
     // Home Menu Buttons Button
-    Button easySwitch(200.0f, 100.0f, 200.0f, 250.0f, EASY_BUTTON, "Easy", globalFont);
-    Button mediumSwitch(200.0f, 100.0f, 200.0f, 400.0f, MEDIUM_BUTTON, "Medium", globalFont);
-    Button hardSwitch(200.0f, 100.0f, 200.0f, 550.0f, HARD_BUTTON, "Hard", globalFont);
+    Button easySwitch(200.0f, 100.0f, 200.0f, 250.0f, EASY_BUTTON, "Easy", homeFont);
+    Button mediumSwitch(200.0f, 100.0f, 200.0f, 400.0f, MEDIUM_BUTTON, "Medium", homeFont);
+    Button hardSwitch(200.0f, 100.0f, 200.0f, 550.0f, HARD_BUTTON, "Hard", homeFont);
  
     //Sudoku Grid
-    Grid grid(sf::Vector2f(50.f, 150.f), 500.f, globalFont);
+    Grid grid(sf::Vector2f(50.f, 150.f), 500.f, gameFont);
     grid.deactivate();
 
     //Number selection buttons
     int number = 1;
     for (int i = 0; i < 9; ++i) {
-        Button button(45.f, 60.f, 50 + 55.f*i, 680.f, REGULAR_BUTTON, std::to_string(i+1), globalFont);
+        Button button(45.f, 60.f, 50 + 55.f*i, 680.f, REGULAR_BUTTON, std::to_string(i+1), gameFont);
         numberChangers[i] = button;
     }
     Button* chosenNumber = &numberChangers[0];
     chosenNumber->deactivate();
 
-    // Load a music to play
-    //sf::Music music;
-    //if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) {
-    //    std::cerr << "Error finding music file";
-    //    return -1;
-    //}
-    //music.setLoop(true);
-    //music.play();
+    //Load a music to play
+    sf::Music music;
+    if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) {
+        std::cerr << "Error finding music file";
+        return -1;
+    }
+    music.setLoop(true);
+    music.play();
 
     const Theme* currentTheme = &HOME_THEME;
 
@@ -236,6 +241,6 @@ int main() {
         hardSwitch.display(window);
         window.display();
     }
-    //music.stop();
+    music.stop();
     return 0;
 }
