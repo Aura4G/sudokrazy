@@ -68,7 +68,7 @@ void Board::removeNumbers(GameState difficulty) {
 
     if (difficulty == STATE_EASY) {
         countdown = rand() % 10 + 10;
-    } else if (difficulty == STATE_MEDIUM) {
+    } else if (difficulty == STATE_MEDIUM || difficulty == STATE_KRAZY) {
         countdown = rand() % 20 + 20;
     } else if (difficulty == STATE_HARD) {
         countdown = rand() % 15 + 40;

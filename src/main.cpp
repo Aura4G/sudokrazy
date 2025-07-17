@@ -59,9 +59,10 @@ int main() {
     titleText.setPosition(sf::Vector2f(120.f, 50.f));
 
     // Home Menu Buttons Button
-    Button easySwitch(200.0f, 100.0f, 200.0f, 250.0f, EASY_BUTTON, "Easy", homeFont);
-    Button mediumSwitch(200.0f, 100.0f, 200.0f, 400.0f, MEDIUM_BUTTON, "Medium", homeFont);
-    Button hardSwitch(200.0f, 100.0f, 200.0f, 550.0f, HARD_BUTTON, "Hard", homeFont);
+    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", homeFont);
+    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", homeFont);
+    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", homeFont);
+    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", homeFont);
  
     //Sudoku Grid
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f, gameFont);
@@ -115,6 +116,11 @@ int main() {
                         stateFlag = STATE_HARD;
                         grid.appropriate(stateFlag);
                     }
+                } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) {
+                    if (krazySwitch.isActive()) {
+                        stateFlag = STATE_KRAZY;
+                        grid.appropriate(stateFlag);
+                    }
                 }
 
                 for (Button& button : numberChangers) {
@@ -148,6 +154,9 @@ int main() {
             case STATE_HARD:
                 currentTheme = &HARD_THEME;
                 break;
+            case STATE_KRAZY:
+                currentTheme = &KRAZY_THEME;
+                break;
         }
 
         if (stateFlag != STATE_HOME) {
@@ -155,10 +164,12 @@ int main() {
             easySwitch.activateMovement(offscreen, 600.f);
             mediumSwitch.activateMovement(offscreen, 600.f);
             hardSwitch.activateMovement(offscreen, 600.f);
+            krazySwitch.activateMovement(offscreen, 600.f);
 
             easySwitch.deactivate();
             mediumSwitch.deactivate();
             hardSwitch.deactivate();
+            krazySwitch.deactivate();
 
             //activating number choice buttons
             for (Button& button : numberChangers) {
@@ -173,10 +184,12 @@ int main() {
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
             mediumSwitch.activateMovement(mediumSwitch.getOriginalPos(), 400.f);
             hardSwitch.activateMovement(hardSwitch.getOriginalPos(), 400.f);
+            krazySwitch.activateMovement(krazySwitch.getOriginalPos(), 400.f);
 
             easySwitch.activate();
             mediumSwitch.activate();
             hardSwitch.activate();
+            krazySwitch.activate();
 
             //deactivating number choice buttons
             for (Button& button : numberChangers) {
@@ -208,6 +221,7 @@ int main() {
             easySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             mediumSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             hardSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+            krazySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         } else {
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
@@ -220,6 +234,7 @@ int main() {
         easySwitch.update(deltaTime);
         mediumSwitch.update(deltaTime);
         hardSwitch.update(deltaTime);
+        krazySwitch.update(deltaTime);
         for (int i = 0; i < 9; i++) {
             numberChangers[i].update(deltaTime);
         }
@@ -239,6 +254,7 @@ int main() {
         easySwitch.display(window);
         mediumSwitch.display(window);
         hardSwitch.display(window);
+        krazySwitch.display(window);
         window.display();
     }
     //music.stop();

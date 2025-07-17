@@ -5,7 +5,8 @@ enum GameState {
     STATE_HOME,
     STATE_EASY,
     STATE_MEDIUM,
-    STATE_HARD
+    STATE_HARD,
+    STATE_KRAZY
 };
 
 class Board {

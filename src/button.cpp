@@ -5,9 +5,11 @@
 
 //Button Colour Themes
 const ButtonTheme REGULAR_BUTTON = {{255,255,255},{127,127,127},{0,0,0}};
+const ButtonTheme INPUT_BUTTON =   {{255,255,255},{127,127,127},{25,151,230}};
 const ButtonTheme EASY_BUTTON =    {{0,255,0},    {0,127,0},    {0,64,0}};
 const ButtonTheme MEDIUM_BUTTON =  {{255,255,0},  {127,127,0},  {64,64,0}};
 const ButtonTheme HARD_BUTTON =    {{255,0,0},    {127,0,0},    {80,0,0}};
+const ButtonTheme KRAZY_BUTTON =   {{169,0,194},  {75,0,86},    {46,0,53}};
 
 //Method declarations for Button class
 Button::Button() {
@@ -44,6 +46,11 @@ void Button::setColor(const sf::Color& col) {
 void Button::setText(const std::string& newText) {
     text.setString(newText);
     fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
+}
+
+void Button::setTheme(const ButtonTheme& newTheme) {
+    theme = newTheme;
+    text.setColor(theme.text);
 }
 
 float Button::getWidth() {

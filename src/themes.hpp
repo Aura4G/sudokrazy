@@ -14,5 +14,6 @@ extern const Theme HOME_THEME;
 extern const Theme EASY_THEME;
 extern const Theme MEDIUM_THEME;
 extern const Theme HARD_THEME;
+extern const Theme KRAZY_THEME;
 
 #endif

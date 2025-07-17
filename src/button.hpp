@@ -19,6 +19,7 @@ public:
 
     void setColor(const sf::Color& col);
     void setText(const std::string& newText);
+    void setTheme(const ButtonTheme& newTheme);
     float getWidth();
     float getHeight();
     sf::Vector2f getOriginalPos();
@@ -46,8 +47,10 @@ private:
 };
 
 extern const ButtonTheme REGULAR_BUTTON;
+extern const ButtonTheme INPUT_BUTTON;
 extern const ButtonTheme EASY_BUTTON;
 extern const ButtonTheme MEDIUM_BUTTON;
 extern const ButtonTheme HARD_BUTTON;
+extern const ButtonTheme KRAZY_BUTTON;
 
 #endif

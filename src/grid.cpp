@@ -115,8 +115,10 @@ void Grid::appropriate(GameState difficulty) {
     for (int i = 0; i < 81; i++) {
         if (playersBoard.getNumber(i/9,i%9) == 0) {
             whiteBlocks[i].setText("");
+            whiteBlocks[i].setTheme(INPUT_BUTTON);
         } else {
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
+            whiteBlocks[i].setTheme(REGULAR_BUTTON);
         }
     }
 }
