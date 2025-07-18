@@ -6,16 +6,18 @@
 #include "sudoku.hpp"
 
 Board::Board() {
+    //sets random seed
     srand(time(0));
-    for (int y = 0; y < 9; y++) {
+    for (int y = 0; y < 9; y++) { //fills each cell of each array with 0
         for (int x = 0; x < 9; x++) {
             grid[y][x] = 0;
         }
     }
-    fillBoard();
+    fillBoard(); //actual values are added
 }
 
 bool Board::isSafe(int row, int col, int num) {
+    //iteratively checks if another number in the row or column matches the new number
     for (int i = 0; i < 9; i++) {
         if (grid[row][i] == num || grid[i][col] == num) {
             return false;
@@ -25,6 +27,7 @@ bool Board::isSafe(int row, int col, int num) {
     int startRow = row - row % 3;
     int startCol = col - col % 3;
 
+    //iteratively checks if another number in its 3x3 matches the new number
     for (int y = 0; y < 3; ++y) {
         for (int x = 0; x < 3; ++x) {
             if (grid[startRow + y][startCol + x] == num) {
@@ -33,6 +36,7 @@ bool Board::isSafe(int row, int col, int num) {
         }
     }
 
+    //returns true if nothing matches
     return true;
 }
 
@@ -40,21 +44,23 @@ bool Board::fillBoard() {
     for (int row = 0; row < 9; ++row) {
         for (int col = 0; col < 9; ++col) {
             if (grid[row][col] == 0) {
+                //each iteration starts with this vector defining all the possible numbers in the cell
                 std::vector<int> numbers = {1,2,3,4,5,6,7,8,9};
-                std::random_shuffle(numbers.begin(), numbers.end());
+                std::random_shuffle(numbers.begin(), numbers.end()); //shuffle to ensure the first number is not always selected
 
                 for (int num : numbers) {
-                    if (isSafe(row, col, num)) {
-                        grid[row][col] = num;
+                    if (isSafe(row, col, num)) { //checks if the number isn't a repeat in its 3x3, row or column
+                        grid[row][col] = num; //before adding the number to the grid
 
-                        if (fillBoard()) {
+                        if (fillBoard()) { //if all numbers up to this point are valid, it's true and the next number can be added
                             return true;
                         }
 
-                        grid[row][col] = 0;
+                        grid[row][col] = 0; //otherwise the number can't be applied and the next number from the vector is tried
                     }
                 }
 
+                //if none can be applied, returns false
                 return false;
             }
         }
@@ -64,25 +70,30 @@ bool Board::fillBoard() {
 }
 
 void Board::removeNumbers(GameState difficulty) {
+    //Determines the quantity of numbers to be removed
     int countdown = 0;
 
     if (difficulty == STATE_EASY) {
-        countdown = rand() % 10 + 10;
-    } else if (difficulty == STATE_MEDIUM || difficulty == STATE_KRAZY) {
-        countdown = rand() % 20 + 20;
+        countdown = rand() % 10 + 10; //countdown between 10 and 20 to be removed
+    } else if (difficulty == STATE_MEDIUM || difficulty == STATE_KRAZY) { //krazy currently removes as much as normal
+        countdown = rand() % 20 + 20; //countdown between 20 and 40 to be removed
     } else if (difficulty == STATE_HARD) {
-        countdown = rand() % 15 + 40;
+        countdown = rand() % 15 + 40; //countdown between 40 and 55 to be removed
     }
 
+    //iterates through the whole grid
     for (int y = 0; y < 9; y++) {
         for (int x = 0; x < 9; x++) {
             int random = rand() % 10;
+            //1/5 chance of a removal naturally occuring, if and only if the countdown quota has not been met
+            //and the number in this cell hasn't already been removed
             if (random < 2 && countdown > 0 && grid[y][x] != 0) {
-                grid[y][x] = 0;
-                countdown--;
+                grid[y][x] = 0; //removes the number
+                countdown--; //and the quota is 1 number closer to being met
             }
         }
 
+        //iterates from the first cell of the first array if the quota has not been met yet
         if (y == 8 && countdown != 0) {
             y = -1;
         }
@@ -121,11 +132,12 @@ void Board::reset() {
     fillBoard();
 }
 
-bool operator== (Board& grid1, Board& grid2) {
+bool operator== (Board& board1, Board& board2) {
     for (int i = 0; i < 81; i++) {
-        if (grid1.getNumber(i/9, i%9) != grid2.getNumber(i/9, i%9)) {
+        if (board1.getNumber(i/9, i%9) != board2.getNumber(i/9, i%9)) { //checks two cells in equal positions are equal
             return false;
         }
     }
+    //returns true (the two boards match) if the prior condition is not met at any point
     return true;
 }

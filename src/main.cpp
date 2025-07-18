@@ -12,24 +12,27 @@ void changeNumber(Button& button, int& number) {
     try {
         number = std::stoi(button.text.getString().toAnsiString());
         // use value
-    } catch (const std::exception& e) {
+    } catch (const std::exception& e) { //error handling (this shouldn't occur at all given the buttons used)
         std::cerr << "Error converting text to int: " << e.what() << std::endl;
     }
 }
 
 int main() {
+    /*Buttons that change the number the player puts on the board*/
     Button numberChangers[9];
 
+    /* Window with fixed size and cannot fullscreen */
     sf::RenderWindow window(sf::VideoMode(600, 800), "Sudoku", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
-    // Create a graphical text to display
+    /*Font for the title screen*/
     sf::Font homeFont;
     if (!homeFont.loadFromFile("media/fonts/LoveDays.ttf")) {
         std::cerr << "Failed to load font.\n";
         return 1;
     }
 
+    /* Font with better readability when playing the game */
     sf::Font gameFont;
     if (!gameFont.loadFromFile("media/fonts/Quicksand_Book.otf")) {
         std::cerr << "Failed to load font.\n";
@@ -58,36 +61,40 @@ int main() {
     titleText.setCharacterSize(100); // in pixels, not points
     titleText.setPosition(sf::Vector2f(120.f, 50.f));
 
-    // Home Menu Buttons Button
+    // Home Menu Buttons
     Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", homeFont);
     Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", homeFont);
     Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", homeFont);
     Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", homeFont);
  
-    //Sudoku Grid
+    //The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f, gameFont);
     grid.deactivate();
 
-    //Number selection buttons
+    //Indicates the number the player is currently using
     int number = 1;
+    //Iteration to construct the buttons used to switch numbers
     for (int i = 0; i < 9; ++i) {
         Button button(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), gameFont);
         numberChangers[i] = button;
     }
+    //Points to a number changing button to control its activity
     Button* chosenNumber = &numberChangers[0];
     chosenNumber->deactivate();
 
-    //Load a music to play
+    //Music to play while game is operational
     sf::Music music;
-    if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) {
-        std::cerr << "Error finding music file";
+    if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) { //CHANGE MUSIC LATER
+        std::cerr << "Error finding music file"; //error handling
         return -1;
     }
     //music.setLoop(true);
     //music.play();
 
+    //Points to a color theme that matches the game state
     const Theme* currentTheme = &HOME_THEME;
 
+    //The current state the game is in
     GameState stateFlag = STATE_HOME;
 
     //game loop
@@ -98,25 +105,26 @@ int main() {
                 window.close();
             }
 
+            //Conditions for each button when clicked on
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
                 
-                if (easySwitch.frame.getGlobalBounds().contains(mousePos)) {
+                if (easySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts an easy game
                     if (easySwitch.isActive()) {
                         stateFlag = STATE_EASY;
                         grid.appropriate(stateFlag);
                     }
-                } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) {
+                } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         stateFlag = STATE_MEDIUM;
                         grid.appropriate(stateFlag);
                     }
-                } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) {
+                } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         stateFlag = STATE_HARD;
                         grid.appropriate(stateFlag);
                     }
-                } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) {
+                } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         stateFlag = STATE_KRAZY;
                         grid.appropriate(stateFlag);
@@ -124,7 +132,7 @@ int main() {
                 }
 
                 for (Button& button : numberChangers) {
-                    if (button.frame.getGlobalBounds().contains(mousePos)) {
+                    if (button.frame.getGlobalBounds().contains(mousePos)) { //switches the input number appropriately
                         if (button.isActive()) {
                             changeNumber(button, number);
                             chosenNumber->activate();
@@ -135,13 +143,13 @@ int main() {
                 }
 
                 grid.updateNumbers(mousePos, number);
-                if (grid.check()) {
+                if (grid.check()) { //checks if the grid has all its correct numbers
                     stateFlag = STATE_HOME;
                 }
             }
         }
 
-        switch (stateFlag) {
+        switch (stateFlag) { //switch graphical themes depending on the game state
             case STATE_HOME:
                 currentTheme = &HOME_THEME;
                 break;
@@ -178,6 +186,7 @@ int main() {
                 }
             }
 
+            //activates the grid and its buttons
             grid.activate();
         } else {
             //activating menu buttons
@@ -196,6 +205,7 @@ int main() {
                 button.deactivate();
             }
 
+            //ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
         }
 
@@ -213,16 +223,17 @@ int main() {
             panel2.setPosition(panel1.getPosition().x - 600, 0);
         }
 
+        //set the colors to the theme
         panel1.setFillColor(currentTheme -> bg1);
         panel2.setFillColor(currentTheme -> bg2);
         titleText.setFillColor(currentTheme -> text);
 
-        if (stateFlag == STATE_HOME) {
+        if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
             easySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             mediumSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             hardSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
             krazySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
-        } else {
+        } else { //ensures the buttons have hover visuals when playing the game and not on the home screen
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
                     button.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
@@ -231,6 +242,7 @@ int main() {
             grid.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         }
 
+        //update the menu buttons each frame for gradual movement
         easySwitch.update(deltaTime);
         mediumSwitch.update(deltaTime);
         hardSwitch.update(deltaTime);
