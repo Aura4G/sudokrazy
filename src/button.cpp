@@ -4,14 +4,16 @@
 #include "button.hpp"
 
 //Button Colour Themes
+
 const ButtonTheme REGULAR_BUTTON = {{255,255,255},{127,127,127},{0,0,0}};
-const ButtonTheme INPUT_BUTTON =   {{255,255,255},{127,127,127},{25,151,230}};
+const ButtonTheme INPUT_BUTTON =   {{255,255,255},{255,255,0},  {25,151,230}};
 const ButtonTheme EASY_BUTTON =    {{0,255,0},    {0,127,0},    {0,64,0}};
 const ButtonTheme MEDIUM_BUTTON =  {{255,255,0},  {127,127,0},  {64,64,0}};
 const ButtonTheme HARD_BUTTON =    {{255,0,0},    {127,0,0},    {80,0,0}};
 const ButtonTheme KRAZY_BUTTON =   {{169,0,194},  {75,0,86},    {46,0,53}};
 
 //Method declarations for Button class
+
 Button::Button() {
     width = 0;
     height = 0;
@@ -45,11 +47,13 @@ void Button::setColor(const sf::Color& col) {
 
 void Button::setText(const std::string& newText) {
     text.setString(newText);
+    //The fit text function must be called again when introducing different text
     fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
 }
 
 void Button::setTheme(const ButtonTheme& newTheme) {
     theme = newTheme;
+    //text colour isn't updated each frame, so it must be updated here
     text.setColor(theme.text);
 }
 
@@ -75,9 +79,9 @@ bool Button::isHovering(const sf::Vector2f& mousePos) const {
 
 void Button::updateHover(const sf::Vector2f& mousePos) {
     if (isHovering(mousePos)) {
-        setColor(theme.hovering);
+        setColor(theme.hovering); //hover colour if hovering
     } else {
-        setColor(theme.unhovered);
+        setColor(theme.unhovered); //regular colour otherwise
     }
 }
 
@@ -119,18 +123,19 @@ void Button::deactivate() {
 void Button::activateMovement(const sf::Vector2f& destination, float moveSpeed = 150.f) {
     this->moveSpeed = moveSpeed;
     moveTarget = destination;
-    isMoving = true;
+    isMoving = true; //is moving is set to true
 }
 
 void Button::update(float deltaTime) {
-    if (!isMoving) return;
+    if (!isMoving) return; //if the button is not expected to move, the function is negated for this frame
 
     sf::Vector2f currentPos = frame.getPosition();
     sf::Vector2f direction = moveTarget - currentPos;
 
+    //Euclidean approach
     float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (distance < 1.f) {
-        isMoving = false;
+        isMoving = false; //set back to false once the destination has been reached.
         return;
     }
 

@@ -21,7 +21,7 @@ public:
     //For text if needed in the button
     sf::Text text;
 
-    //default constructor
+    //default constructor, necessary for button arrays
     Button();
 
 
