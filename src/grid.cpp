@@ -121,7 +121,7 @@ bool Grid::check() {
 }
 
 void Grid::appropriate(GameState difficulty) {
-    finalBoard.reset(); //The comparison board gets a completely new sudoku solution
+    finalBoard.reset(); //The answer board gets a completely new sudoku solution
     playersBoard = finalBoard; //The player's board copies the new solution..
     playersBoard.removeNumbers(difficulty); //And randomly removes numbers from it
 
@@ -135,4 +135,40 @@ void Grid::appropriate(GameState difficulty) {
             whiteBlocks[i].setTheme(REGULAR_BUTTON);
         }
     }
+}
+
+
+void Grid::krazyMode() {
+    //the entire grid must be polled to see how many numbers are in the player's board
+
+    //numbers on the board already that shouldn't be changed
+    int setNumbers[9] = {9,9,9,9,9,9,9,9,9};
+
+    //numbers on the board that the player should change to win
+    int changeableNumbers[9] = {9,9,9,9,9,9,9,9,9};
+
+    for (Button& button : whiteBlocks) {
+        try {
+            int number = std::stoi(button.text.getString().toAnsiString());
+            // check if it's an active button
+            if (button.isActive()) {
+                if (number != 0) {
+                    changeableNumbers[number-1]--;
+                }
+            } else {
+                setNumbers[number-1]--; 
+            }
+        } catch (const std::exception& e) { //error handling (this shouldn't occur at all given the buttons used)
+            std::cerr << "Error converting text to int: " << e.what() << std::endl;
+        }
+    }
+
+    //The answer board shuffles to a random new solution
+    finalBoard.reset();
+
+    //The player board copies the new solution
+    playersBoard = finalBoard;
+
+    //And removes numbers from the grid to match the quantity of that number in the prior player grid
+    
 }

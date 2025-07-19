@@ -48,6 +48,10 @@
         "set": "cpp",
         "format": "cpp",
         "ranges": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "text_encoding": "cpp",
+        "charconv": "cpp",
+        "optional": "cpp",
+        "variant": "cpp"
     }
 }

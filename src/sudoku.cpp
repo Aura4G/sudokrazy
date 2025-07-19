@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <algorithm>
+#include <iterator>
 #include <vector>
 #include "sudoku.hpp"
 
@@ -75,10 +76,12 @@ void Board::removeNumbers(GameState difficulty) {
 
     if (difficulty == STATE_EASY) {
         countdown = rand() % 10 + 10; //countdown between 10 and 20 to be removed
-    } else if (difficulty == STATE_MEDIUM || difficulty == STATE_KRAZY) { //krazy currently removes as much as normal
+    } else if (difficulty == STATE_MEDIUM) { //krazy currently removes as much as normal
         countdown = rand() % 20 + 20; //countdown between 20 and 40 to be removed
     } else if (difficulty == STATE_HARD) {
         countdown = rand() % 15 + 40; //countdown between 40 and 55 to be removed
+    } else if (difficulty == STATE_KRAZY) {
+        countdown = rand() % 20 + 30; //countdown between 30 and 50 to be removed;
     }
 
     //iterates through the whole grid
@@ -140,4 +143,25 @@ bool operator== (Board& board1, Board& board2) {
     }
     //returns true (the two boards match) if the prior condition is not met at any point
     return true;
+}
+
+void Board::selectiveRemoval(int (&setNumbers)[9], int (&changeableNumbers)[9]) {
+    //iterates through the whole grid
+    int counter;
+
+    while (!std::equal(std::begin(setNumbers), std::end(setNumbers), std::begin({0,0,0,0,0,0,0,0,0})) ||
+           !std::equal(std::begin(changeableNumbers), std::end(changeableNumbers), std::begin({0,0,0,0,0,0,0,0,0}))) {
+        int random = rand() % 10;
+        int y = (counter % 9) / 9;
+        int x = counter % 9;
+        //1/5 chance of a removal naturally occuring, if and only if the countdown quota has not been met
+        //and the number in this cell hasn't already been removed
+        if (random < 2 && setNumbers[grid[y][x]-1] > 0 && grid[y][x] != 0) {
+            setNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
+            grid[y][x] = 0; //removes the number
+        } else if (random < 2 && changeableNumbers[grid[y][x]-1] > 0 && grid[y][x] != 0) {
+            changeableNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
+            grid[y][x] = 0; //removes the number
+        }
+    }
 }

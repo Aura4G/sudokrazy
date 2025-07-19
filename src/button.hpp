@@ -67,6 +67,10 @@ public:
     sf::Vector2f getOriginalPos();
 
 
+    /** @returns the button theme being used by the button */
+    ButtonTheme getTheme();
+
+
     /** Used for validation and ensuring there aren't double/incorrect inputs
     * @returns True if the button selected is active
     */

@@ -69,6 +69,10 @@ sf::Vector2f Button::getOriginalPos() {
     return sf::Vector2f(x,y);
 }
 
+ButtonTheme Button::getTheme() {
+    return theme;
+}
+
 bool Button::isActive() {
     return active;
 }

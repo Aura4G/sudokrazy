@@ -59,6 +59,9 @@ public:
     */
     void appropriate(GameState difficulty);
 
+
+    void krazyMode();
+
 private:
     //The black frame of the sudoku grid
     sf::RectangleShape back;

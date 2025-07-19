@@ -76,6 +76,15 @@ public:
     */
     int getNumber(int y, int x);
 
+
+    /** Used for krazy mode. Imitates shuffling the board without removing any values from
+    * the previous player board 
+    * 
+    * @param setNumbers the quantity of static numbers from 1-9 to remove from the board
+    * @param changeableNumbers the quantity of interactive numbers from 1-9 to remove from the board
+    */
+    void selectiveRemoval(int (&setNumbers)[9], int (&changeableNumbers)[9]);
+
 private:
     //The 9x9 sudoku grid on which numbers are added and removed according to both player actions and game state selection
     int grid[9][9];
