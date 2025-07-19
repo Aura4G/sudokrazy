@@ -51,7 +51,6 @@ int main() {
     panel2.setPosition(panelWidth,0);
 
     float scrollSpeed = 100.f; //pixels per second
-    sf::Vector2f offscreen = sf::Vector2f(200.f,800.f);
     sf::Clock clock;
 
     // Title Text
@@ -169,10 +168,10 @@ int main() {
 
         if (stateFlag != STATE_HOME) {
             //deactivating menu buttons
-            easySwitch.activateMovement(offscreen, 600.f);
-            mediumSwitch.activateMovement(offscreen, 600.f);
-            hardSwitch.activateMovement(offscreen, 600.f);
-            krazySwitch.activateMovement(offscreen, 600.f);
+            easySwitch.activateMovement(sf::Vector2f(-200.f,easySwitch.getOriginalPos().y), 600.f);
+            mediumSwitch.activateMovement(sf::Vector2f(600.f,mediumSwitch.getOriginalPos().y), 600.f);
+            hardSwitch.activateMovement(sf::Vector2f(-200.f,hardSwitch.getOriginalPos().y), 600.f);
+            krazySwitch.activateMovement(sf::Vector2f(600.f,krazySwitch.getOriginalPos().y), 600.f);
 
             easySwitch.deactivate();
             mediumSwitch.deactivate();
