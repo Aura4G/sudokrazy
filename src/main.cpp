@@ -8,6 +8,8 @@
 #include "main.hpp"
 #include "button.hpp"
 
+GameState stateFlag = STATE_HOME;
+
 void changeNumber(Button& button, int& number) {    
     try {
         number = std::stoi(button.text.getString().toAnsiString());
@@ -93,8 +95,7 @@ int main() {
     //Points to a color theme that matches the game state
     const Theme* currentTheme = &HOME_THEME;
 
-    //The current state the game is in
-    GameState stateFlag = STATE_HOME;
+    stateFlag = STATE_HOME;
 
     //game loop
     while (window.isOpen()) {
@@ -111,22 +112,22 @@ int main() {
                 if (easySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts an easy game
                     if (easySwitch.isActive()) {
                         stateFlag = STATE_EASY;
-                        grid.appropriate(stateFlag);
+                        grid.appropriate();
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         stateFlag = STATE_MEDIUM;
-                        grid.appropriate(stateFlag);
+                        grid.appropriate();
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         stateFlag = STATE_HARD;
-                        grid.appropriate(stateFlag);
+                        grid.appropriate();
                     }
                 } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         stateFlag = STATE_KRAZY;
-                        grid.appropriate(stateFlag);
+                        grid.appropriate();
                     }
                 }
 

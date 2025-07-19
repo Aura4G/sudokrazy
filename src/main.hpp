@@ -11,4 +11,7 @@
  */
 void changeNumber(Button& button, int& number);
 
+//The current state the game is in
+extern GameState stateFlag;
+
 #endif

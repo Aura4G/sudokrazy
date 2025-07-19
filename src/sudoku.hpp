@@ -52,9 +52,10 @@ public:
     * MEDIUM: 20-40 numbers removed
     * 
     * HARD: 40-55 numbers removed
-    * @param difficulty The difficulty state selected
+    * 
+    * KRAZY: 30-50 numbers removed
     */ 
-    void removeNumbers(GameState difficulty = STATE_MEDIUM);
+    void removeNumbers();
 
 
     /** Replaces the number of a selected active cell in the grid with the number the player is using
@@ -80,10 +81,9 @@ public:
     /** Used for krazy mode. Imitates shuffling the board without removing any values from
     * the previous player board 
     * 
-    * @param setNumbers the quantity of static numbers from 1-9 to remove from the board
-    * @param changeableNumbers the quantity of interactive numbers from 1-9 to remove from the board
+    * @param changeToRemove the quantity of interactive numbers from 1-9 that the player has not filled in.
     */
-    void selectiveRemoval(int (&setNumbers)[9], int (&changeableNumbers)[9]);
+    void selectiveRemoval(int (&changeToRemove)[9]);
 
 private:
     //The 9x9 sudoku grid on which numbers are added and removed according to both player actions and game state selection

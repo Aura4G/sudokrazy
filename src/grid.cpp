@@ -6,6 +6,7 @@
 #include "grid.hpp"
 #include "sudoku.hpp"
 #include "button.hpp"
+#include "main.hpp"
 
 Grid::Grid(sf::Vector2f position, float size, const sf::Font& sharedFont) {
 
@@ -96,6 +97,16 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
                 std::string newText = std::to_string(number);
                 block.setText(newText);
                 playersBoard.setNumber(counter / 9, counter % 9, number);
+
+                turns++;
+                if (turns % 5 == 0 && stateFlag == STATE_KRAZY) {
+                    if (!shuffled) {
+                        krazyMode();
+                        shuffled = true;
+                    }
+                } else {
+                    shuffled = false;
+                }
             }
         }
         counter++;
@@ -120,10 +131,12 @@ bool Grid::check() {
     return finalBoard == playersBoard;
 }
 
-void Grid::appropriate(GameState difficulty) {
+void Grid::appropriate() {
     finalBoard.reset(); //The answer board gets a completely new sudoku solution
     playersBoard = finalBoard; //The player's board copies the new solution..
-    playersBoard.removeNumbers(difficulty); //And randomly removes numbers from it
+    playersBoard.removeNumbers(); //And randomly removes numbers from it
+    turns = 0;
+    shuffled = false;
 
     //Activates and deactivates buttons accordingly, also changing their text contents and themes.
     for (int i = 0; i < 81; i++) {
@@ -141,25 +154,19 @@ void Grid::appropriate(GameState difficulty) {
 void Grid::krazyMode() {
     //the entire grid must be polled to see how many numbers are in the player's board
 
-    //numbers on the board already that shouldn't be changed
-    int setNumbers[9] = {9,9,9,9,9,9,9,9,9};
+    //total active panels
+    int changeableTotal[9] = {0,0,0,0,0,0,0,0,0};
 
-    //numbers on the board that the player should change to win
-    int changeableNumbers[9] = {9,9,9,9,9,9,9,9,9};
+    //active panels not filled in
+    int changeToRemove[9] = {0,0,0,0,0,0,0,0,0};
 
-    for (Button& button : whiteBlocks) {
-        try {
-            int number = std::stoi(button.text.getString().toAnsiString());
-            // check if it's an active button
-            if (button.isActive()) {
-                if (number != 0) {
-                    changeableNumbers[number-1]--;
-                }
+    for (int i = 0; i < 81; i++) {
+        if (whiteBlocks[i].isActive()) {
+            if (playersBoard.getNumber(i/9,i%9) == 0) {
+                changeToRemove[finalBoard.getNumber(i/9,i%9)]++;
             } else {
-                setNumbers[number-1]--; 
+                changeableTotal[finalBoard.getNumber(i/9,i%9)]++;
             }
-        } catch (const std::exception& e) { //error handling (this shouldn't occur at all given the buttons used)
-            std::cerr << "Error converting text to int: " << e.what() << std::endl;
         }
     }
 
@@ -170,5 +177,22 @@ void Grid::krazyMode() {
     playersBoard = finalBoard;
 
     //And removes numbers from the grid to match the quantity of that number in the prior player grid
-    
+    playersBoard.selectiveRemoval(changeToRemove);
+    //Activates and deactivates buttons accordingly, also changing their text contents and themes.
+    for (int i = 0; i < 81; i++) {
+        if (playersBoard.getNumber(i/9,i%9) == 0) {
+            whiteBlocks[i].setText("");
+            whiteBlocks[i].setTheme(INPUT_BUTTON);
+            whiteBlocks[i].activate();
+        } else if (changeableTotal[playersBoard.getNumber(i/9, i%9)-1] > 0) {
+            whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
+            whiteBlocks[i].setTheme(INPUT_BUTTON);
+            whiteBlocks[i].activate();
+            changeableTotal[playersBoard.getNumber(i/9, i%9)-1]--;
+        } else {
+            whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
+            whiteBlocks[i].setTheme(REGULAR_BUTTON);
+            whiteBlocks[i].deactivate();
+        }
+    }
 }

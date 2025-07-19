@@ -5,6 +5,7 @@
 #include <iterator>
 #include <vector>
 #include "sudoku.hpp"
+#include "main.hpp"
 
 Board::Board() {
     //sets random seed
@@ -70,17 +71,17 @@ bool Board::fillBoard() {
     return true;
 }
 
-void Board::removeNumbers(GameState difficulty) {
+void Board::removeNumbers() {
     //Determines the quantity of numbers to be removed
     int countdown = 0;
 
-    if (difficulty == STATE_EASY) {
+    if (stateFlag == STATE_EASY) {
         countdown = rand() % 10 + 10; //countdown between 10 and 20 to be removed
-    } else if (difficulty == STATE_MEDIUM) { //krazy currently removes as much as normal
+    } else if (stateFlag == STATE_MEDIUM) { //krazy currently removes as much as normal
         countdown = rand() % 20 + 20; //countdown between 20 and 40 to be removed
-    } else if (difficulty == STATE_HARD) {
+    } else if (stateFlag == STATE_HARD) {
         countdown = rand() % 15 + 40; //countdown between 40 and 55 to be removed
-    } else if (difficulty == STATE_KRAZY) {
+    } else if (stateFlag == STATE_KRAZY) {
         countdown = rand() % 20 + 30; //countdown between 30 and 50 to be removed;
     }
 
@@ -143,28 +144,23 @@ bool operator== (Board& board1, Board& board2) {
     return true;
 }
 
-void Board::selectiveRemoval(int (&setNumbers)[9], int (&changeableNumbers)[9]) {
+void Board::selectiveRemoval(int (&changeToRemove)[9]) {
     //iterates through the whole grid
     int counter = 0;
+    int zeroArray[9] = {0,0,0,0,0,0,0,0,0};
 
-    while (!std::equal(std::begin(setNumbers), std::end(setNumbers), std::begin({0,0,0,0,0,0,0,0,0})) ||
-           !std::equal(std::begin(changeableNumbers), std::end(changeableNumbers), std::begin({0,0,0,0,0,0,0,0,0}))) {
+    while (!std::equal(std::begin(changeToRemove), std::end(changeToRemove), std::begin(zeroArray))) {
         int random = rand() % 10;
         int y = (counter % 81) / 9;
         int x = counter % 9;
         //1/5 chance of a removal naturally occuring, if and only if the countdown quota has not been met
         //and the number in this cell hasn't already been removed
-        if (random < 2 && setNumbers[grid[y][x]-1] > 0 && grid[y][x] != 0) {
-            if (setNumbers[grid[y][x]-1] > 0) {
-                setNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
-                grid[y][x] = 0; //removes the number
-            }
-        } else if (random < 2 && grid[y][x] != 0) {
-            if (changeableNumbers[grid[y][x]-1] > 0) {
-                changeableNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
+        if (random < 2 && grid[y][x] != 0) {
+            if (changeToRemove[grid[y][x]-1] > 0) {
+                changeToRemove[grid[y][x]-1]--; //and the quota is 1 number closer to being met
                 grid[y][x] = 0; //removes the number
             }
         }
-        counter++;
+        counter = (counter + 1) % 81;
     }
 }

@@ -55,11 +55,11 @@ public:
 
     /** Creates a new sudoku problem, removes numbers based on the difficulty,
     * and visualises this new problem on the grid
-    * @param difficulty The difficulty the player is selecting, determining the quantity of numbers removed
     */
-    void appropriate(GameState difficulty);
+    void appropriate();
 
 
+    //Triggers the board shuffles every 5 turns and visualises this change to the sfml grid
     void krazyMode();
 
 private:
@@ -79,6 +79,13 @@ private:
     * Its solution matches that of the final board
     */
     Board playersBoard = finalBoard;
+
+
+    //Indicates how many turns the user has taken to complete the grid 
+    int turns = 0;
+
+    //Flag to ensure a shuffle occurs only once every 5 turns
+    bool shuffled = false;
 };
 
 #endif
