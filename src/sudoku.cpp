@@ -85,21 +85,19 @@ void Board::removeNumbers(GameState difficulty) {
     }
 
     //iterates through the whole grid
-    for (int y = 0; y < 9; y++) {
-        for (int x = 0; x < 9; x++) {
-            int random = rand() % 10;
-            //1/5 chance of a removal naturally occuring, if and only if the countdown quota has not been met
-            //and the number in this cell hasn't already been removed
-            if (random < 2 && countdown > 0 && grid[y][x] != 0) {
-                grid[y][x] = 0; //removes the number
-                countdown--; //and the quota is 1 number closer to being met
-            }
-        }
 
-        //iterates from the first cell of the first array if the quota has not been met yet
-        if (y == 8 && countdown != 0) {
-            y = -1;
+    int counter = 0;
+    while (countdown != 0) {
+        int random = rand() % 10;
+        int y = (counter % 81) / 9;
+        int x = counter % 9;
+        //1/5 chance of a removal naturally occuring, if and only if the countdown quota has not been met
+        //and the number in this cell hasn't already been removed
+        if (random < 2 && countdown > 0 && grid[y][x] != 0) {
+            grid[y][x] = 0; //removes the number
+            countdown--; //and the quota is 1 number closer to being met
         }
+        counter++;
     }
 }
 
@@ -147,21 +145,26 @@ bool operator== (Board& board1, Board& board2) {
 
 void Board::selectiveRemoval(int (&setNumbers)[9], int (&changeableNumbers)[9]) {
     //iterates through the whole grid
-    int counter;
+    int counter = 0;
 
     while (!std::equal(std::begin(setNumbers), std::end(setNumbers), std::begin({0,0,0,0,0,0,0,0,0})) ||
            !std::equal(std::begin(changeableNumbers), std::end(changeableNumbers), std::begin({0,0,0,0,0,0,0,0,0}))) {
         int random = rand() % 10;
-        int y = (counter % 9) / 9;
+        int y = (counter % 81) / 9;
         int x = counter % 9;
         //1/5 chance of a removal naturally occuring, if and only if the countdown quota has not been met
         //and the number in this cell hasn't already been removed
         if (random < 2 && setNumbers[grid[y][x]-1] > 0 && grid[y][x] != 0) {
-            setNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
-            grid[y][x] = 0; //removes the number
-        } else if (random < 2 && changeableNumbers[grid[y][x]-1] > 0 && grid[y][x] != 0) {
-            changeableNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
-            grid[y][x] = 0; //removes the number
+            if (setNumbers[grid[y][x]-1] > 0) {
+                setNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
+                grid[y][x] = 0; //removes the number
+            }
+        } else if (random < 2 && grid[y][x] != 0) {
+            if (changeableNumbers[grid[y][x]-1] > 0) {
+                changeableNumbers[grid[y][x]-1]--; //and the quota is 1 number closer to being met
+                grid[y][x] = 0; //removes the number
+            }
         }
+        counter++;
     }
 }
