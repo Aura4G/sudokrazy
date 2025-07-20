@@ -160,12 +160,18 @@ void Grid::krazyMode() {
     //active panels not filled in
     int changeToRemove[9] = {0,0,0,0,0,0,0,0,0};
 
+    //panels with incorrect numbers
+    int incorrect[9] = {0,0,0,0,0,0,0,0,0}; //TODO
+
     for (int i = 0; i < 81; i++) {
         if (whiteBlocks[i].isActive()) {
             if (playersBoard.getNumber(i/9,i%9) == 0) {
-                changeToRemove[finalBoard.getNumber(i/9,i%9)]++;
+                changeToRemove[finalBoard.getNumber(i/9,i%9)-1]++;
             } else {
-                changeableTotal[finalBoard.getNumber(i/9,i%9)]++;
+                changeableTotal[finalBoard.getNumber(i/9,i%9)-1]++;
+                if (playersBoard.getNumber(i/9,i%9) != finalBoard.getNumber(i/9,i%9)) {
+                    incorrect[playersBoard.getNumber(i/9,i%9)-1]++;
+                }
             }
         }
     }
@@ -192,6 +198,7 @@ void Grid::krazyMode() {
         } else {
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
             whiteBlocks[i].setTheme(REGULAR_BUTTON);
+            whiteBlocks[i].setColor(whiteBlocks[i].getTheme().unhovered);
             whiteBlocks[i].deactivate();
         }
     }
