@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <array>
 #include "sudoku.hpp"
 #include "main.hpp"
 
@@ -144,7 +145,7 @@ bool operator== (Board& board1, Board& board2) {
     return true;
 }
 
-void Board::selectiveRemoval(int (&changeToRemove)[9]) {
+void Board::selectiveRemoval(int (&changeToRemove)[9], std::vector<std::array<int, 2>>& incorrect) {
     //iterates through the whole grid
     int counter = 0;
     int zeroArray[9] = {0,0,0,0,0,0,0,0,0};
@@ -160,6 +161,20 @@ void Board::selectiveRemoval(int (&changeToRemove)[9]) {
                 changeToRemove[grid[y][x]-1]--; //and the quota is 1 number closer to being met
                 grid[y][x] = 0; //removes the number
             }
+        }
+        counter = (counter + 1) % 81;
+    }
+
+    counter = 0;
+    int pointer = 0;
+
+    while (pointer != incorrect.size()) {
+        int y = (counter % 81) / 9;
+        int x = counter % 9;
+
+        if (grid[y][x] == incorrect[pointer][0]) {
+            grid[y][x] = incorrect[pointer][1];
+            pointer++;
         }
         counter = (counter + 1) % 81;
     }

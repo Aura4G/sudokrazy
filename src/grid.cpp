@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <vector>
+#include <array>
 
 #include "grid.hpp"
 #include "sudoku.hpp"
@@ -161,16 +163,19 @@ void Grid::krazyMode() {
     int changeToRemove[9] = {0,0,0,0,0,0,0,0,0};
 
     //panels with incorrect numbers
-    int incorrect[9] = {0,0,0,0,0,0,0,0,0}; //TODO
+    //first number is the final answer
+    //second is the player's answer
+    std::vector<std::array<int,2>> incorrect;
 
     for (int i = 0; i < 81; i++) {
         if (whiteBlocks[i].isActive()) {
             if (playersBoard.getNumber(i/9,i%9) == 0) {
                 changeToRemove[finalBoard.getNumber(i/9,i%9)-1]++;
             } else {
-                changeableTotal[finalBoard.getNumber(i/9,i%9)-1]++;
                 if (playersBoard.getNumber(i/9,i%9) != finalBoard.getNumber(i/9,i%9)) {
-                    incorrect[playersBoard.getNumber(i/9,i%9)-1]++;
+                    incorrect.push_back({finalBoard.getNumber(i/9,i%9),playersBoard.getNumber(i/9,i%9)});
+                } else {
+                    changeableTotal[finalBoard.getNumber(i/9,i%9)-1]++;
                 }
             }
         }
@@ -183,14 +188,19 @@ void Grid::krazyMode() {
     playersBoard = finalBoard;
 
     //And removes numbers from the grid to match the quantity of that number in the prior player grid
-    playersBoard.selectiveRemoval(changeToRemove);
+    playersBoard.selectiveRemoval(changeToRemove, incorrect);
     //Activates and deactivates buttons accordingly, also changing their text contents and themes.
     for (int i = 0; i < 81; i++) {
         if (playersBoard.getNumber(i/9,i%9) == 0) {
             whiteBlocks[i].setText("");
             whiteBlocks[i].setTheme(INPUT_BUTTON);
             whiteBlocks[i].activate();
-        } else if (changeableTotal[playersBoard.getNumber(i/9, i%9)-1] > 0) {
+        } else if (changeableTotal[playersBoard.getNumber(i/9, i%9)-1] > 0 && playersBoard.getNumber(i/9,i%9) != 0) {
+            whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
+            whiteBlocks[i].setTheme(INPUT_BUTTON);
+            whiteBlocks[i].activate();
+            changeableTotal[playersBoard.getNumber(i/9, i%9)-1]--;
+        } else if (finalBoard.getNumber(i/9, i%9) != playersBoard.getNumber(i/9, i%9) && playersBoard.getNumber(i/9,i%9) != 0) {
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
             whiteBlocks[i].setTheme(INPUT_BUTTON);
             whiteBlocks[i].activate();

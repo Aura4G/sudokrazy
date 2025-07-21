@@ -83,7 +83,7 @@ public:
     * 
     * @param changeToRemove the quantity of interactive numbers from 1-9 that the player has not filled in.
     */
-    void selectiveRemoval(int (&changeToRemove)[9]);
+    void selectiveRemoval(int (&changeToRemove)[9], std::vector<std::array<int, 2>>& incorrect);
 
 private:
     //The 9x9 sudoku grid on which numbers are added and removed according to both player actions and game state selection
