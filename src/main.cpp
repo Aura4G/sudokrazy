@@ -58,9 +58,11 @@ int main() {
     // Title Text
     sf::Text titleText;
     titleText.setFont(homeFont);
-    titleText.setString("Sudoku!!");
+    titleText.setString("SudoKrazy!!");
     titleText.setCharacterSize(100); // in pixels, not points
-    titleText.setPosition(sf::Vector2f(120.f, 50.f));
+    sf::FloatRect textRect = titleText.getLocalBounds();
+    titleText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
+    titleText.setPosition(sf::Vector2f(300,150));
 
     // Home Menu Buttons
     Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", homeFont);
@@ -82,6 +84,9 @@ int main() {
     //Points to a number changing button to control its activity
     Button* chosenNumber = &numberChangers[0];
     chosenNumber->deactivate();
+
+    //Back/Close button
+    Button exit(50.f, 50.f, 20.f, 20.f, REGULAR_BUTTON, "x", homeFont);
 
     //Music to play while game is operational
     sf::Music music;
@@ -112,22 +117,33 @@ int main() {
                 if (easySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts an easy game
                     if (easySwitch.isActive()) {
                         stateFlag = STATE_EASY;
+                        exit.setTheme(EASY_BUTTON);
                         grid.appropriate();
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         stateFlag = STATE_MEDIUM;
+                        exit.setTheme(MEDIUM_BUTTON);
                         grid.appropriate();
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         stateFlag = STATE_HARD;
+                        exit.setTheme(HARD_BUTTON);
                         grid.appropriate();
                     }
                 } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         stateFlag = STATE_KRAZY;
+                        exit.setTheme(KRAZY_BUTTON);
                         grid.appropriate();
+                    }
+                } else if (exit.frame.getGlobalBounds().contains(mousePos) && exit.isActive()) {
+                    if (stateFlag == STATE_HOME) { //clicking the exit button on the home screen closes the game
+                        window.close();
+                    } else { //clicking the exit button mid-game goes back to the home screen
+                        stateFlag = STATE_HOME;
+                        exit.setTheme(REGULAR_BUTTON);
                     }
                 }
 
@@ -179,6 +195,8 @@ int main() {
             hardSwitch.deactivate();
             krazySwitch.deactivate();
 
+            exit.setText("<-");
+
             //activating number choice buttons
             for (Button& button : numberChangers) {
                 if (&button != chosenNumber) {
@@ -199,6 +217,8 @@ int main() {
             mediumSwitch.activate();
             hardSwitch.activate();
             krazySwitch.activate();
+
+            exit.setText("x");
 
             //deactivating number choice buttons
             for (Button& button : numberChangers) {
@@ -241,12 +261,14 @@ int main() {
             }
             grid.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         }
+        exit.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
 
         //update the menu buttons each frame for gradual movement
         easySwitch.update(deltaTime);
         mediumSwitch.update(deltaTime);
         hardSwitch.update(deltaTime);
         krazySwitch.update(deltaTime);
+        exit.update(deltaTime);
         for (int i = 0; i < 9; i++) {
             numberChangers[i].update(deltaTime);
         }
@@ -267,6 +289,7 @@ int main() {
         mediumSwitch.display(window);
         hardSwitch.display(window);
         krazySwitch.display(window);
+        exit.display(window);
         window.display();
     }
     //music.stop();

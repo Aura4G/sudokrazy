@@ -150,6 +150,7 @@ void Board::selectiveRemoval(int (&changeToRemove)[9], std::vector<std::array<in
     int counter = 0;
     int zeroArray[9] = {0,0,0,0,0,0,0,0,0};
 
+    //loop to remove numbers from the grid that weren't entered in the prior grid
     while (!std::equal(std::begin(changeToRemove), std::end(changeToRemove), std::begin(zeroArray))) {
         int random = rand() % 10;
         int y = (counter % 81) / 9;
@@ -168,6 +169,7 @@ void Board::selectiveRemoval(int (&changeToRemove)[9], std::vector<std::array<in
     counter = 0;
     int pointer = 0;
 
+    //loop to replace correct remaining values in the grid with the mistakes the player has made
     while (pointer != incorrect.size()) {
         int y = (counter % 81) / 9;
         int x = counter % 9;

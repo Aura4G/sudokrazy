@@ -82,6 +82,7 @@ public:
     * the previous player board 
     * 
     * @param changeToRemove the quantity of interactive numbers from 1-9 that the player has not filled in.
+    * @param incorrect the quantity of panels the user has incorrectly entered, that must be replicated in the new grid
     */
     void selectiveRemoval(int (&changeToRemove)[9], std::vector<std::array<int, 2>>& incorrect);
 
