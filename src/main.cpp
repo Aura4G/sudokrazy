@@ -86,7 +86,7 @@ int main() {
     chosenNumber->deactivate();
 
     //Back/Close button
-    Button exit(50.f, 50.f, 20.f, 20.f, REGULAR_BUTTON, "x", homeFont);
+    Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", homeFont, ShapeType::Circle);
 
     //Music to play while game is operational
     sf::Music music;
@@ -138,12 +138,12 @@ int main() {
                         exit.setTheme(KRAZY_BUTTON);
                         grid.appropriate();
                     }
-                } else if (exit.frame.getGlobalBounds().contains(mousePos) && exit.isActive()) {
+                } else if (exit.circleFrame.getGlobalBounds().contains(mousePos) && exit.isActive()) {
                     if (stateFlag == STATE_HOME) { //clicking the exit button on the home screen closes the game
                         window.close();
                     } else { //clicking the exit button mid-game goes back to the home screen
                         stateFlag = STATE_HOME;
-                        exit.setTheme(REGULAR_BUTTON);
+                        exit.setTheme(EXIT_BUTTON);
                     }
                 }
 
@@ -161,6 +161,7 @@ int main() {
                 grid.updateNumbers(mousePos, number);
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     stateFlag = STATE_HOME;
+                    exit.setTheme(EXIT_BUTTON);
                 }
             }
         }

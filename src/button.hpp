@@ -13,11 +13,21 @@ struct ButtonTheme {
     sf::Color text;
 };
 
+//Specifies the frame type of the button
+enum class ShapeType {Rectangle, Circle};
+
 //A SFML button with appropriate logic and functionality
 class Button {
 public:
+    //The shape the button frame will have
+    ShapeType shapeType = ShapeType::Rectangle;
+    
     //The visual bounds of the button
     sf::RectangleShape frame;
+
+    //only used if shapeType == Circles
+    sf::CircleShape circleFrame;
+    
     //For text if needed in the button
     sf::Text text;
 
@@ -33,8 +43,9 @@ public:
     * @param theme The button theme the button is using upon construction
     * @param targetText The text to display on the button
     * @param sharedFont The font object called from main for the button's text to use
+    * @param shapeType The shape of the button frame
     */
-    Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont);
+    Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont, ShapeType type = ShapeType::Rectangle);
 
 
     /** Changes the colour of the button frame
@@ -149,6 +160,13 @@ private:
     * @param padding However much distance from the edges of the bounds specified for the text to fit within
     */
     void fitTextInFrame(sf::Text& text, const sf::FloatRect& targetRect, float padding);
+
+    /** Centers and Scales button text to fit in the circle button frame
+    * @param text The button text
+    * @param circle The target circle for the text to fit in
+    * @param padding However much distance from the edges of the bounds specified for the text to fit within
+    */
+    void fitTextInFrame(sf::Text& text, const sf::CircleShape& circle, float padding);
 };
 
 //Generic button, used also in default constructor
@@ -168,5 +186,8 @@ extern const ButtonTheme HARD_BUTTON;
 
 //Button to select krazy mode
 extern const ButtonTheme KRAZY_BUTTON;
+
+//Exit/Close button
+extern const ButtonTheme EXIT_BUTTON;
 
 #endif

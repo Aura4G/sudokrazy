@@ -11,6 +11,7 @@ const ButtonTheme EASY_BUTTON =    {{0,255,0},    {0,127,0},    {0,64,0}};
 const ButtonTheme MEDIUM_BUTTON =  {{255,255,0},  {127,127,0},  {64,64,0}};
 const ButtonTheme HARD_BUTTON =    {{255,0,0},    {127,0,0},    {80,0,0}};
 const ButtonTheme KRAZY_BUTTON =   {{169,0,194},  {75,0,86},    {46,0,53}};
+const ButtonTheme EXIT_BUTTON =    {{32,32,32},   {0,0,0},      {144,0,32}};
 
 //Method declarations for Button class
 
@@ -22,39 +23,55 @@ Button::Button() {
     theme = REGULAR_BUTTON;
 }
 
-Button::Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont)
-    : width(width), height(height), x(x), y(y), theme(theme)
+Button::Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont, ShapeType type)
+    : width(width), height(height), x(x), y(y), theme(theme), shapeType(type)
     {
         //button frame formatting
-        frame.setPosition(x,y);
-        frame.setSize(sf::Vector2f(width, height));
+        if (shapeType == ShapeType::Rectangle) {
+            frame.setPosition(x,y);
+            frame.setSize(sf::Vector2f(width, height));
+        } else {
+            circleFrame.setRadius(width);
+            circleFrame.setOrigin(width,width);
+            circleFrame.setPosition(x,y);
+        }
 
         //button text formatting
         text.setString(targetText);
         text.setFont(sharedFont);
         text.setCharacterSize(48);
+        text.setFillColor(theme.text);
 
-        sf::FloatRect bounds = text.getLocalBounds();
-        text.setOrigin(bounds.left + bounds.width / 2.0f, bounds.top + bounds.height / 2.0f);
-        text.setPosition(x + width / 2.0f, y + height / 2.0f);
-        text.setColor(theme.text);
-        fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
+
+        if (shapeType == ShapeType::Rectangle) {
+            fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
+        } else {
+            fitTextInFrame(text, circleFrame, 10.0f);
+        }
     }
 
 void Button::setColor(const sf::Color& col) {
-    frame.setFillColor(col);
+    if (shapeType == ShapeType::Rectangle) {
+        frame.setFillColor(col);
+    } else {
+        circleFrame.setFillColor(col);
+    }
 }
 
 void Button::setText(const std::string& newText) {
     text.setString(newText);
     //The fit text function must be called again when introducing different text
-    fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
+    if (shapeType == ShapeType::Rectangle) {
+        fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
+    } else {
+        fitTextInFrame(text, circleFrame, 10.0f);
+    }
 }
 
 void Button::setTheme(const ButtonTheme& newTheme) {
     theme = newTheme;
     //text colour isn't updated each frame, so it must be updated here
-    text.setColor(theme.text);
+    text.setFillColor(theme.text);
 }
 
 float Button::getWidth() {
@@ -78,7 +95,15 @@ bool Button::isActive() {
 }
 
 bool Button::isHovering(const sf::Vector2f& mousePos) const {
-    return frame.getGlobalBounds().contains(mousePos);
+    if (shapeType == ShapeType::Rectangle) {
+        return frame.getGlobalBounds().contains(mousePos);
+    } else {
+        sf::Vector2f center = circleFrame.getPosition();
+        float radius = circleFrame.getRadius();
+        float dx = mousePos.x - center.x;
+        float dy = mousePos.y - center.y;
+        return (dx * dx + dy * dy) <= (radius * radius);
+    }
 }
 
 void Button::updateHover(const sf::Vector2f& mousePos) {
@@ -111,8 +136,37 @@ void Button::fitTextInFrame(sf::Text& text, const sf::FloatRect& targetRect, flo
     text.setPosition(x + width / 2.0f, y + height / 2.0f);
 }
 
+void Button::fitTextInFrame(sf::Text& text, const sf::CircleShape& circle, float padding = 10.f) {
+    // Get circle bounds
+    sf::FloatRect circleBounds = circle.getGlobalBounds();
+
+    //get bounds of the text
+    sf::FloatRect textBounds = text.getLocalBounds();
+
+    //get available width and height from button frame
+    float availableWidth = circleBounds.width - padding * 2;
+    float availableHeight = circleBounds.height - padding * 2;
+
+    //Calculate a scale factor from our available widths and heights
+    float scaleX = availableWidth / textBounds.width;
+    float scaleY = availableHeight / textBounds.height;
+    float scale = std::min(scaleX, scaleY); //choose the minimum between the two scales to ensure it fits in the bounds
+
+    //Apply scale
+    text.setScale(scale,scale);
+
+    //Center the origin of the scaled text
+    textBounds = text.getLocalBounds();
+    text.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
+    text.setPosition(x, y);
+} 
+
 void Button::display(sf::RenderWindow& window) {
-    window.draw(frame);
+    if (shapeType == ShapeType::Rectangle) {
+        window.draw(frame);
+    } else {
+        window.draw(circleFrame);
+    }
     window.draw(text);
 }
 
@@ -149,5 +203,6 @@ void Button::update(float deltaTime) {
     if (std::abs(movement.y) > std::abs(direction.y)) movement.y = direction.y;
 
     frame.move(movement);
+    circleFrame.move(movement);
     text.move(movement);
 }
