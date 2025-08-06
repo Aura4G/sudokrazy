@@ -7,6 +7,7 @@
 #include "grid.hpp"
 #include "main.hpp"
 #include "button.hpp"
+#include "resource_manager.hpp"
 
 GameState stateFlag = STATE_HOME;
 
@@ -27,19 +28,9 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(600, 800), "Sudoku", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
-    /*Font for the title screen*/
-    sf::Font homeFont;
-    if (!homeFont.loadFromFile("media/fonts/LoveDays.ttf")) {
-        std::cerr << "Failed to load font.\n";
-        return 1;
-    }
-
-    /* Font with better readability when playing the game */
-    sf::Font gameFont;
-    if (!gameFont.loadFromFile("media/fonts/Quicksand_Book.otf")) {
-        std::cerr << "Failed to load font.\n";
-        return 1;
-    }
+    /*Load all media resources necessary*/
+    ResourceManager::loadFont("homeFont", "media/fonts/LoveDays.ttf");
+    ResourceManager::loadFont("gameFont", "media/fonts/Quicksand_Book.otf");
 
     /* Dynamic Background */
     //Define size of each coloured background panel
@@ -57,7 +48,7 @@ int main() {
 
     // Title Text
     sf::Text titleText;
-    titleText.setFont(homeFont);
+    titleText.setFont(ResourceManager::getFont("homeFont"));
     titleText.setString("SudoKrazy!!");
     titleText.setCharacterSize(100); // in pixels, not points
     sf::FloatRect textRect = titleText.getLocalBounds();
@@ -65,20 +56,20 @@ int main() {
     titleText.setPosition(sf::Vector2f(300,150));
 
     // Home Menu Buttons
-    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", homeFont);
-    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", homeFont);
-    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", homeFont);
-    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", homeFont);
+    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", ResourceManager::getFont("homeFont"));
+    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", ResourceManager::getFont("homeFont"));
+    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", ResourceManager::getFont("homeFont"));
+    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", ResourceManager::getFont("homeFont"));
  
     //The visualised sudoku grid the player plays on
-    Grid grid(sf::Vector2f(50.f, 150.f), 500.f, gameFont);
+    Grid grid(sf::Vector2f(50.f, 150.f), 500.f, ResourceManager::getFont("gameFont"));
     grid.deactivate();
 
     //Indicates the number the player is currently using
     int number = 1;
     //Iteration to construct the buttons used to switch numbers
     for (int i = 0; i < 9; ++i) {
-        Button button(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), gameFont);
+        Button button(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), ResourceManager::getFont("gameFont"));
         numberChangers[i] = button;
     }
     //Points to a number changing button to control its activity
@@ -86,7 +77,7 @@ int main() {
     chosenNumber->deactivate();
 
     //Back/Close button
-    Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", homeFont, ShapeType::Circle);
+    Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", ResourceManager::getFont("homeFont"), ShapeType::Circle);
 
     //Music to play while game is operational
     sf::Music music;

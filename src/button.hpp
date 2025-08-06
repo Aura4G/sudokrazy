@@ -31,6 +31,9 @@ public:
     //For text if needed in the button
     sf::Text text;
 
+    //For icons in the middle of the button
+    sf::Image subject;
+
     //default constructor, necessary for button arrays
     Button();
 
