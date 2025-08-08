@@ -8,13 +8,13 @@
 class ResourceManager {
 public:
     static sf::Font& getFont(const std::string& name);
-    static sf::Image& getImage(const std::string& name);
+    static sf::Texture& getTexture(const std::string& name);
     static void loadFont(const std::string& name, const std::string& filename);
-    static void loadImage(const std::string& name, const std::string& filename);
+    static void loadTexture(const std::string& name, const std::string& filename);
 
 private:
     static std::map<std::string, sf::Font> fonts;
-    static std::map<std::string, sf::Image> images;
+    static std::map<std::string, sf::Texture> textures;
 };
 
 #endif

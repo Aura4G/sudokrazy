@@ -5,7 +5,7 @@
 #include "resource_manager.hpp"
 
 std::map<std::string, sf::Font> ResourceManager::fonts;
-std::map<std::string, sf::Image> ResourceManager::images;
+std::map<std::string, sf::Texture> ResourceManager::textures;
 
 void ResourceManager::loadFont(const std::string& name, const std::string& filename) {
     sf::Font font;
@@ -21,22 +21,28 @@ sf::Font& ResourceManager::getFont(const std::string& name) {
         return fonts.at(name);
     } catch (const std::out_of_range& ex) {
         std::cerr << "out_of_range::what(): " << ex.what() << '\n';
+        exit(1);
     }
 }
 
-void ResourceManager::loadImage(const std::string& name, const std::string& filename) {
+void ResourceManager::loadTexture(const std::string& name, const std::string& filename) {
     sf::Image image;
     if (!image.loadFromFile(filename)) {
         std::cerr << "Failed to load image.\n";
         exit(1);
     }
-    images[name] = image;
+
+    sf::Texture texture;
+    texture.loadFromImage(image);
+
+    textures[name] = texture;
 }
 
-sf::Image& ResourceManager::getImage(const std::string& name) {
+sf::Texture& ResourceManager::getTexture(const std::string& name) {
     try {
-        return images.at(name);
+        return textures.at(name);
     } catch (const std::out_of_range& ex) {
         std::cerr << "out_of_range::what(): " << ex.what() << '\n';
+        exit(1);
     }
 }
