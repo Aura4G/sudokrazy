@@ -2,6 +2,7 @@
 #define __GRID_HPP__
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 #include "sudoku.hpp"
 #include "button.hpp"
 
@@ -11,7 +12,7 @@ public:
     /** Constructor (may need to add default later)
     * @param position The position relative to the window for the grid to be placed
     */
-    Grid(sf::Vector2f position, float size, const sf::Font& sharedFont);
+    Grid(sf::Vector2f position, float size);
 
 
     /** Checks if its two Board objects are equal, indicating game completion
@@ -67,7 +68,7 @@ private:
     sf::RectangleShape back;
 
     //The panels containing the numbers on the grid
-    Button whiteBlocks[81];
+    std::vector<Button> whiteBlocks;
 
     //A full, complete sudoku board
     Board finalBoard;

@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <math.h>
 #include "button.hpp"
+#include "resource_manager.hpp"
 
 //Button Colour Themes
 
@@ -42,11 +43,14 @@ Button::Button(float width, float height, float x, float y, const ButtonTheme& t
         text.setCharacterSize(48);
         text.setFillColor(theme.text);
 
+        subject.setTexture(ResourceManager::getTexture("placeholder"));
 
         if (shapeType == ShapeType::Rectangle) {
             fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
+            fitSpriteInFrame(subject, frame.getGlobalBounds(), 20.0f);
         } else {
             fitTextInFrame(text, circleFrame, 10.0f);
+            fitSpriteInFrame(subject, circleFrame, 20.0f);
         }
     }
 
@@ -159,7 +163,54 @@ void Button::fitTextInFrame(sf::Text& text, const sf::CircleShape& circle, float
     textBounds = text.getLocalBounds();
     text.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
     text.setPosition(x, y);
-} 
+}
+
+void Button::fitSpriteInFrame(sf::Sprite& subject, const sf::FloatRect& targetRect, float padding = 10.f) {
+    //get bounds of the sprite
+    sf::FloatRect subjectBounds = subject.getLocalBounds();
+
+    //get available width and height from button frame
+    float availableWidth = targetRect.width - 2 * padding;
+    float availableHeight = targetRect.height - 2 * padding;
+
+    //Calculate a scale factor from our available widths and heights
+    float scaleX = availableWidth / subjectBounds.width;
+    float scaleY = availableHeight / subjectBounds.height;
+    float scale = std::min(scaleX, scaleY); //choose the minimum between the two scales to ensure it fits in the bounds
+
+    //Apply scale
+    subject.setScale(scale,scale);
+
+    //Center the origin of the scaled sprite
+    subjectBounds = subject.getLocalBounds();
+    subject.setOrigin(subjectBounds.left + subjectBounds.width / 2.0f, subjectBounds.top + subjectBounds.height / 2.0f);
+    subject.setPosition(x + width / 2.0f, y + height / 2.0f);
+}
+
+void Button::fitSpriteInFrame(sf::Sprite& subject, const sf::CircleShape& circle, float padding = 10.f) {
+    // Get circle bounds
+    sf::FloatRect circleBounds = circle.getGlobalBounds();
+
+    //get bounds of the sprite
+    sf::FloatRect subjectBounds = subject.getLocalBounds();
+
+    //get available width and height from button frame
+    float availableWidth = circleBounds.width - padding * 2;
+    float availableHeight = circleBounds.height - padding * 2;
+
+    //Calculate a scale factor from our available widths and heights
+    float scaleX = availableWidth / subjectBounds.width;
+    float scaleY = availableHeight / subjectBounds.height;
+    float scale = std::min(scaleX, scaleY); //choose the minimum between the two scales to ensure it fits in the bounds
+
+    //Apply scale
+    subject.setScale(scale,scale);
+
+    //Center the origin of the scaled sprite
+    subjectBounds = subject.getLocalBounds();
+    subject.setOrigin(subjectBounds.left + subjectBounds.width / 2.0f, subjectBounds.top + subjectBounds.height / 2.0f);
+    subject.setPosition(x, y);
+}
 
 void Button::display(sf::RenderWindow& window) {
     if (shapeType == ShapeType::Rectangle) {
@@ -167,6 +218,11 @@ void Button::display(sf::RenderWindow& window) {
     } else {
         window.draw(circleFrame);
     }
+
+    if (subject.getTexture() != &ResourceManager::getTexture("placeholder")) {
+        window.draw(subject);
+    }
+
     window.draw(text);
 }
 
@@ -204,5 +260,6 @@ void Button::update(float deltaTime) {
 
     frame.move(movement);
     circleFrame.move(movement);
+    subject.move(movement);
     text.move(movement);
 }

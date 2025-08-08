@@ -32,7 +32,7 @@ public:
     sf::Text text;
 
     //For icons in the middle of the button
-    sf::Image subject;
+    sf::Sprite subject;
 
     //default constructor, necessary for button arrays
     Button();
@@ -129,6 +129,12 @@ public:
     */
     void update(float deltaTime);
 
+    //Prevents button cloning and dangling texture pointers
+    Button(const Button&) = delete;
+    Button& operator=(const Button&) = delete;
+    Button(Button&&) = default;
+    Button& operator=(Button&&) = default;
+
 private:
     //The width of the button frame
     float width;
@@ -170,6 +176,20 @@ private:
     * @param padding However much distance from the edges of the bounds specified for the text to fit within
     */
     void fitTextInFrame(sf::Text& text, const sf::CircleShape& circle, float padding);
+
+    /** Centers and Scales button subject to fit in the button frame
+    * @param subject The button texture
+    * @param targetRect The target bounds for the texture to fit in
+    * @param padding However much distance from the edges of the bounds specified for the texture to fit within
+    */
+    void fitSpriteInFrame(sf::Sprite& subject, const sf::FloatRect& targetRect, float padding);
+
+    /** Centers and Scales button subject to fit in the circle button frame
+    * @param subject The button subject
+    * @param circle The target circle for the texture to fit in
+    * @param padding However much distance from the edges of the bounds specified for the texture to fit within
+    */
+    void fitSpriteInFrame(sf::Sprite& subject, const sf::CircleShape& circle, float padding);
 };
 
 //Generic button, used also in default constructor

@@ -2,6 +2,7 @@
 #include <SFML/Window.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
+#include <vector>
 
 #include "themes.hpp"
 #include "grid.hpp"
@@ -22,7 +23,8 @@ void changeNumber(Button& button, int& number) {
 
 int main() {
     /*Buttons that change the number the player puts on the board*/
-    Button numberChangers[9];
+    std::vector<Button> numberChangers;
+    numberChangers.reserve(9);
 
     /* Window with fixed size and cannot fullscreen */
     sf::RenderWindow window(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
@@ -31,6 +33,7 @@ int main() {
     /*Load all media resources necessary*/
     ResourceManager::loadFont("homeFont", "media/fonts/LoveDays.ttf");
     ResourceManager::loadFont("gameFont", "media/fonts/Quicksand_Book.otf");
+    ResourceManager::loadTexture("placeholder", "media/images/placeholder.png");
 
     /* Dynamic Background */
     //Define size of each coloured background panel
@@ -62,15 +65,14 @@ int main() {
     Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", ResourceManager::getFont("homeFont"));
  
     //The visualised sudoku grid the player plays on
-    Grid grid(sf::Vector2f(50.f, 150.f), 500.f, ResourceManager::getFont("gameFont"));
+    Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
     grid.deactivate();
 
     //Indicates the number the player is currently using
     int number = 1;
     //Iteration to construct the buttons used to switch numbers
     for (int i = 0; i < 9; ++i) {
-        Button button(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), ResourceManager::getFont("gameFont"));
-        numberChangers[i] = button;
+        numberChangers.emplace_back(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), ResourceManager::getFont("gameFont"));
     }
     //Points to a number changing button to control its activity
     Button* chosenNumber = &numberChangers[0];
@@ -262,7 +264,7 @@ int main() {
         krazySwitch.update(deltaTime);
         exit.update(deltaTime);
         for (int i = 0; i < 9; i++) {
-            numberChangers[i].update(deltaTime);
+            numberChangers.at(i).update(deltaTime);
         }
 
         //Draw everything necessary

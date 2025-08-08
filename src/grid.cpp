@@ -9,8 +9,10 @@
 #include "sudoku.hpp"
 #include "button.hpp"
 #include "main.hpp"
+#include "resource_manager.hpp"
 
-Grid::Grid(sf::Vector2f position, float size, const sf::Font& sharedFont) {
+Grid::Grid(sf::Vector2f position, float size) {
+    whiteBlocks.reserve(81);
 
     //Distance between each white block, and from the outer frame
     const float PADDING = 2.5f;
@@ -56,13 +58,10 @@ Grid::Grid(sf::Vector2f position, float size, const sf::Font& sharedFont) {
 
         //the position of the white block
         sf::Vector2f whiteBlockPos(additiveX + position.x + PADDING/2.f, additiveY + position.y + PADDING/2.f);
-        Button block(size/9.f - PADDING*2.f, size/9.f - PADDING*2.f, whiteBlockPos.x, whiteBlockPos.y, REGULAR_BUTTON, input, sharedFont);
+        whiteBlocks.emplace_back(size/9.f - PADDING*2.f, size/9.f - PADDING*2.f, whiteBlockPos.x, whiteBlockPos.y, REGULAR_BUTTON, input, ResourceManager::getFont("gameFont"));
         if (playersBoard.getNumber(y,x) != 0) {
-            block.deactivate(); //blocks that already have visual numbers in them do not get altered in the current game
+            whiteBlocks.back().deactivate(); //blocks that already have visual numbers in them do not get altered in the current game
         }
-
-        //the block is added to the array
-        whiteBlocks[i] = block;
     }
 }
 
