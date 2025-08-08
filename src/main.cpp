@@ -30,10 +30,26 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
-    /*Load all media resources necessary*/
+    /* Set window icon */
+    sf::Image winIcon;
+    if (!winIcon.loadFromFile("media/images/sudokrazy_logo.png")) {
+        std::cerr << "Missing/Invalid image file\n";
+        return 1;
+    }
+    window.setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
+
+    /* Load all media resources necessary */
+
+    /* Fonts */
+
     ResourceManager::loadFont("homeFont", "media/fonts/LoveDays.ttf");
     ResourceManager::loadFont("gameFont", "media/fonts/Quicksand_Book.otf");
+
+    /* Images */
+
     ResourceManager::loadTexture("placeholder", "media/images/placeholder.png");
+    ResourceManager::loadTexture("title", "media/images/sudokrazy_title.png");
+
 
     /* Dynamic Background */
     //Define size of each coloured background panel
@@ -49,20 +65,18 @@ int main() {
     float scrollSpeed = 100.f; //pixels per second
     sf::Clock clock;
 
-    // Title Text
-    sf::Text titleText;
-    titleText.setFont(ResourceManager::getFont("homeFont"));
-    titleText.setString("SudoKrazy!!");
-    titleText.setCharacterSize(100); // in pixels, not points
-    sf::FloatRect textRect = titleText.getLocalBounds();
-    titleText.setOrigin(textRect.left + textRect.width/2.0f, textRect.top  + textRect.height/2.0f);
-    titleText.setPosition(sf::Vector2f(300,150));
+    //Title
+    sf::Sprite title(ResourceManager::getTexture("title"));
+    title.setScale(0.5f,0.5f);
+    sf::FloatRect titleRect = title.getLocalBounds();
+    title.setOrigin(titleRect.left + titleRect.width/2.0f, titleRect.top  + titleRect.height/2.0f);
+    title.setPosition(sf::Vector2f(300,150));
 
     // Home Menu Buttons
-    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", ResourceManager::getFont("homeFont"));
-    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", ResourceManager::getFont("homeFont"));
-    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", ResourceManager::getFont("homeFont"));
-    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", ResourceManager::getFont("homeFont"));
+    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", ResourceManager::getFont("gameFont"));
+    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", ResourceManager::getFont("gameFont"));
+    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", ResourceManager::getFont("gameFont"));
+    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", ResourceManager::getFont("gameFont"));
  
     //The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
@@ -240,7 +254,6 @@ int main() {
         //set the colors to the theme
         panel1.setFillColor(currentTheme -> bg1);
         panel2.setFillColor(currentTheme -> bg2);
-        titleText.setFillColor(currentTheme -> text);
 
         if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
             easySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
@@ -277,7 +290,7 @@ int main() {
                 button.display(window);
             }
         } else {
-            window.draw(titleText);
+            window.draw(title);
         }
         easySwitch.display(window);
         mediumSwitch.display(window);
