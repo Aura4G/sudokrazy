@@ -25,7 +25,7 @@ int main() {
     Button numberChangers[9];
 
     /* Window with fixed size and cannot fullscreen */
-    sf::RenderWindow window(sf::VideoMode(600, 800), "Sudoku", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
     /*Load all media resources necessary*/

@@ -7,7 +7,7 @@ SRC_DIR = src
 SRC = $(wildcard $(SRC_DIR)/*.cpp)
 OBJ = $(SRC:.cpp=.o)
 RES = $(SRC_DIR)/resource.o
-TARGET = sudoku_game.exe
+TARGET = sudokrazy.exe
 
 # Linker flags and libraries
 LDFLAGS = -L/mingw64/lib -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lm -mwindows
