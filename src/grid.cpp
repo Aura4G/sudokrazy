@@ -114,6 +114,7 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
                     block.setText("");
                     playersBoard.setNumber(counter / 9, counter % 9, 0);
                 }
+                block.setColor(block.getTheme().unhovered);
             }
         }
         counter++;
