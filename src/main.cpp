@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
+#include <cerrno>
 
 #include "themes.hpp"
 #include "grid.hpp"
@@ -18,6 +19,7 @@ void changeNumber(Button& button, int& number) {
         // use value
     } catch (const std::exception& e) { //error handling (this shouldn't occur at all given the buttons used)
         std::cerr << "Error converting text to int: " << e.what() << std::endl;
+        exit(errno);
     }
 }
 
@@ -34,7 +36,7 @@ int main() {
     sf::Image winIcon;
     if (!winIcon.loadFromFile("media/images/sudokrazy_logo.png")) {
         std::cerr << "Missing/Invalid image file\n";
-        return 1;
+        return errno;
     }
     window.setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
 
@@ -49,6 +51,8 @@ int main() {
 
     ResourceManager::loadTexture("placeholder", "media/images/placeholder.png");
     ResourceManager::loadTexture("title", "media/images/sudokrazy_title.png");
+    ResourceManager::loadTexture("locked", "media/images/locked.png");
+    ResourceManager::loadTexture("eraser", "media/images/eraser.png");
 
 
     /* Dynamic Background */
@@ -95,11 +99,15 @@ int main() {
     //Back/Close button
     Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", ResourceManager::getFont("homeFont"), ShapeType::Circle);
 
+    //Eraser button
+    Button eraser(37.5f, 0.f, 527.5f, 47.5f, REGULAR_BUTTON, "", ResourceManager::getFont("gameFont"), ShapeType::Circle);
+    eraser.setTexture(ResourceManager::getTexture("eraser"), 5.f);
+
     //Music to play while game is operational
     sf::Music music;
     if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) { //CHANGE MUSIC LATER
         std::cerr << "Error finding music file"; //error handling
-        return -1;
+        return errno;
     }
     //music.setLoop(true);
     //music.play();
@@ -125,24 +133,28 @@ int main() {
                     if (easySwitch.isActive()) {
                         stateFlag = STATE_EASY;
                         exit.setTheme(EASY_BUTTON);
+                        eraser.setTheme(EASY_BUTTON);
                         grid.appropriate();
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         stateFlag = STATE_MEDIUM;
                         exit.setTheme(MEDIUM_BUTTON);
+                        eraser.setTheme(MEDIUM_BUTTON);
                         grid.appropriate();
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         stateFlag = STATE_HARD;
                         exit.setTheme(HARD_BUTTON);
+                        eraser.setTheme(HARD_BUTTON);
                         grid.appropriate();
                     }
                 } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         stateFlag = STATE_KRAZY;
                         exit.setTheme(KRAZY_BUTTON);
+                        eraser.setTheme(KRAZY_BUTTON);
                         grid.appropriate();
                     }
                 } else if (exit.circleFrame.getGlobalBounds().contains(mousePos) && exit.isActive()) {
@@ -151,6 +163,12 @@ int main() {
                     } else { //clicking the exit button mid-game goes back to the home screen
                         stateFlag = STATE_HOME;
                         exit.setTheme(EXIT_BUTTON);
+                    }
+                } else if (eraser.circleFrame.getGlobalBounds().contains(mousePos) && eraser.isActive()) {
+                    if (!Grid::eraser_mode) { //clicking the exit button on the home screen closes the game
+                        Grid::eraser_mode = true;
+                    } else { //clicking the exit button mid-game goes back to the home screen
+                        Grid::eraser_mode = false;
                     }
                 }
 
@@ -214,6 +232,7 @@ int main() {
 
             //activates the grid and its buttons
             grid.activate();
+            eraser.activate();
         } else {
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -235,6 +254,7 @@ int main() {
 
             //ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
+            eraser.deactivate();
         }
 
         //move panels to the right
@@ -269,6 +289,9 @@ int main() {
             grid.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
         }
         exit.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+        if (!Grid::eraser_mode) {
+            eraser.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+        }
 
         //update the menu buttons each frame for gradual movement
         easySwitch.update(deltaTime);
@@ -276,6 +299,7 @@ int main() {
         hardSwitch.update(deltaTime);
         krazySwitch.update(deltaTime);
         exit.update(deltaTime);
+        eraser.update(deltaTime);
         for (int i = 0; i < 9; i++) {
             numberChangers.at(i).update(deltaTime);
         }
@@ -289,6 +313,7 @@ int main() {
             for (Button& button : numberChangers) { //this loop
                 button.display(window);
             }
+            eraser.display(window);
         } else {
             window.draw(title);
         }

@@ -31,9 +31,6 @@ public:
     //For text if needed in the button
     sf::Text text;
 
-    //For icons in the middle of the button
-    sf::Sprite subject;
-
     //default constructor, necessary for button arrays
     Button();
 
@@ -69,6 +66,12 @@ public:
     void setTheme(const ButtonTheme& newTheme);
 
 
+    /** Changes the button sprite's texture
+    * @param newSprite The texture to replace the button's current sprite
+    */
+    void setTexture(const sf::Texture& newTexture, float padding);
+
+
     /** @returns The button width */
     float getWidth();
 
@@ -83,6 +86,10 @@ public:
 
     /** @returns the button theme being used by the button */
     ButtonTheme getTheme();
+
+
+    /** @returns the texture currently being used by the button */
+    sf::Sprite getSprite();
 
 
     /** Used for validation and ensuring there aren't double/incorrect inputs
@@ -162,6 +169,9 @@ private:
 
     //The colour theme the button is currently using
     ButtonTheme theme;
+
+    //For icons in the middle of the button
+    sf::Sprite subject;
 
     /** Centers and Scales button text to fit in the button frame
     * @param text The button text

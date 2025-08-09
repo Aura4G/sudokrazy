@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cerrno>
 #include <SFML/Graphics.hpp>
 #include "resource_manager.hpp"
 
@@ -11,7 +12,7 @@ void ResourceManager::loadFont(const std::string& name, const std::string& filen
     sf::Font font;
     if (!font.loadFromFile(filename)) {
         std::cerr << "Failed to load font.\n";
-        exit(1);
+        exit(errno);
     }
     fonts[name] = font;
 }
@@ -21,7 +22,7 @@ sf::Font& ResourceManager::getFont(const std::string& name) {
         return fonts.at(name);
     } catch (const std::out_of_range& ex) {
         std::cerr << "out_of_range::what(): " << ex.what() << '\n';
-        exit(1);
+        exit(errno);
     }
 }
 
@@ -29,7 +30,7 @@ void ResourceManager::loadTexture(const std::string& name, const std::string& fi
     sf::Image image;
     if (!image.loadFromFile(filename)) {
         std::cerr << "Failed to load image.\n";
-        exit(1);
+        exit(errno);
     }
 
     sf::Texture texture;
@@ -43,6 +44,6 @@ sf::Texture& ResourceManager::getTexture(const std::string& name) {
         return textures.at(name);
     } catch (const std::out_of_range& ex) {
         std::cerr << "out_of_range::what(): " << ex.what() << '\n';
-        exit(1);
+        exit(errno);
     }
 }

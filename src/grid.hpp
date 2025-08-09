@@ -63,6 +63,9 @@ public:
     //Triggers the board shuffles every 5 turns and visualises this change to the sfml grid
     void krazyMode();
 
+    //flag to identify whether the player is adding or removing numbers from the board
+    static bool eraser_mode;
+
 private:
     //The black frame of the sudoku grid
     sf::RectangleShape back;

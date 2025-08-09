@@ -11,6 +11,8 @@
 #include "main.hpp"
 #include "resource_manager.hpp"
 
+bool Grid::eraser_mode = false;
+
 Grid::Grid(sf::Vector2f position, float size) {
     whiteBlocks.reserve(81);
 
@@ -94,19 +96,23 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
         if (block.frame.getGlobalBounds().contains(mousePos)) { //if current block is clicked on..
             if (block.isActive()) { //.. and active ..
                 //.. The number the player is using replaces the current contents of the block
-                
-                std::string newText = std::to_string(number);
-                block.setText(newText);
-                playersBoard.setNumber(counter / 9, counter % 9, number);
+                if (!eraser_mode) {
+                    std::string newText = std::to_string(number);
+                    block.setText(newText);
+                    playersBoard.setNumber(counter / 9, counter % 9, number);
 
-                turns++;
-                if (turns % 5 == 0 && stateFlag == STATE_KRAZY) {
-                    if (!shuffled) {
-                        krazyMode();
-                        shuffled = true;
+                    turns++;
+                    if (turns % 5 == 0 && stateFlag == STATE_KRAZY) {
+                        if (!shuffled) {
+                            krazyMode();
+                            shuffled = true;
+                        }
+                    } else {
+                        shuffled = false;
                     }
                 } else {
-                    shuffled = false;
+                    block.setText("");
+                    playersBoard.setNumber(counter / 9, counter % 9, 0);
                 }
             }
         }

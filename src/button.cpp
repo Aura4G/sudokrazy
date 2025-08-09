@@ -44,6 +44,7 @@ Button::Button(float width, float height, float x, float y, const ButtonTheme& t
         text.setFillColor(theme.text);
 
         subject.setTexture(ResourceManager::getTexture("placeholder"));
+        subject.setTextureRect(sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
         if (shapeType == ShapeType::Rectangle) {
             fitTextInFrame(text, frame.getGlobalBounds(), 10.0f);
@@ -78,6 +79,17 @@ void Button::setTheme(const ButtonTheme& newTheme) {
     text.setFillColor(theme.text);
 }
 
+void Button::setTexture(const sf::Texture& newTexture, float padding = 10.f) {
+    subject.setTexture(newTexture);
+    subject.setTextureRect(sf::IntRect(0, 0, newTexture.getSize().x, newTexture.getSize().y));
+    
+    if (shapeType == ShapeType::Circle) {
+        fitSpriteInFrame(subject, circleFrame, padding);
+    } else {
+        fitSpriteInFrame(subject, frame.getGlobalBounds(), padding);
+    }
+}
+
 float Button::getWidth() {
     return width;
 }
@@ -92,6 +104,10 @@ sf::Vector2f Button::getOriginalPos() {
 
 ButtonTheme Button::getTheme() {
     return theme;
+}
+
+sf::Sprite Button::getSprite() {
+    return subject;
 }
 
 bool Button::isActive() {
@@ -221,9 +237,9 @@ void Button::display(sf::RenderWindow& window) {
 
     if (subject.getTexture() != &ResourceManager::getTexture("placeholder")) {
         window.draw(subject);
+    } else {
+        window.draw(text);
     }
-
-    window.draw(text);
 }
 
 void Button::activate() {
