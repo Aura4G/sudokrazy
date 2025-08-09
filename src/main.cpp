@@ -163,6 +163,7 @@ int main() {
                     } else { //clicking the exit button mid-game goes back to the home screen
                         stateFlag = STATE_HOME;
                         exit.setTheme(EXIT_BUTTON);
+                        Grid::eraser_mode = false;
                     }
                 } else if (eraser.circleFrame.getGlobalBounds().contains(mousePos) && eraser.isActive()) {
                     if (!Grid::eraser_mode) { //clicking the exit button on the home screen closes the game
@@ -187,6 +188,7 @@ int main() {
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     stateFlag = STATE_HOME;
                     exit.setTheme(EXIT_BUTTON);
+                    Grid::eraser_mode = false;
                 }
             }
         }
