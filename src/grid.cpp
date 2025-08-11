@@ -97,18 +97,20 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
             if (block.isActive()) { //.. and active ..
                 //.. The number the player is using replaces the current contents of the block
                 if (!eraser_mode) {
-                    std::string newText = std::to_string(number);
-                    block.setText(newText);
-                    playersBoard.setNumber(counter / 9, counter % 9, number);
+                    if (number != playersBoard.getNumber(counter / 9, counter % 9)) {
+                        std::string newText = std::to_string(number);
+                        block.setText(newText);
+                        playersBoard.setNumber(counter / 9, counter % 9, number);
 
-                    turns++;
-                    if (turns % 5 == 0 && stateFlag == STATE_KRAZY) {
-                        if (!shuffled) {
-                            krazyMode();
-                            shuffled = true;
+                        turns++;
+                        if (turns % 5 == 0 && stateFlag == STATE_KRAZY) {
+                            if (!shuffled) {
+                                krazyMode();
+                                shuffled = true;
+                            }
+                        } else {
+                            shuffled = false;
                         }
-                    } else {
-                        shuffled = false;
                     }
                 } else {
                     block.setText("");

@@ -23,14 +23,48 @@ void changeNumber(Button& button, int& number) {
     }
 }
 
+bool isFullscreen = true;
+sf::Vector2f virtualSize(600.f, 800.f);
+sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
+
+std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen) {
+    if (fullscreen) {
+        sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+        return std::make_unique<sf::RenderWindow>(desktopMode, "Sudokrazy", sf::Style::Fullscreen);
+    } else {
+        return std::make_unique<sf::RenderWindow>(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
+    }
+}
+
+void updateView(sf::RenderWindow& win) {
+    sf::Vector2u windowSize = win.getSize();
+    float windowRatio = static_cast<float>(windowSize.x) / windowSize.y;
+    float virtualRatio = virtualSize.x / virtualSize.y;
+    sf::FloatRect viewport(0.f, 0.f, 1.f, 1.f);
+
+    if (windowRatio > virtualRatio) {
+        float scale = virtualRatio / windowRatio;
+        viewport.left = (1.f - scale) / 2.f;
+        viewport.width = scale;
+    } else {
+        float scale = windowRatio / virtualRatio;
+        viewport.top = (1.f - scale) / 2.f;
+        viewport.height = scale;
+    }
+
+    gameView.setViewport(viewport);
+    win.setView(gameView);
+}
+
 int main() {
     /*Buttons that change the number the player puts on the board*/
     std::vector<Button> numberChangers;
     numberChangers.reserve(9);
 
     /* Window with fixed size and cannot fullscreen */
-    sf::RenderWindow window(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
-    window.setFramerateLimit(60);
+    auto window = createWindow(isFullscreen);
+    updateView(*window);
+    window->setFramerateLimit(60);
 
     /* Set window icon */
     sf::Image winIcon;
@@ -38,7 +72,7 @@ int main() {
         std::cerr << "Missing/Invalid image file\n";
         return errno;
     }
-    window.setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
+    window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
 
     /* Load all media resources necessary */
 
@@ -118,54 +152,55 @@ int main() {
     stateFlag = STATE_HOME;
 
     //game loop
-    while (window.isOpen()) {
+    while (window->isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event)) {
+        while (window->pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
-                window.close();
+                window->close();
             }
 
             //Conditions for each button when clicked on
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2f mousePos = static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+                sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
+                sf::Vector2f worldPos = window->mapPixelToCoords(pixelPos, gameView);
                 
-                if (easySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts an easy game
+                if (easySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts an easy game
                     if (easySwitch.isActive()) {
                         stateFlag = STATE_EASY;
                         exit.setTheme(EASY_BUTTON);
                         eraser.setTheme(EASY_BUTTON);
                         grid.appropriate();
                     }
-                } else if (mediumSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a medium game
+                } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         stateFlag = STATE_MEDIUM;
                         exit.setTheme(MEDIUM_BUTTON);
                         eraser.setTheme(MEDIUM_BUTTON);
                         grid.appropriate();
                     }
-                } else if (hardSwitch.frame.getGlobalBounds().contains(mousePos)) { //starts a hard game
+                } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         stateFlag = STATE_HARD;
                         exit.setTheme(HARD_BUTTON);
                         eraser.setTheme(HARD_BUTTON);
                         grid.appropriate();
                     }
-                } else if (krazySwitch.frame.getGlobalBounds().contains(mousePos)) { //starts krazy mode
+                } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         stateFlag = STATE_KRAZY;
                         exit.setTheme(KRAZY_BUTTON);
                         eraser.setTheme(KRAZY_BUTTON);
                         grid.appropriate();
                     }
-                } else if (exit.circleFrame.getGlobalBounds().contains(mousePos) && exit.isActive()) {
+                } else if (exit.circleFrame.getGlobalBounds().contains(worldPos) && exit.isActive()) {
                     if (stateFlag == STATE_HOME) { //clicking the exit button on the home screen closes the game
-                        window.close();
+                        window->close();
                     } else { //clicking the exit button mid-game goes back to the home screen
                         stateFlag = STATE_HOME;
                         exit.setTheme(EXIT_BUTTON);
                         Grid::eraser_mode = false;
                     }
-                } else if (eraser.circleFrame.getGlobalBounds().contains(mousePos) && eraser.isActive()) {
+                } else if (eraser.circleFrame.getGlobalBounds().contains(worldPos) && eraser.isActive()) {
                     if (!Grid::eraser_mode) { //clicking the exit button on the home screen closes the game
                         Grid::eraser_mode = true;
                     } else { //clicking the exit button mid-game goes back to the home screen
@@ -174,7 +209,7 @@ int main() {
                 }
 
                 for (Button& button : numberChangers) {
-                    if (button.frame.getGlobalBounds().contains(mousePos)) { //switches the input number appropriately
+                    if (button.frame.getGlobalBounds().contains(worldPos)) { //switches the input number appropriately
                         if (button.isActive()) {
                             changeNumber(button, number);
                             chosenNumber->activate();
@@ -184,12 +219,22 @@ int main() {
                     }
                 }
 
-                grid.updateNumbers(mousePos, number);
+                grid.updateNumbers(worldPos, number);
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     stateFlag = STATE_HOME;
                     exit.setTheme(EXIT_BUTTON);
                     Grid::eraser_mode = false;
                 }
+            }
+
+            if (event.type == sf::Event::Resized)
+                updateView(*window);
+
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
+                isFullscreen = !isFullscreen;
+                window->close();
+                window = createWindow(isFullscreen);
+                updateView(*window);
             }
         }
 
@@ -213,10 +258,10 @@ int main() {
 
         if (stateFlag != STATE_HOME) {
             //deactivating menu buttons
-            easySwitch.activateMovement(sf::Vector2f(-200.f,easySwitch.getOriginalPos().y), 600.f);
-            mediumSwitch.activateMovement(sf::Vector2f(600.f,mediumSwitch.getOriginalPos().y), 600.f);
-            hardSwitch.activateMovement(sf::Vector2f(-200.f,hardSwitch.getOriginalPos().y), 600.f);
-            krazySwitch.activateMovement(sf::Vector2f(600.f,krazySwitch.getOriginalPos().y), 600.f);
+            easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
+            mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
+            hardSwitch.activateMovement(sf::Vector2f(-210.f,hardSwitch.getOriginalPos().y), 600.f);
+            krazySwitch.activateMovement(sf::Vector2f(610.f,krazySwitch.getOriginalPos().y), 600.f);
 
             easySwitch.deactivate();
             mediumSwitch.deactivate();
@@ -278,21 +323,21 @@ int main() {
         panel2.setFillColor(currentTheme -> bg2);
 
         if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
-            easySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
-            mediumSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
-            hardSwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
-            krazySwitch.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+            easySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+            mediumSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+            hardSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+            krazySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         } else { //ensures the buttons have hover visuals when playing the game and not on the home screen
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
-                    button.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+                    button.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
                 }
             }
-            grid.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+            grid.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
-        exit.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+        exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         if (!Grid::eraser_mode) {
-            eraser.updateHover(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+            eraser.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
 
         //update the menu buttons each frame for gradual movement
@@ -307,24 +352,25 @@ int main() {
         }
 
         //Draw everything necessary
-        window.clear(currentTheme -> bgClear);
-        window.draw(panel1);
-        window.draw(panel2);
+        window->clear(currentTheme -> bgClear);
+        window->setView(gameView);
+        window->draw(panel1);
+        window->draw(panel2);
         if (stateFlag != STATE_HOME) {
-            grid.display(window);
+            grid.display(*window);
             for (Button& button : numberChangers) { //this loop
-                button.display(window);
+                button.display(*window);
             }
-            eraser.display(window);
+            eraser.display(*window);
         } else {
-            window.draw(title);
+            window->draw(title);
         }
-        easySwitch.display(window);
-        mediumSwitch.display(window);
-        hardSwitch.display(window);
-        krazySwitch.display(window);
-        exit.display(window);
-        window.display();
+        easySwitch.display(*window);
+        mediumSwitch.display(*window);
+        hardSwitch.display(*window);
+        krazySwitch.display(*window);
+        exit.display(*window);
+        window->display();
     }
     //music.stop();
     return 0;
