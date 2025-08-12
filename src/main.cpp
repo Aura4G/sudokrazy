@@ -136,6 +136,8 @@ int main() {
     sf:: RectangleShape panel3(sf::Vector2f(panelWidth, panelHeight));
     panel3.setPosition(-panelWidth,0);
 
+    sf::Color clearTheme = {255,255,255};
+
     float scrollSpeed = 100.f; //pixels per second
     sf::Clock clock;
 
@@ -395,7 +397,8 @@ int main() {
         }
 
         //Draw everything necessary
-        window->clear(currentTheme -> bgClear);
+        clearTheme = updateColour(clearTheme, currentTheme->bgClear);
+        window->clear(clearTheme);
         window->setView(gameView);
         window->draw(panel1);
         window->draw(panel2);
