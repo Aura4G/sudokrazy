@@ -6,6 +6,11 @@
 #include "grid.hpp"
 #include "button.hpp"
 
+/**
+ * Main render window functions
+ * @author Aura4G (Aria Noroozi)
+*/
+
 //Flag to identify whether or not the game is operating in full screen
 extern bool isFullscreen;
 
@@ -21,8 +26,18 @@ extern sf::View gameView;
  */
 void changeNumber(Button& button, int& number);
 
+/**
+ * Creates an SFML window, either windowed or in exclusive fullscreen
+ * @param fullscreen A flag to determine whether the window being created will be windowed
+ * or fullscreen
+ * @return The new window to replace the current render window
+*/
 std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen);
 
+/**
+ * Scales window and its assets to new window size
+ * @param win The current game window
+*/
 void updateView(sf::RenderWindow& win);
 
 //The current state the game is in

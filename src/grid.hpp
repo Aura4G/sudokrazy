@@ -6,6 +6,11 @@
 #include "sudoku.hpp"
 #include "button.hpp"
 
+/**
+ * 9*9 sudoku grid SFML visualisation and functionality
+ * @author Aura4G (Aria Noroozi)
+*/
+
 //A natively drawn and interactive 9x9 grid, integrated with the backend Board object to create a working sudoku board
 class Grid {
 public:
@@ -16,7 +21,7 @@ public:
 
 
     /** Checks if its two Board objects are equal, indicating game completion
-    * @returns True if the two boards match
+    * @return True if the two boards match
     */
     bool check();
 

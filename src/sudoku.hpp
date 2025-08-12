@@ -1,6 +1,11 @@
 #ifndef __SUDOKU_HPP__
 #define __SUDOKU_HPP__
 
+/**
+ * Sudoku Game Functions
+ * @author Aura4G (Aria Noroozi)
+*/
+
 //Enum defining the current state of the game, for improved readability
 enum GameState {
     STATE_HOME,
@@ -18,7 +23,7 @@ public:
     
 
     /** Creates a random complete sudoku board recursively
-    * @returns True, once a complete, valid sudoku board has been created
+    * @return True, once a complete, valid sudoku board has been created
     */
     bool fillBoard();
 
@@ -27,7 +32,7 @@ public:
     * @param row The row on which the number is being queried
     * @param col The column on which the number is being queried
     * @param num The number (from 1-9) to be queried/placed on the board
-    * @returns True if it's safe to place, false if otherwise
+    * @return True if it's safe to place, false if otherwise
     */
     bool isSafe(int row, int col, int num);
 
@@ -35,7 +40,7 @@ public:
     /** Friend perator overload function for simplified comparison of two boards
     * @param board1
     * @param board2
-    * @returns True if every cell in board 1 mirrors that of board 2
+    * @return True if every cell in board 1 mirrors that of board 2
     */
     friend bool operator== (Board& board1, Board& board2);
 
@@ -73,7 +78,7 @@ public:
     /** Retrieves the number from an arbitrary cell in the grid
     * @param y the column in the grid
     * @param x the row in the grid
-    * @returns the number in that cell of the grid
+    * @return the number in that cell of the grid
     */
     int getNumber(int y, int x);
 

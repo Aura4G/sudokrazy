@@ -33,6 +33,7 @@ void ResourceManager::loadTexture(const std::string& name, const std::string& fi
         exit(errno);
     }
 
+    //The image object is loaded into a texture, that's then stored in the map
     sf::Texture texture;
     texture.loadFromImage(image);
 

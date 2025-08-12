@@ -3,12 +3,19 @@
 
 #include <SFML/Graphics.hpp>
 
+/**
+ * Theme Structure and every instance for this project
+ * @author Aura4G (Aria Noroozi)
+*/
+
 //contains all the different colour objects needed for a unique colour theme
 struct Theme {
     //used for panel1
     sf::Color bg1;
     //used for panel2
     sf::Color bg2;
+    //used for panel3
+    sf::Color bg3;
     //used for the native background
     sf::Color bgClear;
     //used for general text

@@ -28,32 +28,63 @@ sf::Vector2f virtualSize(600.f, 800.f);
 sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
 
 std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen) {
-    if (fullscreen) {
+    if (fullscreen) { //Renders a window in exclusive fullscreen if the fullscreen flag is checked
         sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
-        return std::make_unique<sf::RenderWindow>(desktopMode, "Sudokrazy", sf::Style::Fullscreen);
-    } else {
+        return std::make_unique<sf::RenderWindow>(desktopMode, "Sudokrazy", sf::Style::None);
+    } else { //Creates a smaller window using the virtual window otherwise
         return std::make_unique<sf::RenderWindow>(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
     }
 }
 
 void updateView(sf::RenderWindow& win) {
+    //Get window size in pixels
     sf::Vector2u windowSize = win.getSize();
+
+    //The aspect ratio of the actual window
     float windowRatio = static_cast<float>(windowSize.x) / windowSize.y;
+
+    //The aspect ratio of the virtual window, the desired aspect ration
     float virtualRatio = virtualSize.x / virtualSize.y;
+
+    //Describes the portion of the window where the view will be drawn. Starts out at 1 pixel
     sf::FloatRect viewport(0.f, 0.f, 1.f, 1.f);
 
     if (windowRatio > virtualRatio) {
+        //The window is wider than desired
         float scale = virtualRatio / windowRatio;
-        viewport.left = (1.f - scale) / 2.f;
-        viewport.width = scale;
+        viewport.left = (1.f - scale) / 2.f; //center horizontally
+        viewport.width = scale;              //shrink width to match ratio
     } else {
+        //The window is taller than desired
         float scale = windowRatio / virtualRatio;
-        viewport.top = (1.f - scale) / 2.f;
-        viewport.height = scale;
+        viewport.top = (1.f - scale) / 2.f; //center vertically
+        viewport.height = scale;            //shrink height to match ratio
     }
 
-    gameView.setViewport(viewport);
-    win.setView(gameView);
+    gameView.setViewport(viewport); // Apply normalized rectangle to view
+    win.setView(gameView);          // Tell the window to use the adjusted view
+}
+
+sf::Color updateColour(sf::Color colour, sf::Color targetColour) {
+    if (colour.r < targetColour.r) {
+        colour.r++;
+    } else if (colour.r > targetColour.r) {
+        colour.r--;
+    }
+
+    if (colour.g < targetColour.g) {
+        colour.g++;
+    } else if (colour.g > targetColour.g) {
+        colour.g--;
+    }
+
+    if (colour.b < targetColour.b) {
+        colour.b++;
+    } else if (colour.b > targetColour.b) {
+        colour.b--;
+    }
+
+    return colour;
 }
 
 int main() {
@@ -64,6 +95,7 @@ int main() {
     /* Window with fixed size and cannot fullscreen */
     auto window = createWindow(isFullscreen);
     updateView(*window);
+    window->setPosition(sf::Vector2i(0,0));
     window->setFramerateLimit(60);
 
     /* Set window icon */
@@ -99,6 +131,9 @@ int main() {
 
     sf:: RectangleShape panel2(sf::Vector2f(panelWidth, panelHeight));
     panel2.setPosition(panelWidth,0);
+
+    sf:: RectangleShape panel3(sf::Vector2f(panelWidth, panelHeight));
+    panel3.setPosition(-panelWidth,0);
 
     float scrollSpeed = 100.f; //pixels per second
     sf::Clock clock;
@@ -227,14 +262,15 @@ int main() {
                 }
             }
 
-            if (event.type == sf::Event::Resized)
-                updateView(*window);
-
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
+            if (event.type == sf::Event::Resized) {
+                updateView(*window); //updates the window if resized in this frame
+            }
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) { //MAKESHIFT window context switch
                 isFullscreen = !isFullscreen;
                 window->close();
                 window = createWindow(isFullscreen);
                 updateView(*window);
+                window->setPosition(sf::Vector2i(0,0));
             }
         }
 
@@ -308,6 +344,7 @@ int main() {
         float deltaTime = clock.restart().asSeconds();
         panel1.move(scrollSpeed*deltaTime, 0);
         panel2.move(scrollSpeed*deltaTime, 0);
+        panel3.move(scrollSpeed*deltaTime, 0);
 
         //loop the panels when they go off-screen
         if (panel1.getPosition().x > 600) {
@@ -315,12 +352,17 @@ int main() {
         }
 
         if (panel2.getPosition().x > 600) {
-            panel2.setPosition(panel1.getPosition().x - 600, 0);
+            panel2.setPosition(panel3.getPosition().x - 300, 0);
+        }
+
+        if (panel3.getPosition().x > 600) {
+            panel3.setPosition(panel1.getPosition().x - 300, 0);
         }
 
         //set the colors to the theme
-        panel1.setFillColor(currentTheme -> bg1);
-        panel2.setFillColor(currentTheme -> bg2);
+        panel1.setFillColor(updateColour(panel1.getFillColor(), currentTheme->bg1));
+        panel2.setFillColor(updateColour(panel2.getFillColor(), currentTheme->bg2));
+        panel3.setFillColor(updateColour(panel3.getFillColor(), currentTheme->bg3));
 
         if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
             easySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
@@ -356,6 +398,7 @@ int main() {
         window->setView(gameView);
         window->draw(panel1);
         window->draw(panel2);
+        window->draw(panel3);
         if (stateFlag != STATE_HOME) {
             grid.display(*window);
             for (Button& button : numberChangers) { //this loop

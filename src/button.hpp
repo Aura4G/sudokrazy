@@ -3,6 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 
+/**
+ * SFML Button visualisation and Functionality
+ * @author Aura4G (Aria Noroozi)
+*/
+
 //Contains all the colours needed for a button
 struct ButtonTheme {
     //when the mouse doesn't hover over a button
@@ -72,35 +77,35 @@ public:
     void setTexture(const sf::Texture& newTexture, float padding);
 
 
-    /** @returns The button width */
+    /** @return The button width */
     float getWidth();
 
 
-    /** @returns The button height */
+    /** @return The button height */
     float getHeight();
 
 
-    /** @returns A vector with the x and y position the button had upon construction */
+    /** @return A vector with the x and y position the button had upon construction */
     sf::Vector2f getOriginalPos();
 
 
-    /** @returns the button theme being used by the button */
+    /** @return the button theme being used by the button */
     ButtonTheme getTheme();
 
 
-    /** @returns the texture currently being used by the button */
+    /** @return the texture currently being used by the button */
     sf::Sprite getSprite();
 
 
     /** Used for validation and ensuring there aren't double/incorrect inputs
-    * @returns True if the button selected is active
+    * @return True if the button selected is active
     */
     bool isActive();
 
 
     /**
     * @param mousePos The mouse position relative to the window on the given frame 
-    * @returns True if the mouse is hovering over the button
+    * @return True if the mouse is hovering over the button
     */
     bool isHovering(const sf::Vector2f& mousePos) const;
 
