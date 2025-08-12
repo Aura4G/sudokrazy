@@ -66,11 +66,12 @@ void updateView(sf::RenderWindow& win) {
 }
 
 sf::Color updateColour(sf::Color colour, sf::Color targetColour) {
+    //Changes the colour scale to be closer to the target
     if (colour.r < targetColour.r) {
         colour.r++;
     } else if (colour.r > targetColour.r) {
         colour.r--;
-    }
+    } //The colour's scale doesn't change if they match
 
     if (colour.g < targetColour.g) {
         colour.g++;
