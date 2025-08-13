@@ -46,4 +46,7 @@ extern const Theme HARD_THEME;
 //For krazy mode
 extern const Theme KRAZY_THEME;
 
+//For the settings menu
+extern const Theme SETTINGS_THEME;
+
 #endif
