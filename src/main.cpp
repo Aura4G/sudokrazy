@@ -134,6 +134,7 @@ int main() {
  
     //The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
+    grid.appropriate();
     grid.deactivate();
 
     //Indicates the number the player is currently using
@@ -173,6 +174,7 @@ int main() {
     const Theme* currentTheme = &HOME_THEME;
 
     stateFlag = STATE_HOME;
+    GameState prevState = STATE_HOME;
 
     //game loop
     while (window->isOpen()) {
@@ -189,6 +191,7 @@ int main() {
                 
                 if (easySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts an easy game
                     if (easySwitch.isActive()) {
+                        prevState = stateFlag;
                         stateFlag = STATE_EASY;
                         exit.setTheme(EASY_BUTTON);
                         eraser.setTheme(EASY_BUTTON);
@@ -196,6 +199,7 @@ int main() {
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
+                        prevState = stateFlag;
                         stateFlag = STATE_MEDIUM;
                         exit.setTheme(MEDIUM_BUTTON);
                         eraser.setTheme(MEDIUM_BUTTON);
@@ -203,6 +207,7 @@ int main() {
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
+                        prevState = stateFlag;
                         stateFlag = STATE_HARD;
                         exit.setTheme(HARD_BUTTON);
                         eraser.setTheme(HARD_BUTTON);
@@ -210,6 +215,7 @@ int main() {
                     }
                 } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
+                        prevState = stateFlag;
                         stateFlag = STATE_KRAZY;
                         exit.setTheme(KRAZY_BUTTON);
                         eraser.setTheme(KRAZY_BUTTON);
@@ -219,15 +225,27 @@ int main() {
                     if (stateFlag == STATE_HOME) { //clicking the exit button on the home screen closes the game
                         window->close();
                     } else { //clicking the exit button mid-game goes back to the home screen
-                        stateFlag = STATE_HOME;
                         exit.setTheme(EXIT_BUTTON);
                         Grid::eraser_mode = false;
+                        if (!settingsToggle.isActive()) {
+                            stateFlag = prevState;
+                            prevState = STATE_SETTINGS;
+                        } else {
+                            prevState = stateFlag;
+                            stateFlag = STATE_HOME;
+                        }
                     }
                 } else if (eraser.circleFrame.getGlobalBounds().contains(worldPos) && eraser.isActive()) {
                     if (!Grid::eraser_mode) { //clicking the exit button on the home screen closes the game
                         Grid::eraser_mode = true;
                     } else { //clicking the exit button mid-game goes back to the home screen
                         Grid::eraser_mode = false;
+                    }
+                } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
+                    if (settingsToggle.isActive()) {
+                        prevState = stateFlag;
+                        stateFlag = STATE_SETTINGS;
+                        exit.setTheme(REGULAR_BUTTON);
                     }
                 }
 
@@ -289,9 +307,12 @@ int main() {
             case STATE_KRAZY:
                 currentTheme = &KRAZY_THEME;
                 break;
+            case STATE_SETTINGS:
+                currentTheme = &SETTINGS_THEME;
+                break;
         }
 
-        if (stateFlag != STATE_HOME) {
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
             mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
@@ -315,7 +336,8 @@ int main() {
             //activates the grid and its buttons
             grid.activate();
             eraser.activate();
-        } else {
+            settingsToggle.activate();
+        } else if (stateFlag == STATE_HOME){
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
             mediumSwitch.activateMovement(mediumSwitch.getOriginalPos(), 400.f);
@@ -337,6 +359,30 @@ int main() {
             //ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
+            settingsToggle.activate();
+        } else {
+            //deactivating menu buttons
+            easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
+            mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
+            hardSwitch.activateMovement(sf::Vector2f(-210.f,hardSwitch.getOriginalPos().y), 600.f);
+            krazySwitch.activateMovement(sf::Vector2f(610.f,krazySwitch.getOriginalPos().y), 600.f);
+
+            easySwitch.deactivate();
+            mediumSwitch.deactivate();
+            hardSwitch.deactivate();
+            krazySwitch.deactivate();
+
+            exit.setText("<-");
+
+            //deactivating number choice buttons
+            for (Button& button : numberChangers) {
+                button.deactivate();
+            }
+
+            //ensures no inputs on the invisible grid can be made when outside gameplay mode
+            grid.deactivate();
+            eraser.deactivate();
+            settingsToggle.deactivate();
         }
 
         //move panels to the right
@@ -401,13 +447,13 @@ int main() {
         window->draw(panel1);
         window->draw(panel2);
         window->draw(panel3);
-        if (stateFlag != STATE_HOME) {
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
             grid.display(*window);
             for (Button& button : numberChangers) { //this loop
                 button.display(*window);
             }
             eraser.display(*window);
-        } else {
+        } else if (stateFlag == STATE_HOME) {
             window->draw(title);
         }
         easySwitch.display(*window);
@@ -415,7 +461,9 @@ int main() {
         hardSwitch.display(*window);
         krazySwitch.display(*window);
         exit.display(*window);
-        settingsToggle.display(*window);
+        if (settingsToggle.isActive()) {
+            settingsToggle.display(*window);
+        }
         window->display();
     }
     //music.stop();
