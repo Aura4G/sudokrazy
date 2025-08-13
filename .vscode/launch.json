@@ -5,7 +5,7 @@
             "name": "Debug SFML App (MSYS2 GDB)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/sudoku_game.exe",
+            "program": "${workspaceFolder}/sudokrazy.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
