@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <cerrno>
+#include <cmath>
 
 #include "themes.hpp"
 #include "grid.hpp"
@@ -65,29 +66,6 @@ void updateView(sf::RenderWindow& win) {
     win.setView(gameView);          // Tell the window to use the adjusted view
 }
 
-sf::Color updateColour(sf::Color colour, sf::Color targetColour) {
-    //Changes the colour scale to be closer to the target
-    if (colour.r < targetColour.r) {
-        colour.r++;
-    } else if (colour.r > targetColour.r) {
-        colour.r--;
-    } //The colour's scale doesn't change if they match
-
-    if (colour.g < targetColour.g) {
-        colour.g++;
-    } else if (colour.g > targetColour.g) {
-        colour.g--;
-    }
-
-    if (colour.b < targetColour.b) {
-        colour.b++;
-    } else if (colour.b > targetColour.b) {
-        colour.b--;
-    }
-
-    return colour;
-}
-
 int main() {
     /*Buttons that change the number the player puts on the board*/
     std::vector<Button> numberChangers;
@@ -97,7 +75,7 @@ int main() {
     auto window = createWindow(isFullscreen);
     updateView(*window);
     window->setPosition(sf::Vector2i(0,0));
-    window->setFramerateLimit(60);
+    window->setVerticalSyncEnabled(true);
 
     /* Set window icon */
     sf::Image winIcon;
@@ -268,13 +246,24 @@ int main() {
             if (event.type == sf::Event::Resized) {
                 updateView(*window); //updates the window if resized in this frame
             }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) { //MAKESHIFT window context switch
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
                 isFullscreen = !isFullscreen;
                 window->close();
+
                 window = createWindow(isFullscreen);
                 updateView(*window);
                 window->setPosition(sf::Vector2i(0,0));
+
+                // Reapply timing policy (pick one of these approaches)
+
+                window->setVerticalSyncEnabled(true);
+
+                // Optional: reapply icon since it's a new window
+                window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
+
+                clock.restart(); // ensure next deltaTime is small/clean
             }
+
         }
 
         switch (stateFlag) { //switch graphical themes depending on the game state
@@ -363,9 +352,9 @@ int main() {
         }
 
         //set the colors to the theme
-        panel1.setFillColor(updateColour(panel1.getFillColor(), currentTheme->bg1));
-        panel2.setFillColor(updateColour(panel2.getFillColor(), currentTheme->bg2));
-        panel3.setFillColor(updateColour(panel3.getFillColor(), currentTheme->bg3));
+        panel1.setFillColor(updateColour(panel1.getFillColor(), currentTheme->bg1, deltaTime));
+        panel2.setFillColor(updateColour(panel2.getFillColor(), currentTheme->bg2, deltaTime));
+        panel3.setFillColor(updateColour(panel3.getFillColor(), currentTheme->bg3, deltaTime));
 
         if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
             easySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
@@ -397,7 +386,7 @@ int main() {
         }
 
         //Draw everything necessary
-        clearTheme = updateColour(clearTheme, currentTheme->bgClear);
+        clearTheme = updateColour(clearTheme, currentTheme->bgClear, deltaTime);
         window->clear(clearTheme);
         window->setView(gameView);
         window->draw(panel1);

@@ -40,14 +40,6 @@ std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen);
 */
 void updateView(sf::RenderWindow& win);
 
-/**
- * Cleanly transitions game colour themes with the game state
- * @param colour the edited colour
- * @param targetColour the theme's end colour to reach
- * @return a colour object closer/identical to the targetColour
-*/
-sf::Color updateColour(sf::Color colour, sf::Color targetColour);
-
 //The current state the game is in
 extern GameState stateFlag;
 

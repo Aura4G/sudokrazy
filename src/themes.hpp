@@ -22,6 +22,15 @@ struct Theme {
     sf::Color text;
 };
 
+/**
+ * Cleanly transitions game colour themes with the game state
+ * @param colour the edited colour
+ * @param targetColour the theme's end colour to reach
+ * @param dt delta time
+ * @return a colour object closer/identical to the targetColour
+*/
+sf::Color updateColour(sf::Color colour, sf::Color targetColour, float dt);
+
 //For the home screen
 extern const Theme HOME_THEME;
 

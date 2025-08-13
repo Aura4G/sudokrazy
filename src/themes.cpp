@@ -1,7 +1,30 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <math.h>
+#include <cmath>
+#include <algorithm>
 #include "themes.hpp"
+
+sf::Color updateColour(sf::Color colour, sf::Color targetColour, float dt) {
+    auto stepTo = [&](sf::Uint8 cur, sf::Uint8 tgt) -> sf::Uint8 {
+        if (cur == tgt) {
+            return cur;
+        }
+
+        // Exponential approach factor
+        const float K = 5.f; // responsiveness, higher = faster approach
+        float a = 1.f - std::exp(-K * dt);
+
+        int next = int(std::round(cur + a * (int(tgt) - int(cur))));
+
+        return static_cast<sf::Uint8>(std::clamp(next, 0, 255));
+    };
+
+    colour.r = stepTo(colour.r, targetColour.r);
+    colour.g = stepTo(colour.g, targetColour.g);
+    colour.b = stepTo(colour.b, targetColour.b);
+    
+    return colour;
+}
 
 /* THEMES */
 //Background and text colour themes
