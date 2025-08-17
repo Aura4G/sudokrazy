@@ -77,6 +77,12 @@ public:
     void setTexture(const sf::Texture& newTexture, float padding);
 
 
+    void setPosition(const sf::Vector2f& newPos);
+
+
+    void setOrigin(float x, float y);
+
+
     /** @return The button width */
     float getWidth();
 

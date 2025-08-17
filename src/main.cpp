@@ -11,6 +11,7 @@
 #include "main.hpp"
 #include "button.hpp"
 #include "resource_manager.hpp"
+#include "slider.hpp"
 
 GameState stateFlag = STATE_HOME;
 
@@ -165,6 +166,8 @@ int main() {
 
     Button vsyncToggle(150.f, 75.f, 100.f, 100.f, EASY_BUTTON, "V-Sync On", "gameFont");
 
+    Slider test(400.f, sf::Vector2f(100.f, 250.f), sf::Color::Black);
+
     //Music to play while game is operational
     sf::Music music;
     if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) { //CHANGE MUSIC LATER
@@ -263,6 +266,8 @@ int main() {
                             vsyncToggle.setText("V-Sync On");
                         }
                         window->setVerticalSyncEnabled(vsync);
+                        window->setFramerateLimit(vsync ? 0 : 60); // optional cap when vsync off
+                        clock.restart();
                     }
                 }
 
@@ -482,6 +487,7 @@ int main() {
             window->draw(title);
         } else {
             vsyncToggle.display(*window);
+            test.display(*window);
         }
         easySwitch.display(*window);
         mediumSwitch.display(*window);

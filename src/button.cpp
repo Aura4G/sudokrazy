@@ -31,10 +31,12 @@ Button::Button(float width, float height, float x, float y, const ButtonTheme& t
         if (shapeType == ShapeType::Rectangle) {
             frame.setPosition(x,y);
             frame.setSize(sf::Vector2f(width, height));
+            frame.setFillColor(theme.unhovered);
         } else {
             circleFrame.setRadius(width);
             circleFrame.setOrigin(width,width);
             circleFrame.setPosition(x,y);
+            circleFrame.setFillColor(theme.unhovered);
         }
 
         //button text formatting
@@ -88,6 +90,20 @@ void Button::setTexture(const sf::Texture& newTexture, float padding = 10.f) {
     } else {
         fitSpriteInFrame(subject, frame.getGlobalBounds(), padding);
     }
+}
+
+void Button::setPosition(const sf::Vector2f& newPos) {
+    frame.setPosition(newPos);
+    circleFrame.setPosition(newPos);
+    text.setPosition(newPos);
+    subject.setPosition(newPos);
+}
+
+void Button::setOrigin(float x, float y) {
+    frame.setOrigin(x,y);
+    text.setOrigin(x,y);
+    subject.setOrigin(x,y);
+    circleFrame.setOrigin(x,y);
 }
 
 float Button::getWidth() {
