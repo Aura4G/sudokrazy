@@ -60,7 +60,7 @@ Grid::Grid(sf::Vector2f position, float size) {
 
         //the position of the white block
         sf::Vector2f whiteBlockPos(additiveX + position.x + PADDING/2.f, additiveY + position.y + PADDING/2.f);
-        whiteBlocks.emplace_back(size/9.f - PADDING*2.f, size/9.f - PADDING*2.f, whiteBlockPos.x, whiteBlockPos.y, REGULAR_BUTTON, input, ResourceManager::getFont("gameFont"));
+        whiteBlocks.emplace_back(size/9.f - PADDING*2.f, size/9.f - PADDING*2.f, whiteBlockPos.x, whiteBlockPos.y, REGULAR_BUTTON, input, "gameFont");
         if (playersBoard.getNumber(y,x) != 0) {
             whiteBlocks.back().deactivate(); //blocks that already have visual numbers in them do not get altered in the current game
         }

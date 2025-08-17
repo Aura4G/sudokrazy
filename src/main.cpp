@@ -14,6 +14,8 @@
 
 GameState stateFlag = STATE_HOME;
 
+bool vsync = true;
+
 void changeNumber(Button& button, int& number) {    
     try {
         number = std::stoi(button.text.getString().toAnsiString());
@@ -75,7 +77,8 @@ int main() {
     auto window = createWindow(isFullscreen);
     updateView(*window);
     window->setPosition(sf::Vector2i(0,0));
-    window->setVerticalSyncEnabled(true);
+
+    window->setVerticalSyncEnabled(vsync);
 
     /* Set window icon */
     sf::Image winIcon;
@@ -127,10 +130,10 @@ int main() {
     title.setPosition(sf::Vector2f(300,150));
 
     // Home Menu Buttons
-    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", ResourceManager::getFont("gameFont"));
-    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", ResourceManager::getFont("gameFont"));
-    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", ResourceManager::getFont("gameFont"));
-    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", ResourceManager::getFont("gameFont"));
+    Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", "gameFont");
+    Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", "gameFont");
+    Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", "gameFont");
+    Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", "gameFont");
  
     //The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
@@ -141,25 +144,26 @@ int main() {
     int number = 1;
     //Iteration to construct the buttons used to switch numbers
     for (int i = 0; i < 9; ++i) {
-        numberChangers.emplace_back(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), ResourceManager::getFont("gameFont"));
+        numberChangers.emplace_back(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), "gameFont");
     }
     //Points to a number changing button to control its activity
     Button* chosenNumber = &numberChangers[0];
     chosenNumber->deactivate();
 
     //Back/Close button
-    Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", ResourceManager::getFont("homeFont"), ShapeType::Circle);
+    Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", "homeFont", ShapeType::Circle);
 
     //Eraser button
-    Button eraser(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "", ResourceManager::getFont("gameFont"), ShapeType::Circle);
+    Button eraser(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "", "gameFont", ShapeType::Circle);
     eraser.setTexture(ResourceManager::getTexture("eraser"), 5.f);
 
 
     /*SETTINGS MENU*/
 
-    Button settingsToggle(37.5f, 0.f, 550.f, 47.5f, REGULAR_BUTTON, "", ResourceManager::getFont("gameFont"), ShapeType::Circle);
+    Button settingsToggle(37.5f, 0.f, 550.f, 47.5f, REGULAR_BUTTON, "", "gameFont", ShapeType::Circle);
     settingsToggle.setTexture(ResourceManager::getTexture("settings"), 10.f);
 
+    Button vsyncToggle(150.f, 75.f, 100.f, 100.f, EASY_BUTTON, "V-Sync On", "gameFont");
 
     //Music to play while game is operational
     sf::Music music;
@@ -247,6 +251,19 @@ int main() {
                         stateFlag = STATE_SETTINGS;
                         exit.setTheme(REGULAR_BUTTON);
                     }
+                } else if (vsyncToggle.frame.getGlobalBounds().contains(worldPos)) {
+                    if (vsyncToggle.isActive()) {
+                        if (vsync) {
+                            vsync = false;
+                            vsyncToggle.setTheme(HARD_BUTTON);
+                            vsyncToggle.setText("V-Sync Off");
+                        } else {
+                            vsync = true;
+                            vsyncToggle.setTheme(EASY_BUTTON);
+                            vsyncToggle.setText("V-Sync On");
+                        }
+                        window->setVerticalSyncEnabled(vsync);
+                    }
                 }
 
                 for (Button& button : numberChangers) {
@@ -281,7 +298,7 @@ int main() {
 
                 // Reapply timing policy (pick one of these approaches)
 
-                window->setVerticalSyncEnabled(true);
+                window->setVerticalSyncEnabled(vsync);
 
                 // Optional: reapply icon since it's a new window
                 window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
@@ -337,6 +354,7 @@ int main() {
             grid.activate();
             eraser.activate();
             settingsToggle.activate();
+            vsyncToggle.deactivate();
         } else if (stateFlag == STATE_HOME){
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -359,7 +377,9 @@ int main() {
             //ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
+
             settingsToggle.activate();
+            vsyncToggle.deactivate();
         } else {
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
@@ -382,7 +402,9 @@ int main() {
             //ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
+
             settingsToggle.deactivate();
+            vsyncToggle.activate();
         }
 
         //move panels to the right
@@ -414,13 +436,15 @@ int main() {
             mediumSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
             hardSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
             krazySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-        } else { //ensures the buttons have hover visuals when playing the game and not on the home screen
+        } else if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //ensures the buttons have hover visuals when playing the game and not on the home screen
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
                     button.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
                 }
             }
             grid.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+        } else {
+            vsyncToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         if (!Grid::eraser_mode) {
@@ -439,6 +463,7 @@ int main() {
             numberChangers.at(i).update(deltaTime);
         }
         settingsToggle.update(deltaTime);
+        vsyncToggle.update(deltaTime);
 
         //Draw everything necessary
         clearTheme = updateColour(clearTheme, currentTheme->bgClear, deltaTime);
@@ -449,12 +474,14 @@ int main() {
         window->draw(panel3);
         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
             grid.display(*window);
-            for (Button& button : numberChangers) { //this loop
+            for (Button& button : numberChangers) {
                 button.display(*window);
             }
             eraser.display(*window);
         } else if (stateFlag == STATE_HOME) {
             window->draw(title);
+        } else {
+            vsyncToggle.display(*window);
         }
         easySwitch.display(*window);
         mediumSwitch.display(*window);

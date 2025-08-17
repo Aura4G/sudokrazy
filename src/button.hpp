@@ -50,7 +50,7 @@ public:
     * @param sharedFont The font object called from main for the button's text to use
     * @param shapeType The shape of the button frame
     */
-    Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont, ShapeType type = ShapeType::Rectangle);
+    Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const std::string& font, ShapeType type = ShapeType::Rectangle);
 
 
     /** Changes the colour of the button frame

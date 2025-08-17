@@ -24,7 +24,7 @@ Button::Button() {
     theme = REGULAR_BUTTON;
 }
 
-Button::Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const sf::Font& sharedFont, ShapeType type)
+Button::Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const std::string& sharedFont, ShapeType type)
     : width(width), height(height), x(x), y(y), theme(theme), shapeType(type)
     {
         //button frame formatting
@@ -39,7 +39,7 @@ Button::Button(float width, float height, float x, float y, const ButtonTheme& t
 
         //button text formatting
         text.setString(targetText);
-        text.setFont(sharedFont);
+        text.setFont(ResourceManager::getFont(sharedFont));
         text.setCharacterSize(48);
         text.setFillColor(theme.text);
 

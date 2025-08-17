@@ -20,6 +20,9 @@ extern sf::Vector2f virtualSize;
 //Game window dimensions
 extern sf::View gameView;
 
+//Vsync status
+extern bool vsync;
+
 /** Takes the text contents of a button and sets the number the player is using to it
  *@param button The number changer the player clicks on
  *@param number The variable in main that's inputted into the grid when clicked on said grid
