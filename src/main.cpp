@@ -102,6 +102,7 @@ int main() {
     ResourceManager::loadTexture("title", "media/images/sudokrazy_title.png");
     ResourceManager::loadTexture("eraser", "media/images/eraser.png");
     ResourceManager::loadTexture("settings", "media/images/settings.png");
+    ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
 
 
     /* Dynamic Background */
@@ -164,9 +165,19 @@ int main() {
     Button settingsToggle(37.5f, 0.f, 550.f, 47.5f, REGULAR_BUTTON, "", "gameFont", ShapeType::Circle);
     settingsToggle.setTexture(ResourceManager::getTexture("settings"), 10.f);
 
-    Button vsyncToggle(150.f, 75.f, 100.f, 100.f, EASY_BUTTON, "V-Sync On", "gameFont");
+    //The settings menu art
+    sf::Sprite settingsTitle(ResourceManager::getTexture("settings title"));
+    titleRect = settingsTitle.getLocalBounds();
+    settingsTitle.setOrigin(titleRect.left + titleRect.width/2.0f, titleRect.top  + titleRect.height/2.0f);
+    settingsTitle.setPosition(sf::Vector2f(300,100));
 
-    Slider test(400.f, sf::Vector2f(100.f, 250.f), sf::Color::Black);
+    //Button to toggle V-Sync on/off
+    Button vsyncToggle(150.f, 75.f, 100.f, 220.f, EASY_BUTTON, "V-Sync On", "gameFont");
+
+    //Button to toggle fullscreen on/off
+    Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, EASY_BUTTON, "Fullscreen", "gameFont");
+
+    Slider test(400.f, sf::Vector2f(100.f, 350.f), sf::Color::Black);
 
     //Music to play while game is operational
     sf::Music music;
@@ -200,39 +211,30 @@ int main() {
                     if (easySwitch.isActive()) {
                         prevState = stateFlag;
                         stateFlag = STATE_EASY;
-                        exit.setTheme(EASY_BUTTON);
-                        eraser.setTheme(EASY_BUTTON);
                         grid.appropriate();
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         prevState = stateFlag;
                         stateFlag = STATE_MEDIUM;
-                        exit.setTheme(MEDIUM_BUTTON);
-                        eraser.setTheme(MEDIUM_BUTTON);
                         grid.appropriate();
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         prevState = stateFlag;
                         stateFlag = STATE_HARD;
-                        exit.setTheme(HARD_BUTTON);
-                        eraser.setTheme(HARD_BUTTON);
                         grid.appropriate();
                     }
                 } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         prevState = stateFlag;
                         stateFlag = STATE_KRAZY;
-                        exit.setTheme(KRAZY_BUTTON);
-                        eraser.setTheme(KRAZY_BUTTON);
                         grid.appropriate();
                     }
                 } else if (exit.circleFrame.getGlobalBounds().contains(worldPos) && exit.isActive()) {
                     if (stateFlag == STATE_HOME) { //clicking the exit button on the home screen closes the game
                         window->close();
                     } else { //clicking the exit button mid-game goes back to the home screen
-                        exit.setTheme(EXIT_BUTTON);
                         Grid::eraser_mode = false;
                         if (!settingsToggle.isActive()) {
                             stateFlag = prevState;
@@ -252,7 +254,6 @@ int main() {
                     if (settingsToggle.isActive()) {
                         prevState = stateFlag;
                         stateFlag = STATE_SETTINGS;
-                        exit.setTheme(REGULAR_BUTTON);
                     }
                 } else if (vsyncToggle.frame.getGlobalBounds().contains(worldPos)) {
                     if (vsyncToggle.isActive()) {
@@ -268,6 +269,27 @@ int main() {
                         window->setVerticalSyncEnabled(vsync);
                         window->setFramerateLimit(vsync ? 0 : 60); // optional cap when vsync off
                         clock.restart();
+                    }
+                } else if (fullscreenToggle.frame.getGlobalBounds().contains(worldPos)) {
+                    if (fullscreenToggle.isActive()) {
+                        isFullscreen = !isFullscreen;
+                        window->close();
+
+                        window = createWindow(isFullscreen);
+                        updateView(*window);
+                        window->setPosition(sf::Vector2i(0,0));
+
+                        // Reapply timing policy (pick one of these approaches)
+
+                        window->setVerticalSyncEnabled(vsync);
+
+                        // Optional: reapply icon since it's a new window
+                        window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
+
+                        clock.restart(); // ensure next deltaTime is small/clean
+
+                        fullscreenToggle.setTheme(isFullscreen ? EASY_BUTTON : HARD_BUTTON);
+                        fullscreenToggle.setText(isFullscreen ? "Fullscreen" : "Windowed");
                     }
                 }
 
@@ -285,7 +307,6 @@ int main() {
                 grid.updateNumbers(worldPos, number);
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     stateFlag = STATE_HOME;
-                    exit.setTheme(EXIT_BUTTON);
                     Grid::eraser_mode = false;
                 }
             }
@@ -293,44 +314,38 @@ int main() {
             if (event.type == sf::Event::Resized) {
                 updateView(*window); //updates the window if resized in this frame
             }
-            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
-                isFullscreen = !isFullscreen;
-                window->close();
 
-                window = createWindow(isFullscreen);
-                updateView(*window);
-                window->setPosition(sf::Vector2i(0,0));
-
-                // Reapply timing policy (pick one of these approaches)
-
-                window->setVerticalSyncEnabled(vsync);
-
-                // Optional: reapply icon since it's a new window
-                window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
-
-                clock.restart(); // ensure next deltaTime is small/clean
-            }
-
+            test.handleEvent(event, *window);
         }
 
         switch (stateFlag) { //switch graphical themes depending on the game state
             case STATE_HOME:
                 currentTheme = &HOME_THEME;
+                exit.setTheme(EXIT_BUTTON);
                 break;
             case STATE_EASY:
                 currentTheme = &EASY_THEME;
+                exit.setTheme(EASY_BUTTON);
+                eraser.setTheme(EASY_BUTTON);
                 break;
             case STATE_MEDIUM:
                 currentTheme = &MEDIUM_THEME;
+                exit.setTheme(MEDIUM_BUTTON);
+                eraser.setTheme(MEDIUM_BUTTON);
                 break;
             case STATE_HARD:
                 currentTheme = &HARD_THEME;
+                exit.setTheme(HARD_BUTTON);
+                eraser.setTheme(HARD_BUTTON);
                 break;
             case STATE_KRAZY:
                 currentTheme = &KRAZY_THEME;
+                exit.setTheme(KRAZY_BUTTON);
+                eraser.setTheme(KRAZY_BUTTON);
                 break;
             case STATE_SETTINGS:
                 currentTheme = &SETTINGS_THEME;
+                exit.setTheme(REGULAR_BUTTON);
                 break;
         }
 
@@ -360,6 +375,7 @@ int main() {
             eraser.activate();
             settingsToggle.activate();
             vsyncToggle.deactivate();
+            fullscreenToggle.deactivate();
         } else if (stateFlag == STATE_HOME){
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -385,6 +401,7 @@ int main() {
 
             settingsToggle.activate();
             vsyncToggle.deactivate();
+            fullscreenToggle.deactivate();
         } else {
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
@@ -410,6 +427,7 @@ int main() {
 
             settingsToggle.deactivate();
             vsyncToggle.activate();
+            fullscreenToggle.activate();
         }
 
         //move panels to the right
@@ -450,6 +468,7 @@ int main() {
             grid.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         } else {
             vsyncToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+            fullscreenToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         if (!Grid::eraser_mode) {
@@ -469,6 +488,7 @@ int main() {
         }
         settingsToggle.update(deltaTime);
         vsyncToggle.update(deltaTime);
+        fullscreenToggle.update(deltaTime);
 
         //Draw everything necessary
         clearTheme = updateColour(clearTheme, currentTheme->bgClear, deltaTime);
@@ -477,16 +497,18 @@ int main() {
         window->draw(panel1);
         window->draw(panel2);
         window->draw(panel3);
-        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Draws for an active sudoku gmae
             grid.display(*window);
             for (Button& button : numberChangers) {
                 button.display(*window);
             }
             eraser.display(*window);
-        } else if (stateFlag == STATE_HOME) {
+        } else if (stateFlag == STATE_HOME) { // Draws for the home menu
             window->draw(title);
-        } else {
+        } else { //Draws for the settings menu
+            window->draw(settingsTitle);
             vsyncToggle.display(*window);
+            fullscreenToggle.display(*window);
             test.display(*window);
         }
         easySwitch.display(*window);

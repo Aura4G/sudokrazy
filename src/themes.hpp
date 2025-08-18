@@ -2,6 +2,7 @@
 #define __THEMES_HPP__
 
 #include <SFML/Graphics.hpp>
+#include "button.hpp"
 
 /**
  * Theme Structure and every instance for this project
