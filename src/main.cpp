@@ -104,6 +104,10 @@ int main() {
     ResourceManager::loadTexture("settings", "media/images/settings.png");
     ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
 
+    /* Audio */
+
+    ResourceManager::loadAudio("main theme", "media/music/Boo_Night_Fever.ogg");
+
 
     /* Dynamic Background */
     //Define size of each coloured background panel
@@ -187,11 +191,7 @@ int main() {
     Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), 1.f, sf::Color::Black);
 
     //Music to play while game is operational
-    sf::Music music;
-    if (!music.openFromFile("./media/music/Boo_Night_Fever.ogg")) { //CHANGE MUSIC LATER
-        std::cerr << "Error finding music file"; //error handling
-        return errno;
-    }
+    sf::Music& music = ResourceManager::getAudio("main theme");
     music.setLoop(true);
     music.play();
 

@@ -5,6 +5,7 @@
 #include <SFML/Audio.hpp>
 #include <map>
 #include <string>
+#include <memory>
 
 /**
  * Resource Management functions
@@ -63,7 +64,7 @@ private:
     static std::map<std::string, sf::Texture> textures;
 
     //Map containing all loaded audios
-    static std::map<std::string, sf::Music> audios;
+    static std::map<std::string, std::unique_ptr<sf::Music>> audios;
 };
 
 #endif

@@ -2,11 +2,14 @@
 #include <string>
 #include <map>
 #include <cerrno>
+#include <memory>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "resource_manager.hpp"
 
 std::map<std::string, sf::Font> ResourceManager::fonts;
 std::map<std::string, sf::Texture> ResourceManager::textures;
+std::map<std::string, std::unique_ptr<sf::Music>> ResourceManager::audios;
 
 void ResourceManager::loadFont(const std::string& name, const std::string& filename) {
     sf::Font font;
@@ -43,6 +46,25 @@ void ResourceManager::loadTexture(const std::string& name, const std::string& fi
 sf::Texture& ResourceManager::getTexture(const std::string& name) {
     try {
         return textures.at(name);
+    } catch (const std::out_of_range& ex) {
+        std::cerr << "out_of_range::what(): " << ex.what() << '\n';
+        exit(errno);
+    }
+}
+
+void ResourceManager::loadAudio(const std::string& name, const std::string& filename) {
+    auto music = std::make_unique<sf::Music>();
+    if (!music->openFromFile(filename)) {
+        std::cerr << "Error finding music file: " << filename << std::endl;
+        exit(errno);
+    }
+
+    audios[name] = std::move(music);
+}
+
+sf::Music& ResourceManager::getAudio(const std::string& name) {
+    try {
+        return *audios.at(name);
     } catch (const std::out_of_range& ex) {
         std::cerr << "out_of_range::what(): " << ex.what() << '\n';
         exit(errno);
