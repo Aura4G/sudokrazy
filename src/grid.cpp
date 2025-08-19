@@ -138,7 +138,10 @@ void Grid::deactivate() {
 }
 
 bool Grid::check() {
-    return finalBoard == playersBoard;
+    if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+        return finalBoard == playersBoard;
+    }
+    return false;
 }
 
 void Grid::appropriate() {

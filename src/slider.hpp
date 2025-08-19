@@ -16,13 +16,7 @@
 */
 class Slider {
 public:
-    //The line on which the grip button slides
-    sf::RectangleShape line;
-
-    //The button held by the user when adjusting the slider
-    Button grip;
-
-
+    
     /**
      * Parameterized constructor for sliders with variable length, position and color
      * @param length the slider length
@@ -99,6 +93,9 @@ public:
     //@return The activity status of the slider
     bool isActive();
 
+    //Allows for dynamic display of slider information
+    void displayPercentage(std::string before, std::string after);
+
 private:
     //The slider's line length
     float length;
@@ -117,6 +114,13 @@ private:
 
     //The distance between the mouse and button when dragging the button
     sf::Vector2f dragOffset;
+
+    //The line on which the grip button slides
+    sf::RectangleShape line;
+
+    //The button held by the user when adjusting the slider
+    Button grip;
+
 };
 
 #endif

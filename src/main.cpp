@@ -27,7 +27,7 @@ void changeNumber(Button& button, int& number) {
     }
 }
 
-bool isFullscreen = true;
+bool isFullscreen = false;
 sf::Vector2f virtualSize(600.f, 800.f);
 sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
 
@@ -139,7 +139,6 @@ int main() {
  
     //The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
-    grid.appropriate();
     grid.deactivate();
 
     //Indicates the number the player is currently using
@@ -175,9 +174,17 @@ int main() {
     Button vsyncToggle(150.f, 75.f, 100.f, 220.f, EASY_BUTTON, "V-Sync On", "gameFont");
 
     //Button to toggle fullscreen on/off
-    Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, EASY_BUTTON, "Fullscreen", "gameFont");
+    Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, (isFullscreen ? EASY_BUTTON : HARD_BUTTON), (isFullscreen ? "Fullscreen" : "Windowed"), "gameFont");
 
-    Slider volumeSlider(400.f, sf::Vector2f(100.f, 350.f), 1.f, sf::Color::Black);
+    sf::Text volumeText;
+    volumeText.setString("Volume:");
+    volumeText.setFont(ResourceManager::getFont("gameFont"));
+    volumeText.setCharacterSize(16);
+    volumeText.setFillColor(sf::Color::Black);
+    volumeText.setPosition(sf::Vector2f(100.f, 320.f));
+
+    //Change Volume
+    Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), 1.f, sf::Color::Black);
 
     //Music to play while game is operational
     sf::Music music;
@@ -434,6 +441,7 @@ int main() {
         }
 
         music.setVolume(volumeSlider.getPercentage());
+        volumeSlider.displayPercentage("","%");
 
         //move panels to the right
         float deltaTime = clock.restart().asSeconds();
@@ -512,6 +520,7 @@ int main() {
             window->draw(title);
         } else { //Draws for the settings menu
             window->draw(settingsTitle);
+            window->draw(volumeText);
             vsyncToggle.display(*window);
             fullscreenToggle.display(*window);
             volumeSlider.display(*window);

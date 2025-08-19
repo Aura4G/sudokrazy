@@ -1,9 +1,11 @@
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "slider.hpp"
 #include "button.hpp"
+#include "resource_manager.hpp"
 
 Slider::Slider(float length, sf::Vector2f position, float defaultSetting, sf::Color color)
-    : length(length), initialPosition(position), defaultSetting(defaultSetting), grip(20.f,20.f,0.f,0.f,MEDIUM_BUTTON,"","gameFont",ShapeType::Circle)
+    : length(length), initialPosition(position), defaultSetting(defaultSetting), grip(20.f,20.f,position.x,position.y,MEDIUM_BUTTON,"","homeFont",ShapeType::Circle)
     {
         line.setPosition(position);
         line.setSize(sf::Vector2f(length, 10.f));
@@ -25,7 +27,7 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
         if (grip.circleFrame.getGlobalBounds().contains(mousePos)) {
             isDragging = true;
-            dragOffset = grip.circleFrame.getPosition() - mousePos;
+            dragOffset = grip.getPosition() - mousePos;
         }
     }
 
@@ -38,15 +40,15 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     //Moves the grip with the mouse, by detecting mouse movement and identifying the dragging flag
     if (event.type == sf::Event::MouseMoved && isDragging) {
         sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseMove.x, event.mouseMove.y});
-        grip.circleFrame.setPosition(sf::Vector2f(mousePos.x + dragOffset.x, initialPosition.y + line.getSize().y/2));
+        grip.setPosition(sf::Vector2f(mousePos.x + dragOffset.x, initialPosition.y + line.getSize().y/2));
 
 
         //The slider's grip button cannot leave the bounds of the slider itself.
         sf::FloatRect bounds = line.getGlobalBounds();
         if (mousePos.x < bounds.left) {
-            grip.circleFrame.setPosition(sf::Vector2f(bounds.left, initialPosition.y + line.getSize().y/2));
+            grip.setPosition(sf::Vector2f(bounds.left, initialPosition.y + line.getSize().y/2));
         } else if (mousePos.x > bounds.left + bounds.width) {
-            grip.circleFrame.setPosition(sf::Vector2f(bounds.left + bounds.width, initialPosition.y + line.getSize().y/2));
+            grip.setPosition(sf::Vector2f(bounds.left + bounds.width, initialPosition.y + line.getSize().y/2));
         }
     }
 
@@ -69,4 +71,13 @@ void Slider::activate() {
 
 void Slider::deactivate() {
     active = false;
+}
+
+void Slider::displayPercentage(std::string before = "", std::string after = "") {
+    int currentNum = static_cast<int>(getPercentage());
+
+    std::string finalString = before + std::to_string(currentNum) + after;
+
+    grip.setText(finalString);
+    grip.setPosition(grip.getPosition());
 }
