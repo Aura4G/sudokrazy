@@ -27,9 +27,11 @@ public:
      * Parameterized constructor for sliders with variable length, position and color
      * @param length the slider length
      * @param position the vector position on the window the start of the slider will take
+     * @param defaultSetting the position on the slider line the grip initially takes, must be be
+     * a float between 0 and 1
      * @param color the color of the line of the slider
     */
-    Slider(float length, sf::Vector2f position, sf::Color color);
+    Slider(float length, sf::Vector2f position, float defaultSetting, sf::Color color);
 
 
     /**
@@ -90,12 +92,19 @@ public:
     float getOriginalPos();
 
 
+    //@return how far along the slider line the button is, in %
+    float getPercentage();
+
+
     //@return The activity status of the slider
     bool isActive();
 
 private:
     //The slider's line length
     float length;
+
+    //The Slider Grip's default position
+    float defaultSetting;
 
     //The slider line's position
     sf::Vector2f initialPosition;

@@ -118,6 +118,14 @@ sf::Vector2f Button::getOriginalPos() {
     return sf::Vector2f(x,y);
 }
 
+sf::Vector2f Button::getPosition() {
+    if (shapeType == ShapeType::Rectangle) {
+        return frame.getPosition();
+    } else {
+        return circleFrame.getPosition();
+    }
+}
+
 ButtonTheme Button::getTheme() {
     return theme;
 }

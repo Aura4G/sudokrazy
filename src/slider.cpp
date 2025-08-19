@@ -2,15 +2,15 @@
 #include "slider.hpp"
 #include "button.hpp"
 
-Slider::Slider(float length, sf::Vector2f position, sf::Color color)
-    : length(length), initialPosition(position), grip(15.f,15.f,0.f,0.f,MEDIUM_BUTTON,"","gameFont",ShapeType::Circle)
+Slider::Slider(float length, sf::Vector2f position, float defaultSetting, sf::Color color)
+    : length(length), initialPosition(position), defaultSetting(defaultSetting), grip(20.f,20.f,0.f,0.f,MEDIUM_BUTTON,"","gameFont",ShapeType::Circle)
     {
         line.setPosition(position);
         line.setSize(sf::Vector2f(length, 10.f));
         line.setFillColor(color);
 
         grip.setOrigin(grip.getWidth(), grip.getWidth());
-        grip.setPosition(sf::Vector2f(initialPosition.x, initialPosition.y + line.getSize().y/2));
+        grip.setPosition(sf::Vector2f(initialPosition.x + defaultSetting * length, initialPosition.y + line.getSize().y/2));
     }
 
 void Slider::display(sf::RenderWindow& window) {
@@ -20,7 +20,7 @@ void Slider::display(sf::RenderWindow& window) {
 
 void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     //The grip is currently being clicked on
-    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+    if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && active) {
                 
         sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
         if (grip.circleFrame.getGlobalBounds().contains(mousePos)) {
@@ -40,6 +40,7 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
         sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseMove.x, event.mouseMove.y});
         grip.circleFrame.setPosition(sf::Vector2f(mousePos.x + dragOffset.x, initialPosition.y + line.getSize().y/2));
 
+
         //The slider's grip button cannot leave the bounds of the slider itself.
         sf::FloatRect bounds = line.getGlobalBounds();
         if (mousePos.x < bounds.left) {
@@ -48,4 +49,24 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
             grip.circleFrame.setPosition(sf::Vector2f(bounds.left + bounds.width, initialPosition.y + line.getSize().y/2));
         }
     }
+
+    if (isDragging) {
+        grip.setColor(grip.getTheme().hovering);
+    } else {
+        grip.setColor(grip.getTheme().unhovered);
+    }
+}
+
+float Slider::getPercentage() {
+    sf::FloatRect bounds = line.getGlobalBounds();
+
+    return ((grip.getPosition().x - bounds.left) / bounds.width) * 100;
+}
+
+void Slider::activate() {
+    active = true;
+}
+
+void Slider::deactivate() {
+    active = false;
 }

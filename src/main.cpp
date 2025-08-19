@@ -177,7 +177,7 @@ int main() {
     //Button to toggle fullscreen on/off
     Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, EASY_BUTTON, "Fullscreen", "gameFont");
 
-    Slider test(400.f, sf::Vector2f(100.f, 350.f), sf::Color::Black);
+    Slider volumeSlider(400.f, sf::Vector2f(100.f, 350.f), 1.f, sf::Color::Black);
 
     //Music to play while game is operational
     sf::Music music;
@@ -185,8 +185,8 @@ int main() {
         std::cerr << "Error finding music file"; //error handling
         return errno;
     }
-    //music.setLoop(true);
-    //music.play();
+    music.setLoop(true);
+    music.play();
 
     //Points to a color theme that matches the game state
     const Theme* currentTheme = &HOME_THEME;
@@ -315,7 +315,7 @@ int main() {
                 updateView(*window); //updates the window if resized in this frame
             }
 
-            test.handleEvent(event, *window);
+            volumeSlider.handleEvent(event, *window);
         }
 
         switch (stateFlag) { //switch graphical themes depending on the game state
@@ -349,7 +349,7 @@ int main() {
                 break;
         }
 
-        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Gameplay state
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
             mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
@@ -376,7 +376,8 @@ int main() {
             settingsToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
-        } else if (stateFlag == STATE_HOME){
+            volumeSlider.deactivate();
+        } else if (stateFlag == STATE_HOME){ //Home Menu State
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
             mediumSwitch.activateMovement(mediumSwitch.getOriginalPos(), 400.f);
@@ -402,7 +403,8 @@ int main() {
             settingsToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
-        } else {
+            volumeSlider.deactivate();
+        } else { //Settings menu state
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
             mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
@@ -428,7 +430,10 @@ int main() {
             settingsToggle.deactivate();
             vsyncToggle.activate();
             fullscreenToggle.activate();
+            volumeSlider.activate();
         }
+
+        music.setVolume(volumeSlider.getPercentage());
 
         //move panels to the right
         float deltaTime = clock.restart().asSeconds();
@@ -466,7 +471,7 @@ int main() {
                 }
             }
             grid.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-        } else {
+        } else { //Settings menu
             vsyncToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
             fullscreenToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
@@ -497,7 +502,7 @@ int main() {
         window->draw(panel1);
         window->draw(panel2);
         window->draw(panel3);
-        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Draws for an active sudoku gmae
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Draws for an active sudoku game
             grid.display(*window);
             for (Button& button : numberChangers) {
                 button.display(*window);
@@ -509,7 +514,7 @@ int main() {
             window->draw(settingsTitle);
             vsyncToggle.display(*window);
             fullscreenToggle.display(*window);
-            test.display(*window);
+            volumeSlider.display(*window);
         }
         easySwitch.display(*window);
         mediumSwitch.display(*window);
@@ -521,6 +526,6 @@ int main() {
         }
         window->display();
     }
-    //music.stop();
+    music.stop();
     return 0;
 }

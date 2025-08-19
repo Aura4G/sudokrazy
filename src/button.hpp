@@ -95,6 +95,10 @@ public:
     sf::Vector2f getOriginalPos();
 
 
+    /** @return A vector with the position the button currently has */
+    sf::Vector2f getPosition();
+
+
     /** @return the button theme being used by the button */
     ButtonTheme getTheme();
 

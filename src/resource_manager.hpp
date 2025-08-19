@@ -2,6 +2,7 @@
 #define __RESOURCE_MANAGER_HPP__
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <map>
 #include <string>
 
@@ -27,6 +28,12 @@ public:
     static sf::Texture& getTexture(const std::string& name);
 
     /**
+     * @return The audio file in the audios map with the corresponding key
+     * @param name The key of the desired audio
+    */
+   static sf::Music& getAudio(const std::string& name);
+
+    /**
      * Adds a font and its key to the fonts map
      * @param name The new font's key for the map
      * @param filename The path to the .otf/.ttf file being used
@@ -40,6 +47,13 @@ public:
     */
     static void loadTexture(const std::string& name, const std::string& filename);
 
+    /**
+     * Adds an audio and its key to the audios map
+     * @param name The new audio's key for the map
+     * @param filename The path to the audio file being used
+    */
+   static void loadAudio(const std::string& name, const std::string& filename);
+
 private:
 
     //Map containing all loaded fonts
@@ -47,6 +61,9 @@ private:
 
     //Map containing all loaded textures
     static std::map<std::string, sf::Texture> textures;
+
+    //Map containing all loaded audios
+    static std::map<std::string, sf::Music> audios;
 };
 
 #endif
