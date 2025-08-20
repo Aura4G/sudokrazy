@@ -125,7 +125,7 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
 
 void Grid::activate() {
     for (Button& block : whiteBlocks) {
-        if (block.text.getString() == "") { //only allows button functionality if the block starts out as empty
+        if (block.text.getString() == "" || block.getTheme().hovering == INPUT_BUTTON.hovering) { //only allows button functionality if the block starts out as empty
             block.activate();
         }
     }
