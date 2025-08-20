@@ -41,7 +41,7 @@ std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen);
  * Scales window and its assets to new window size
  * @param win The current game window
 */
-void updateView(sf::RenderWindow& win);
+void updateView(sf::RenderTexture& target, sf::RenderWindow& win);
 
 //The current state the game is in
 extern GameState stateFlag;

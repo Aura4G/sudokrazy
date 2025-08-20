@@ -3,6 +3,7 @@
 #include "slider.hpp"
 #include "button.hpp"
 #include "resource_manager.hpp"
+#include "main.hpp"
 
 Slider::Slider(float length, sf::Vector2f position, float defaultSetting, sf::Color color)
     : length(length), initialPosition(position), defaultSetting(defaultSetting), grip(20.f,20.f,position.x,position.y,MEDIUM_BUTTON,"","homeFont",ShapeType::Circle)
@@ -24,7 +25,7 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
     //The grip is currently being clicked on
     if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left && active) {
                 
-        sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y});
+        sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseButton.x, event.mouseButton.y}, gameView);
         if (grip.circleFrame.getGlobalBounds().contains(mousePos)) {
             isDragging = true;
             dragOffset = grip.getPosition() - mousePos;
@@ -39,7 +40,7 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 
     //Moves the grip with the mouse, by detecting mouse movement and identifying the dragging flag
     if (event.type == sf::Event::MouseMoved && isDragging) {
-        sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseMove.x, event.mouseMove.y});
+        sf::Vector2f mousePos = window.mapPixelToCoords({event.mouseMove.x, event.mouseMove.y}, gameView);
         grip.setPosition(sf::Vector2f(mousePos.x + dragOffset.x, initialPosition.y + line.getSize().y/2));
 
 

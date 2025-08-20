@@ -40,7 +40,7 @@ std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen) {
     }
 }
 
-void updateView(sf::RenderWindow& win) {
+void updateView(sf::RenderTexture& target, sf::RenderWindow& win) {
     //Get window size in pixels
     sf::Vector2u windowSize = win.getSize();
 
@@ -66,7 +66,10 @@ void updateView(sf::RenderWindow& win) {
     }
 
     gameView.setViewport(viewport); // Apply normalized rectangle to view
-    win.setView(gameView);          // Tell the window to use the adjusted view
+    
+    target.setView(gameView); //Apply view to the render texture
+    
+    win.setView(win.getDefaultView());          // Tell the window to use the adjusted view
 }
 
 int main() {
@@ -76,7 +79,12 @@ int main() {
 
     /* Window with fixed size and cannot fullscreen */
     auto window = createWindow(isFullscreen);
-    updateView(*window);
+
+    //brightness shader activation
+    sf::RenderTexture renderTexture;
+    renderTexture.create(window->getSize().x, window->getSize().y);
+
+    updateView(renderTexture, *window);
     window->setPosition(sf::Vector2i(0,0));
 
     window->setVerticalSyncEnabled(vsync);
@@ -111,11 +119,6 @@ int main() {
     /* Shaders */
 
     ResourceManager::loadShader("brightness", "media/shaders/brightness.frag");
-
-
-    //brightness shader activation
-    sf::RenderTexture renderTexture;
-    renderTexture.create(window->getSize().x, window->getSize().y);
 
     sf::Shader& brightnessShader = ResourceManager::getShader("brightness");
     float currentBrightness = 1.0f; //normal brightness
@@ -202,10 +205,22 @@ int main() {
     //Change Volume
     Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), 1.f, sf::Color::Black);
 
+    sf::Text brightnessText;
+    brightnessText.setString("Brightness:");
+    brightnessText.setFont(ResourceManager::getFont("gameFont"));
+    brightnessText.setCharacterSize(16);
+    brightnessText.setFillColor(sf::Color::Black);
+    brightnessText.setPosition(sf::Vector2f(100.f, 400.f));
+
+    //Change Brightness
+    Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), 1.f, sf::Color::Black);
+
+
     //Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
     music.setLoop(true);
     music.play();
+
 
     //Points to a color theme that matches the game state
     const Theme* currentTheme = &HOME_THEME;
@@ -295,7 +310,10 @@ int main() {
                         window->close();
 
                         window = createWindow(isFullscreen);
-                        updateView(*window);
+
+                        renderTexture.create(window->getSize().x, window->getSize().y);
+
+                        updateView(renderTexture, *window);
                         window->setPosition(sf::Vector2i(0,0));
 
                         // Reapply timing policy (pick one of these approaches)
@@ -331,10 +349,11 @@ int main() {
             }
 
             if (event.type == sf::Event::Resized) {
-                updateView(*window); //updates the window if resized in this frame
+                updateView(renderTexture, *window); //updates the window if resized in this frame
             }
 
             volumeSlider.handleEvent(event, *window);
+            brightnessSlider.handleEvent(event, *window);
         }
 
         switch (stateFlag) { //switch graphical themes depending on the game state
@@ -396,6 +415,7 @@ int main() {
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
+            brightnessSlider.deactivate();
         } else if (stateFlag == STATE_HOME){ //Home Menu State
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -423,6 +443,7 @@ int main() {
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
+            brightnessSlider.deactivate();
         } else { //Settings menu state
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
@@ -450,10 +471,14 @@ int main() {
             vsyncToggle.activate();
             fullscreenToggle.activate();
             volumeSlider.activate();
+            brightnessSlider.activate();
         }
 
         music.setVolume(volumeSlider.getPercentage());
         volumeSlider.displayPercentage("","%");
+
+        currentBrightness = brightnessSlider.getPercentage()/100.f;
+        brightnessSlider.displayPercentage("","%");
 
         //move panels to the right
         float deltaTime = clock.restart().asSeconds();
@@ -533,9 +558,11 @@ int main() {
         } else { //Draws for the settings menu
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);
+            renderTexture.draw(brightnessText);
             vsyncToggle.display(renderTexture);
             fullscreenToggle.display(renderTexture);
             volumeSlider.display(renderTexture);
+            brightnessSlider.display(renderTexture);
         }
         easySwitch.display(renderTexture);
         mediumSwitch.display(renderTexture);
