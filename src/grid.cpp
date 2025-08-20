@@ -67,10 +67,10 @@ Grid::Grid(sf::Vector2f position, float size) {
     }
 }
 
-void Grid::display(sf::RenderWindow& window) {
-    window.draw(back);
+void Grid::display(sf::RenderTexture& renderTexture) {
+    renderTexture.draw(back);
     for (int i = 0; i < 81; i++) {
-        whiteBlocks[i].display(window);
+        whiteBlocks[i].display(renderTexture);
     }
 }
 

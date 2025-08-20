@@ -15,9 +15,9 @@ Slider::Slider(float length, sf::Vector2f position, float defaultSetting, sf::Co
         grip.setPosition(sf::Vector2f(initialPosition.x + defaultSetting * length, initialPosition.y + line.getSize().y/2));
     }
 
-void Slider::display(sf::RenderWindow& window) {
-    window.draw(line);
-    grip.display(window);
+void Slider::display(sf::RenderTexture& renderTexture) {
+    renderTexture.draw(line);
+    grip.display(renderTexture);
 }
 
 void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {

@@ -63,7 +63,7 @@ public:
 
     //Draws the slider
     //TODO
-    void display(sf::RenderWindow& window);
+    void display(sf::RenderTexture& renderTexture);
 
 
     //TODO

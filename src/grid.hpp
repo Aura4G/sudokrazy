@@ -29,7 +29,7 @@ public:
     /** Draws the grid frame and all of the buttons
     * @param window The window being drawn on
     */
-    void display(sf::RenderWindow& window);
+    void display(sf::RenderTexture& renderTexture);
 
 
     /** Iteratively calls the update function for every button in the grid

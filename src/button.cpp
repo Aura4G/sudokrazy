@@ -252,17 +252,17 @@ void Button::fitSpriteInFrame(sf::Sprite& subject, const sf::CircleShape& circle
     subject.setPosition(x, y);
 }
 
-void Button::display(sf::RenderWindow& window) {
+void Button::display(sf::RenderTexture& renderTexture) {
     if (shapeType == ShapeType::Rectangle) {
-        window.draw(frame);
+        renderTexture.draw(frame);
     } else {
-        window.draw(circleFrame);
+        renderTexture.draw(circleFrame);
     }
 
     if (subject.getTexture() != &ResourceManager::getTexture("placeholder")) {
-        window.draw(subject);
+        renderTexture.draw(subject);
     } else {
-        window.draw(text);
+        renderTexture.draw(text);
     }
 }
 

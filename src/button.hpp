@@ -129,7 +129,7 @@ public:
     /** Calls all necessary draws for the text and frame
     * @param window The game window drawn on 
     */
-    void display(sf::RenderWindow& window);
+    void display(sf::RenderTexture& renderTexture);
 
 
     //Sets active to true

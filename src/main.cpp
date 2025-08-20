@@ -108,6 +108,18 @@ int main() {
 
     ResourceManager::loadAudio("main theme", "media/music/Boo_Night_Fever.ogg");
 
+    /* Shaders */
+
+    ResourceManager::loadShader("brightness", "media/shaders/brightness.frag");
+
+
+    //brightness shader activation
+    sf::RenderTexture renderTexture;
+    renderTexture.create(window->getSize().x, window->getSize().y);
+
+    sf::Shader& brightnessShader = ResourceManager::getShader("brightness");
+    float currentBrightness = 1.0f; //normal brightness
+
 
     /* Dynamic Background */
     //Define size of each coloured background panel
@@ -505,34 +517,41 @@ int main() {
 
         //Draw everything necessary
         clearTheme = updateColour(clearTheme, currentTheme->bgClear, deltaTime);
-        window->clear(clearTheme);
-        window->setView(gameView);
-        window->draw(panel1);
-        window->draw(panel2);
-        window->draw(panel3);
+        renderTexture.clear(clearTheme);
+        renderTexture.setView(gameView);
+        renderTexture.draw(panel1);
+        renderTexture.draw(panel2);
+        renderTexture.draw(panel3);
         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Draws for an active sudoku game
-            grid.display(*window);
+            grid.display(renderTexture);
             for (Button& button : numberChangers) {
-                button.display(*window);
+                button.display(renderTexture);
             }
-            eraser.display(*window);
+            eraser.display(renderTexture);
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
-            window->draw(title);
+            renderTexture.draw(title);
         } else { //Draws for the settings menu
-            window->draw(settingsTitle);
-            window->draw(volumeText);
-            vsyncToggle.display(*window);
-            fullscreenToggle.display(*window);
-            volumeSlider.display(*window);
+            renderTexture.draw(settingsTitle);
+            renderTexture.draw(volumeText);
+            vsyncToggle.display(renderTexture);
+            fullscreenToggle.display(renderTexture);
+            volumeSlider.display(renderTexture);
         }
-        easySwitch.display(*window);
-        mediumSwitch.display(*window);
-        hardSwitch.display(*window);
-        krazySwitch.display(*window);
-        exit.display(*window);
+        easySwitch.display(renderTexture);
+        mediumSwitch.display(renderTexture);
+        hardSwitch.display(renderTexture);
+        krazySwitch.display(renderTexture);
+        exit.display(renderTexture);
         if (settingsToggle.isActive()) {
-            settingsToggle.display(*window);
+            settingsToggle.display(renderTexture);
         }
+        renderTexture.display();
+
+        //Apply shaders
+        window->clear();
+        sf::Sprite finalSprite(renderTexture.getTexture());
+        brightnessShader.setUniform("brightness", currentBrightness);
+        window->draw(finalSprite, &brightnessShader);
         window->display();
     }
     music.stop();
