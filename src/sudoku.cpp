@@ -76,7 +76,7 @@ void Board::removeNumbers() {
     //Determines the quantity of numbers to be removed
     int countdown = 0;
 
-    if (stateFlag == STATE_EASY || stateFlag == STATE_HOME || stateFlag == STATE_SETTINGS) {
+    if (stateFlag == STATE_EASY) {
         countdown = rand() % 10 + 10; //countdown between 10 and 20 to be removed
     } else if (stateFlag == STATE_MEDIUM) { //krazy currently removes as much as normal
         countdown = rand() % 20 + 20; //countdown between 20 and 40 to be removed

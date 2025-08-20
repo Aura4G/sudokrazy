@@ -138,7 +138,7 @@ void Grid::deactivate() {
 }
 
 bool Grid::check() {
-    if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+    if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //The grid will only check the board if an active game is being played
         return finalBoard == playersBoard;
     }
     return false;

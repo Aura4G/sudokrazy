@@ -13,6 +13,9 @@ Slider::Slider(float length, sf::Vector2f position, float defaultSetting, sf::Co
         line.setFillColor(color);
 
         grip.setOrigin(grip.getWidth(), grip.getWidth());
+
+        //Places the slider's grip button at the default position specified in the function call
+        //This means that the slider's initial percentage is whatever position default gives the button
         grip.setPosition(sf::Vector2f(initialPosition.x + defaultSetting * length, initialPosition.y + line.getSize().y/2));
     }
 
@@ -75,10 +78,13 @@ void Slider::deactivate() {
 }
 
 void Slider::displayPercentage(std::string before = "", std::string after = "") {
+    //Button display only needs integer information to be displayed; it's not complex
     int currentNum = static_cast<int>(getPercentage());
 
     std::string finalString = before + std::to_string(currentNum) + after;
 
     grip.setText(finalString);
+
+    //The button's position must be set again to allow for text to move with the button
     grip.setPosition(grip.getPosition());
 }

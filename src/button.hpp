@@ -77,9 +77,17 @@ public:
     void setTexture(const sf::Texture& newTexture, float padding);
 
 
+    /**
+     * Sets the button's frames, text and sprite to a another position on the window
+     * @param newPos the new button position
+    */
     void setPosition(const sf::Vector2f& newPos);
 
-
+    /**
+     * Sets the origin for all sfml elements in the button
+     * @param x
+     * @param y
+    */
     void setOrigin(float x, float y);
 
 
@@ -127,7 +135,7 @@ public:
 
 
     /** Calls all necessary draws for the text and frame
-    * @param window The game window drawn on 
+    * @param renderTexture The game render texture drawn on 
     */
     void display(sf::RenderTexture& renderTexture);
 

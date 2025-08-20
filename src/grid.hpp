@@ -27,7 +27,7 @@ public:
 
 
     /** Draws the grid frame and all of the buttons
-    * @param window The window being drawn on
+    * @param renderTexture The render texture being drawn on
     */
     void display(sf::RenderTexture& renderTexture);
 

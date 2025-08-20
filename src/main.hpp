@@ -39,6 +39,7 @@ std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen);
 
 /**
  * Scales window and its assets to new window size
+ * @param target The render texture that's drawn by the game window
  * @param win The current game window
 */
 void updateView(sf::RenderTexture& target, sf::RenderWindow& win);

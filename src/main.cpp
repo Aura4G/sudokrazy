@@ -69,7 +69,7 @@ void updateView(sf::RenderTexture& target, sf::RenderWindow& win) {
     
     target.setView(gameView); //Apply view to the render texture
     
-    win.setView(win.getDefaultView());          // Tell the window to use the adjusted view
+    win.setView(win.getDefaultView()); // Tell the window to use the adjusted view
 }
 
 int main() {

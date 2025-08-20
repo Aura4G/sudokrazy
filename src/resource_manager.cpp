@@ -54,6 +54,7 @@ sf::Texture& ResourceManager::getTexture(const std::string& name) {
 }
 
 void ResourceManager::loadAudio(const std::string& name, const std::string& filename) {
+    //Music object duplication is a deleted function, so we have to use unique pointers and memory movement for music
     auto music = std::make_unique<sf::Music>();
     if (!music->openFromFile(filename)) {
         std::cerr << "Error finding music file: " << filename << std::endl;
@@ -73,6 +74,7 @@ sf::Music& ResourceManager::getAudio(const std::string& name) {
 }
 
 void ResourceManager::loadShader(const std::string& name, const std::string& filename) {
+    //Shader object duplication is a deleted function, so we have to use unique pointers and memory movement for shader
     auto shader = std::make_unique<sf::Shader>();
     if (!shader->loadFromFile(filename, sf::Shader::Fragment)) {
         std::cerr << "Error finding shader file: " << filename << std::endl;

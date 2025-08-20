@@ -83,6 +83,8 @@ void Button::setTheme(const ButtonTheme& newTheme) {
 
 void Button::setTexture(const sf::Texture& newTexture, float padding = 10.f) {
     subject.setTexture(newTexture);
+
+    //Scales the sprite to the button frame so the texture can use more space
     subject.setTextureRect(sf::IntRect(0, 0, newTexture.getSize().x, newTexture.getSize().y));
     
     if (shapeType == ShapeType::Circle) {
@@ -119,6 +121,7 @@ sf::Vector2f Button::getOriginalPos() {
 }
 
 sf::Vector2f Button::getPosition() {
+    //returns the position of the frame that's being used
     if (shapeType == ShapeType::Rectangle) {
         return frame.getPosition();
     } else {
@@ -139,9 +142,9 @@ bool Button::isActive() {
 }
 
 bool Button::isHovering(const sf::Vector2f& mousePos) const {
-    if (shapeType == ShapeType::Rectangle) {
+    if (shapeType == ShapeType::Rectangle) { //returns whether or not the mouse is in the rectangle frame
         return frame.getGlobalBounds().contains(mousePos);
-    } else {
+    } else { //returns true if mouse position from circle center doesn't exceed the circle's area
         sf::Vector2f center = circleFrame.getPosition();
         float radius = circleFrame.getRadius();
         float dx = mousePos.x - center.x;
@@ -253,6 +256,7 @@ void Button::fitSpriteInFrame(sf::Sprite& subject, const sf::CircleShape& circle
 }
 
 void Button::display(sf::RenderTexture& renderTexture) {
+    //Draws frame of the button's selected shape type
     if (shapeType == ShapeType::Rectangle) {
         renderTexture.draw(frame);
     } else {

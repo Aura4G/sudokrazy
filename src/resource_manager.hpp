@@ -19,24 +19,28 @@ public:
     /**
      * @return The font file in the fonts map with the corresponding key
      * @param name The key of the desired font
+     * @throw std::out_of_range
     */
     static sf::Font& getFont(const std::string& name);
 
     /**
      * @return The texture in the textures map with the corresponding key
      * @param name The key of the desired texture
+     * @throw std::out_of_range
     */
     static sf::Texture& getTexture(const std::string& name);
 
     /**
      * @return The audio file in the audios map with the corresponding key
      * @param name The key of the desired audio
+     * @throw std::out_of_range
     */
     static sf::Music& getAudio(const std::string& name);
 
     /**
      * @return The shader file in the shaders map with the corresponding key
      * @param name The key of the desired shader 
+     * @throw std::out_of_range
     */
     static sf::Shader& getShader(const std::string& name);
 

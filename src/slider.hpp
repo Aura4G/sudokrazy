@@ -47,8 +47,6 @@ public:
     /**
     * "Activates" the slider, allowing for user interactions to affect the slider
     * and any settings attributed to the slider
-    * 
-    * @todo
     */
     void activate();
 
@@ -56,13 +54,14 @@ public:
     /**
     * "Deactivates" the slider, prohibiting user interactions from affecting the slider
     * and any settings attributed to the slider
-    * @todo
     */
     void deactivate();
 
 
-    //Draws the slider
-    //TODO
+    /**
+     * Draws the slider
+     * @param renderTexture The render texture being drawn on
+    */
     void display(sf::RenderTexture& renderTexture);
 
 
