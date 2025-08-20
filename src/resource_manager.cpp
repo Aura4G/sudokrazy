@@ -10,6 +10,7 @@
 std::map<std::string, sf::Font> ResourceManager::fonts;
 std::map<std::string, sf::Texture> ResourceManager::textures;
 std::map<std::string, std::unique_ptr<sf::Music>> ResourceManager::audios;
+std::map<std::string, std::unique_ptr<sf::Shader>> ResourceManager::shaders;
 
 void ResourceManager::loadFont(const std::string& name, const std::string& filename) {
     sf::Font font;
@@ -65,6 +66,25 @@ void ResourceManager::loadAudio(const std::string& name, const std::string& file
 sf::Music& ResourceManager::getAudio(const std::string& name) {
     try {
         return *audios.at(name);
+    } catch (const std::out_of_range& ex) {
+        std::cerr << "out_of_range::what(): " << ex.what() << '\n';
+        exit(errno);
+    }
+}
+
+void ResourceManager::loadShader(const std::string& name, const std::string& filename) {
+    auto shader = std::make_unique<sf::Shader>();
+    if (!shader->loadFromFile(filename, sf::Shader::Fragment)) {
+        std::cerr << "Error finding shader file: " << filename << std::endl;
+        exit(errno);
+    }
+
+    shaders[name] = std::move(shader);
+}
+
+sf::Shader& ResourceManager::getShader(const std::string& name) {
+    try {
+        return *shaders.at(name);
     } catch (const std::out_of_range& ex) {
         std::cerr << "out_of_range::what(): " << ex.what() << '\n';
         exit(errno);

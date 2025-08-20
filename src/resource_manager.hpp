@@ -32,7 +32,13 @@ public:
      * @return The audio file in the audios map with the corresponding key
      * @param name The key of the desired audio
     */
-   static sf::Music& getAudio(const std::string& name);
+    static sf::Music& getAudio(const std::string& name);
+
+    /**
+     * @return The shader file in the shaders map with the corresponding key
+     * @param name The key of the desired shader 
+    */
+    static sf::Shader& getShader(const std::string& name);
 
     /**
      * Adds a font and its key to the fonts map
@@ -53,7 +59,14 @@ public:
      * @param name The new audio's key for the map
      * @param filename The path to the audio file being used
     */
-   static void loadAudio(const std::string& name, const std::string& filename);
+    static void loadAudio(const std::string& name, const std::string& filename);
+
+    /**
+     * Adds a shader and its key to the shaders map
+     * @param name The new audio's key for the map
+     * @param filename The path to the audio file being used
+    */
+    static void loadShader(const std::string& name, const std::string& filename);
 
 private:
 
@@ -65,6 +78,9 @@ private:
 
     //Map containing all loaded audios
     static std::map<std::string, std::unique_ptr<sf::Music>> audios;
+
+    //Map containing all loaded shaders
+    static std::map<std::string, std::unique_ptr<sf::Shader>> shaders;
 };
 
 #endif
