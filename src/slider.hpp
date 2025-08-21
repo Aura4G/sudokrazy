@@ -18,7 +18,7 @@ class Slider {
 public:
     
     /**
-     * Parameterized constructor for sliders with variable length, position and color
+     * Parameterised constructor for sliders with variable length, position and color
      * @param length the slider length
      * @param position the vector position on the window the start of the slider will take
      * @param defaultSetting the position on the slider line the grip initially takes, must be be
