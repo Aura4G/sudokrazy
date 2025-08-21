@@ -50,7 +50,7 @@ public:
     * @param mousePos Mouse position relative to the window in the current frame
     * @param number The new number to replace the current number in the selected panel of the grid IF it is visible and active
     */
-    void updateNumbers(const sf::Vector2f& mousePos, int number);
+    bool updateNumbers(const sf::Vector2f& mousePos, int number);
 
 
     //Activates the grid and every button on the grid

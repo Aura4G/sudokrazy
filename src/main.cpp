@@ -13,6 +13,7 @@
 #include "button.hpp"
 #include "resource_manager.hpp"
 #include "slider.hpp"
+#include "record.hpp"
 
 GameState stateFlag = STATE_HOME;
 
@@ -229,6 +230,11 @@ int main() {
     stateFlag = STATE_HOME;
     GameState prevState = STATE_HOME;
 
+    sf::Clock timer;
+    int score = 0;
+    float timeGap = 0;
+    sf::Time previousHit = timer.getElapsedTime();
+
     //game loop
     while (window->isOpen()) {
         sf::Event event;
@@ -244,24 +250,32 @@ int main() {
                 
                 if (easySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts an easy game
                     if (easySwitch.isActive()) {
+                        timer.restart();
+                        score = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_EASY;
                         grid.appropriate();
                     }
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
+                        timer.restart();
+                        score = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_MEDIUM;
                         grid.appropriate();
                     }
                 } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
+                        timer.restart();
+                        score = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_HARD;
                         grid.appropriate();
                     }
                 } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
+                        timer.restart();
+                        score = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_KRAZY;
                         grid.appropriate();
@@ -342,8 +356,17 @@ int main() {
                     }
                 }
 
-                grid.updateNumbers(worldPos, number);
+                if (grid.updateNumbers(worldPos, number)) {
+                    timeGap = timer.getElapsedTime().asSeconds() - previousHit.asSeconds();
+                    score += (timeGap >= 60.f ? 5 : static_cast<int>(stateFlag * (50 - 0.75 * timeGap)));
+                    previousHit = timer.getElapsedTime();
+                }
+                
                 if (grid.check()) { //checks if the grid has all its correct numbers
+                    Record game(score, stateFlag, timer.getElapsedTime());
+                    RecordManager::addRecord(game);
+
+                    prevState = stateFlag;
                     stateFlag = STATE_HOME;
                     Grid::eraser_mode = false;
                 }

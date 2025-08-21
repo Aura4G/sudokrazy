@@ -88,7 +88,7 @@ void Grid::updateHover(const sf::Vector2f& mousePos) {
     }
 }
 
-void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
+bool Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
     //Used to access a particular cell from row and column..
     int counter = 0;
     // .. when iterating through each block 
@@ -111,6 +111,11 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
                         } else {
                             shuffled = false;
                         }
+
+                        if (playersBoard.getNumber(counter/9, counter%9) == finalBoard.getNumber(counter/9, counter%9)) {
+                            return true;
+                        }
+                        return false;
                     }
                 } else {
                     block.setText("");
@@ -121,6 +126,8 @@ void Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
         }
         counter++;
     }
+
+    return false;
 }
 
 void Grid::activate() {
