@@ -368,7 +368,7 @@ int main() {
 
                 if (grid.updateNumbers(worldPos, number)) {
                     timeGap = timer.getElapsedTime().asSeconds() - previousHit.asSeconds();
-                    score += (timeGap >= 60.f ? 5 : static_cast<int>(stateFlag * (50 - 0.75 * timeGap)));
+                    score += (timeGap >= 60.f ? 5 * stateFlag : static_cast<int>(stateFlag * (50 - 0.75 * timeGap)));
                     previousHit = timer.getElapsedTime();
                 }
                 
