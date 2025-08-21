@@ -217,6 +217,16 @@ int main() {
     //Change Brightness
     Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), 1.f, sf::Color::Black);
 
+    sf::Text scrollerText;
+    scrollerText.setString("Background scroll speed:");
+    scrollerText.setFont(ResourceManager::getFont("gameFont"));
+    scrollerText.setCharacterSize(16);
+    scrollerText.setFillColor(sf::Color::Black);
+    scrollerText.setPosition(sf::Vector2f(100.f, 480.f));
+
+    //Change Brightness
+    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), 0.67f, sf::Color::Black);
+
 
     //Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
@@ -378,6 +388,7 @@ int main() {
 
             volumeSlider.handleEvent(event, *window);
             brightnessSlider.handleEvent(event, *window);
+            scrollerSlider.handleEvent(event, *window);
         }
 
         switch (stateFlag) { //switch graphical themes depending on the game state
@@ -440,6 +451,7 @@ int main() {
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
+            scrollerSlider.deactivate();
         } else if (stateFlag == STATE_HOME){ //Home Menu State
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -468,6 +480,7 @@ int main() {
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
+            scrollerSlider.deactivate();
         } else { //Settings menu state
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
@@ -496,6 +509,7 @@ int main() {
             fullscreenToggle.activate();
             volumeSlider.activate();
             brightnessSlider.activate();
+            scrollerSlider.activate();
         }
 
         music.setVolume(volumeSlider.getPercentage());
@@ -503,6 +517,9 @@ int main() {
 
         currentBrightness = brightnessSlider.getPercentage()/100.f;
         brightnessSlider.displayPercentage("","%");
+
+        scrollSpeed = scrollerSlider.getPercentage()*1.5f;
+        scrollerSlider.displayPercentage("","%");
 
         //move panels to the right
         float deltaTime = clock.restart().asSeconds();
@@ -583,10 +600,12 @@ int main() {
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);
             renderTexture.draw(brightnessText);
+            renderTexture.draw(scrollerText);
             vsyncToggle.display(renderTexture);
             fullscreenToggle.display(renderTexture);
             volumeSlider.display(renderTexture);
             brightnessSlider.display(renderTexture);
+            scrollerSlider.display(renderTexture);
         }
         easySwitch.display(renderTexture);
         mediumSwitch.display(renderTexture);
