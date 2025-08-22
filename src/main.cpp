@@ -245,6 +245,9 @@ int main() {
     float timeGap = 0;
     sf::Time previousHit = timer.getElapsedTime();
 
+    float timeOut = 0;
+    float totalTimeOut = 0;
+
     //game loop
     while (window->isOpen()) {
         sf::Event event;
@@ -262,6 +265,8 @@ int main() {
                     if (easySwitch.isActive()) {
                         timer.restart();
                         score = 0;
+                        totalTimeOut = 0;
+                        timeOut = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_EASY;
                         grid.appropriate();
@@ -270,6 +275,8 @@ int main() {
                     if (mediumSwitch.isActive()) {
                         timer.restart();
                         score = 0;
+                        totalTimeOut = 0;
+                        timeOut = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_MEDIUM;
                         grid.appropriate();
@@ -278,6 +285,8 @@ int main() {
                     if (hardSwitch.isActive()) {
                         timer.restart();
                         score = 0;
+                        totalTimeOut = 0;
+                        timeOut = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_HARD;
                         grid.appropriate();
@@ -286,6 +295,8 @@ int main() {
                     if (krazySwitch.isActive()) {
                         timer.restart();
                         score = 0;
+                        totalTimeOut = 0;
+                        timeOut = 0;
                         prevState = stateFlag;
                         stateFlag = STATE_KRAZY;
                         grid.appropriate();
@@ -302,6 +313,11 @@ int main() {
                             prevState = stateFlag;
                             stateFlag = STATE_HOME;
                         }
+
+                        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+                            timeOut = timer.getElapsedTime().asSeconds() - timeOut;
+                            totalTimeOut += timeOut;
+                        }
                     }
                 } else if (eraser.circleFrame.getGlobalBounds().contains(worldPos) && eraser.isActive()) {
                     if (!Grid::eraser_mode) { //clicking the exit button on the home screen closes the game
@@ -311,6 +327,10 @@ int main() {
                     }
                 } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
                     if (settingsToggle.isActive()) {
+                        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+                            timeOut = timer.getElapsedTime().asSeconds();
+                        }
+
                         prevState = stateFlag;
                         stateFlag = STATE_SETTINGS;
                     }
@@ -368,7 +388,7 @@ int main() {
 
                 if (grid.updateNumbers(worldPos, number)) {
                     timeGap = timer.getElapsedTime().asSeconds() - previousHit.asSeconds();
-                    score += (timeGap >= 60.f ? 5 * stateFlag : static_cast<int>(stateFlag * (50 - 0.75 * timeGap)));
+                    score += (timeGap >= 60.f ? 5 * stateFlag : static_cast<int>(stateFlag * (50 - 0.75 * (timeGap - totalTimeOut))));
                     previousHit = timer.getElapsedTime();
                 }
                 
