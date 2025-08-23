@@ -618,6 +618,8 @@ int main() {
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
                     button.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+                } else {
+                    button.setColor(button.getTheme().hovering);
                 }
             }
             grid.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
