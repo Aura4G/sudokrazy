@@ -225,7 +225,7 @@ int main() {
     scrollerText.setPosition(sf::Vector2f(100.f, 480.f));
 
     //Change Brightness
-    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), 0.67f, sf::Color::Black);
+    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), 0.5f, sf::Color::Black);
 
 
     //Music to play while game is operational
@@ -247,6 +247,26 @@ int main() {
 
     float timeOut = 0;
     float totalTimeOut = 0;
+
+    sf::Text scoreText;
+    scoreText.setString("");
+    scoreText.setFont(ResourceManager::getFont("homeFont"));
+    scoreText.setCharacterSize(24);
+    scoreText.setFillColor(currentTheme->text);
+
+    sf::FloatRect textRect = scoreText.getLocalBounds();
+    scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    scoreText.setPosition(sf::Vector2f(300.f, 100.f));
+
+    sf::Text timerText;
+    timerText.setString("");
+    timerText.setFont(ResourceManager::getFont("homeFont"));
+    timerText.setCharacterSize(20);
+    timerText.setFillColor(currentTheme->text);
+
+    textRect = timerText.getLocalBounds();
+    timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    timerText.setPosition(sf::Vector2f(300.f, 50.f));
 
     //game loop
     while (window->isOpen()) {
@@ -541,6 +561,16 @@ int main() {
         scrollSpeed = scrollerSlider.getPercentage()*1.5f;
         scrollerSlider.displayPercentage("","%");
 
+        scoreText.setString(std::to_string(score));
+        scoreText.setPosition(sf::Vector2f(300.f, 100.f));
+
+        int elapsed = static_cast<int>(timer.getElapsedTime().asSeconds() - totalTimeOut);
+        int minutes = elapsed / 60;
+        int seconds = elapsed % 60;
+
+        timerText.setString(std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
+        timerText.setPosition(sf::Vector2f(300.f, 50.f));
+
         //move panels to the right
         float deltaTime = clock.restart().asSeconds();
         panel1.move(scrollSpeed*deltaTime, 0);
@@ -614,6 +644,8 @@ int main() {
                 button.display(renderTexture);
             }
             eraser.display(renderTexture);
+            renderTexture.draw(scoreText);
+            renderTexture.draw(timerText);
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
             renderTexture.draw(title);
         } else { //Draws for the settings menu
