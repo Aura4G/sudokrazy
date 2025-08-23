@@ -250,9 +250,11 @@ int main() {
 
     sf::Text scoreText;
     scoreText.setString("");
-    scoreText.setFont(ResourceManager::getFont("homeFont"));
-    scoreText.setCharacterSize(24);
+    scoreText.setFont(ResourceManager::getFont("gameFont"));
+    scoreText.setCharacterSize(30);
     scoreText.setFillColor(currentTheme->text);
+    scoreText.setOutlineColor(sf::Color::Black);
+    scoreText.setOutlineThickness(1);
 
     sf::FloatRect textRect = scoreText.getLocalBounds();
     scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
@@ -260,9 +262,11 @@ int main() {
 
     sf::Text timerText;
     timerText.setString("");
-    timerText.setFont(ResourceManager::getFont("homeFont"));
-    timerText.setCharacterSize(20);
+    timerText.setFont(ResourceManager::getFont("gameFont"));
+    timerText.setCharacterSize(30);
     timerText.setFillColor(currentTheme->text);
+    timerText.setOutlineColor(sf::Color::Black);
+    timerText.setOutlineThickness(1);
 
     textRect = timerText.getLocalBounds();
     timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
@@ -284,6 +288,7 @@ int main() {
                 if (easySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts an easy game
                     if (easySwitch.isActive()) {
                         timer.restart();
+                        previousHit = timer.getElapsedTime();
                         score = 0;
                         totalTimeOut = 0;
                         timeOut = 0;
@@ -294,6 +299,7 @@ int main() {
                 } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a medium game
                     if (mediumSwitch.isActive()) {
                         timer.restart();
+                        previousHit = timer.getElapsedTime();
                         score = 0;
                         totalTimeOut = 0;
                         timeOut = 0;
@@ -304,6 +310,7 @@ int main() {
                 } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a hard game
                     if (hardSwitch.isActive()) {
                         timer.restart();
+                        previousHit = timer.getElapsedTime();
                         score = 0;
                         totalTimeOut = 0;
                         timeOut = 0;
@@ -314,6 +321,7 @@ int main() {
                 } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts krazy mode
                     if (krazySwitch.isActive()) {
                         timer.restart();
+                        previousHit = timer.getElapsedTime();
                         score = 0;
                         totalTimeOut = 0;
                         timeOut = 0;
@@ -562,6 +570,9 @@ int main() {
         scrollerSlider.displayPercentage("","%");
 
         scoreText.setString(std::to_string(score));
+        scoreText.setFillColor(currentTheme->text);
+        textRect = scoreText.getLocalBounds();
+        scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         scoreText.setPosition(sf::Vector2f(300.f, 100.f));
 
         int elapsed = static_cast<int>(timer.getElapsedTime().asSeconds() - totalTimeOut);
@@ -569,6 +580,9 @@ int main() {
         int seconds = elapsed % 60;
 
         timerText.setString(std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
+        timerText.setFillColor(currentTheme->text);
+        textRect = timerText.getLocalBounds();
+        timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         timerText.setPosition(sf::Vector2f(300.f, 50.f));
 
         //move panels to the right
