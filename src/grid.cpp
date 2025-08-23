@@ -166,6 +166,7 @@ void Grid::appropriate() {
         } else {
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
             whiteBlocks[i].setTheme(REGULAR_BUTTON);
+            whiteBlocks[i].setColor(REGULAR_BUTTON.unhovered);
         }
     }
 }
