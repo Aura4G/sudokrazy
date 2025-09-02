@@ -422,7 +422,8 @@ int main() {
                 
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     Record game(score, stateFlag, timer.getElapsedTime());
-                    RecordManager::addRecord(game);
+                    SaveManager::addRecord(game);
+                    SaveManager::SaveRecords("save.dat");
 
                     prevState = stateFlag;
                     stateFlag = STATE_HOME;

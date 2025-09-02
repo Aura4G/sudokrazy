@@ -36,6 +36,10 @@ public:
     /// @return The time of the inquired game
     sf::Time getTime();
 
+    std::string serialise() const;
+
+    static Record deserialize(const std::string& str);
+
 private:
 
     //The accrued score of the game
@@ -49,7 +53,7 @@ private:
 
 };
 
-class RecordManager {
+class SaveManager {
 public:
 
     /// @return a completed game's record
@@ -58,10 +62,23 @@ public:
     //Adds a record to the records vector
     static void addRecord(Record game);
 
+    static void SaveRecords(const std::string& filename);
+    
+    static void LoadRecords(const std::string& filename);
+
 private:
 
     //Vector storing all completed sudoku game instances, with their scores and times
     static std::vector<Record> records;
+
+    static void Obfuscate(std::vector<char>& buffer);
+
+    static std::string GetSavePath(const std::string& filename);
+
+    static void Save(const std::string& filename, const std::string& data);
+
+    static std::string loadSave(const std::string& filename);
+
 };
 
 #endif
