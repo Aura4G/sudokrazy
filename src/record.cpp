@@ -15,6 +15,11 @@
 #include "sudoku.hpp"
 
 std::vector<Record> SaveManager::records;
+float SaveManager::volume = 1.f;
+float SaveManager::brightness = 1.f;
+float SaveManager::backgroundSpeed = 0.5f;
+bool SaveManager::vsync = true;
+bool SaveManager::fullscreen = false;
 
 Record::Record(int score, GameState difficulty, sf::Time time)
     : score(score), difficulty(difficulty), time(time)
@@ -151,4 +156,98 @@ void SaveManager::LoadRecords(const std::string& filename) {
         in.read(&recordString[0], len);
         records.emplace_back(Record::deserialize(recordString));
     }
+}
+
+void SaveManager::SaveSettings(const std::string& filename) {
+    std::ostringstream out;
+
+    out << std::to_string(volume) << "\n"
+        << std::to_string(brightness) << "\n"
+        << std::to_string(backgroundSpeed) << "\n"
+        << std::to_string(vsync) << "\n"
+        << std::to_string(fullscreen);
+
+    Save(filename, out.str());
+}
+
+void SaveManager::LoadSettings(const std::string& filename) {
+    std::string data = loadSave(filename);
+
+    if (data == "") {
+        data = "1\n1\n0.5\n1\n0";
+    }
+
+    std::istringstream in(data);
+
+    std::string line;
+
+    // --- Line 1: Volume ---
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> volume;
+    }
+
+    // --- Line 2: Brightness ---
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> brightness;
+    }
+
+    // --- Line 3: Background scroll speed ---
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> backgroundSpeed;
+    }
+
+    // --- Line 4: V-Sync ---
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> vsync;
+    }
+
+    // --- Line 5: Fullscreen ---
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> fullscreen;
+    }
+}
+
+float SaveManager::getVolume() {
+    return volume;
+}
+
+void SaveManager::setVolume(float newVolume) {
+    volume = newVolume;
+}
+
+float SaveManager::getBrightness() {
+    return brightness;
+}
+
+void SaveManager::setBrightness(float newBrightness) {
+    brightness = newBrightness;
+}
+
+float SaveManager::getBSpeed() {
+    return backgroundSpeed;
+}
+
+void SaveManager::setBSpeed(float newSpeed) {
+    backgroundSpeed = newSpeed;
+}
+
+bool SaveManager::getVSync() {
+    return vsync;
+}
+
+void SaveManager::setVSync(bool flag) {
+    vsync = flag;
+}
+
+bool SaveManager::getFullscreen() {
+    return fullscreen;
+}
+
+void SaveManager::setFullscreen(bool flag) {
+    fullscreen = flag;
 }

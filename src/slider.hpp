@@ -89,6 +89,10 @@ public:
     float getPercentage();
 
 
+    //@return If the slider is currently being dragged
+    bool getDragging();
+
+
     //@return The activity status of the slider
     bool isActive();
 

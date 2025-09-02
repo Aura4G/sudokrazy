@@ -75,6 +75,15 @@ void updateView(sf::RenderTexture& target, sf::RenderWindow& win) {
 }
 
 int main() {
+    /* Load .dat files */
+
+    SaveManager::LoadRecords("records.dat");
+    SaveManager::LoadSettings("settings.dat");
+
+    vsync = SaveManager::getVSync();
+    isFullscreen = SaveManager::getFullscreen();
+
+
     /*Buttons that change the number the player puts on the board*/
     std::vector<Button> numberChangers;
     numberChangers.reserve(9);
@@ -205,7 +214,7 @@ int main() {
     volumeText.setPosition(sf::Vector2f(100.f, 320.f));
 
     //Change Volume
-    Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), 1.f, sf::Color::Black);
+    Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), SaveManager::getVolume(), sf::Color::Black);
 
     sf::Text brightnessText;
     brightnessText.setString("Brightness:");
@@ -215,7 +224,7 @@ int main() {
     brightnessText.setPosition(sf::Vector2f(100.f, 400.f));
 
     //Change Brightness
-    Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), 1.f, sf::Color::Black);
+    Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), SaveManager::getBrightness(), sf::Color::Black);
 
     sf::Text scrollerText;
     scrollerText.setString("Background scroll speed:");
@@ -225,7 +234,7 @@ int main() {
     scrollerText.setPosition(sf::Vector2f(100.f, 480.f));
 
     //Change Brightness
-    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), 0.5f, sf::Color::Black);
+    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getBSpeed(), sf::Color::Black);
 
 
     //Music to play while game is operational
@@ -337,6 +346,7 @@ int main() {
                         if (!settingsToggle.isActive()) {
                             stateFlag = prevState;
                             prevState = STATE_SETTINGS;
+                            SaveManager::SaveSettings("settings.dat");
                         } else {
                             prevState = stateFlag;
                             stateFlag = STATE_HOME;
@@ -366,10 +376,12 @@ int main() {
                     if (vsyncToggle.isActive()) {
                         if (vsync) {
                             vsync = false;
+                            SaveManager::setVSync(vsync);
                             vsyncToggle.setTheme(HARD_BUTTON);
                             vsyncToggle.setText("V-Sync Off");
                         } else {
                             vsync = true;
+                            SaveManager::setVSync(vsync);
                             vsyncToggle.setTheme(EASY_BUTTON);
                             vsyncToggle.setText("V-Sync On");
                         }
@@ -380,6 +392,7 @@ int main() {
                 } else if (fullscreenToggle.frame.getGlobalBounds().contains(worldPos)) {
                     if (fullscreenToggle.isActive()) {
                         isFullscreen = !isFullscreen;
+                        SaveManager::setFullscreen(isFullscreen);
                         window->close();
 
                         window = createWindow(isFullscreen);
@@ -423,7 +436,7 @@ int main() {
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     Record game(score, stateFlag, timer.getElapsedTime());
                     SaveManager::addRecord(game);
-                    SaveManager::SaveRecords("save.dat");
+                    SaveManager::SaveRecords("records.dat");
 
                     prevState = stateFlag;
                     stateFlag = STATE_HOME;
@@ -563,12 +576,21 @@ int main() {
 
         music.setVolume(volumeSlider.getPercentage());
         volumeSlider.displayPercentage("","%");
+        if (volumeSlider.getDragging()) {
+            SaveManager::setVolume(volumeSlider.getPercentage()/100);
+        }
 
         currentBrightness = brightnessSlider.getPercentage()/100.f;
         brightnessSlider.displayPercentage("","%");
+        if (brightnessSlider.getDragging()) {
+            SaveManager::setBrightness(brightnessSlider.getPercentage()/100);
+        }
 
         scrollSpeed = scrollerSlider.getPercentage()*1.5f;
         scrollerSlider.displayPercentage("","%");
+        if (scrollerSlider.getDragging()) {
+            SaveManager::setBSpeed(scrollerSlider.getPercentage()/100);
+        }
 
         scoreText.setString(std::to_string(score));
         scoreText.setFillColor(currentTheme->text);

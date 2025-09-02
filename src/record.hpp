@@ -56,6 +56,8 @@ private:
 class SaveManager {
 public:
 
+    /// GAME RECORDS ///
+
     /// @return a completed game's record
     static Record getRecord(int index);
 
@@ -63,8 +65,35 @@ public:
     static void addRecord(Record game);
 
     static void SaveRecords(const std::string& filename);
-    
+
     static void LoadRecords(const std::string& filename);
+
+
+    /// SETTINGS ///
+
+    static void SaveSettings(const std::string& filename);
+
+    static void LoadSettings(const std::string& filename);
+
+    static float getVolume();
+
+    static void setVolume(float newVolume);
+
+    static float getBrightness();
+
+    static void setBrightness(float newBrightness);
+
+    static float getBSpeed();
+
+    static void setBSpeed(float newSpeed);
+
+    static bool getVSync();
+
+    static void setVSync(bool flag);
+
+    static bool getFullscreen();
+
+    static void setFullscreen(bool flag);
 
 private:
 
@@ -78,6 +107,16 @@ private:
     static void Save(const std::string& filename, const std::string& data);
 
     static std::string loadSave(const std::string& filename);
+
+    static float volume;
+
+    static float brightness;
+
+    static float backgroundSpeed;
+
+    static bool vsync;
+
+    static bool fullscreen;
 
 };
 

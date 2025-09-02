@@ -88,3 +88,7 @@ void Slider::displayPercentage(std::string before = "", std::string after = "") 
     //The button's position must be set again to allow for text to move with the button
     grip.setPosition(grip.getPosition());
 }
+
+bool Slider::getDragging() {
+    return isDragging;
+}
