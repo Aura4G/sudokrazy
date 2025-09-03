@@ -352,16 +352,19 @@ int main() {
                         window->close();
                     } else { //clicking the exit button mid-game goes back to the home screen
                         Grid::eraser_mode = false;
-                        if (!settingsToggle.isActive()) {
+                        if (!settingsToggle.isActive()) { //Condition when leaving settings menu
                             stateFlag = prevState;
                             prevState = STATE_SETTINGS;
-                            SaveManager::SaveSettings("settings.dat");
-                        } else {
+                            SaveManager::SaveSettings("settings.dat"); //saves settings when leaving
+                        } else { //Condition for leaving an open game
                             prevState = stateFlag;
                             stateFlag = STATE_HOME;
                         }
 
                         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
+                            //Calculates the total time spent in the settings menu outside of an active game
+                            //So that it can deduct that time-out from the in-game timer
+
                             timeOut = timer.getElapsedTime().asSeconds() - timeOut;
                             totalTimeOut += timeOut;
                         }
@@ -385,12 +388,12 @@ int main() {
                     if (vsyncToggle.isActive()) {
                         if (vsync) {
                             vsync = false;
-                            SaveManager::setVSync(vsync);
+                            SaveManager::setVSync(vsync); //saves vsync setting
                             vsyncToggle.setTheme(HARD_BUTTON);
                             vsyncToggle.setText("V-Sync Off");
                         } else {
                             vsync = true;
-                            SaveManager::setVSync(vsync);
+                            SaveManager::setVSync(vsync); //saves vsync setting
                             vsyncToggle.setTheme(EASY_BUTTON);
                             vsyncToggle.setText("V-Sync On");
                         }
@@ -401,7 +404,7 @@ int main() {
                 } else if (fullscreenToggle.frame.getGlobalBounds().contains(worldPos)) {
                     if (fullscreenToggle.isActive()) {
                         isFullscreen = !isFullscreen;
-                        SaveManager::setFullscreen(isFullscreen);
+                        SaveManager::setFullscreen(isFullscreen); //saves window setting
                         window->close();
 
                         window = createWindow(isFullscreen);
@@ -444,6 +447,8 @@ int main() {
                 
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     Record game(score, stateFlag, timer.getElapsedTime());
+
+                    //Saves the new game to the records vector, and saves the records to appdata
                     SaveManager::addRecord(game);
                     SaveManager::SaveRecords("records.dat");
 

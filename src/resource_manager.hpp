@@ -12,7 +12,7 @@
  * @author Aura4G (Aria Noroozi)
 */
 
-//static class to manage all external resources like images and fonts
+/// @brief static class to manage all external resources like images and fonts
 class ResourceManager {
 public:
 
@@ -45,28 +45,28 @@ public:
     static sf::Shader& getShader(const std::string& name);
 
     /**
-     * Adds a font and its key to the fonts map
+     * @brief Adds a font and its key to the fonts map
      * @param name The new font's key for the map
      * @param filename The path to the .otf/.ttf file being used
     */
     static void loadFont(const std::string& name, const std::string& filename);
 
     /**
-     * Adds a texture and its key to the textures map
+     * @brief Adds a texture and its key to the textures map
      * @param name The new texture's key for the map
      * @param filename The path to the image file being used
     */
     static void loadTexture(const std::string& name, const std::string& filename);
 
     /**
-     * Adds an audio and its key to the audios map
+     * @brief Adds an audio and its key to the audios map
      * @param name The new audio's key for the map
      * @param filename The path to the audio file being used
     */
     static void loadAudio(const std::string& name, const std::string& filename);
 
     /**
-     * Adds a shader and its key to the shaders map
+     * @brief Adds a shader and its key to the shaders map
      * @param name The new audio's key for the map
      * @param filename The path to the audio file being used
     */
@@ -74,16 +74,16 @@ public:
 
 private:
 
-    //Map containing all loaded fonts
+    /// @brief Map containing all loaded fonts
     static std::map<std::string, sf::Font> fonts;
 
-    //Map containing all loaded textures
+    /// @brief Map containing all loaded textures
     static std::map<std::string, sf::Texture> textures;
 
-    //Map containing all loaded audios
+    /// @brief Map containing all loaded audios
     static std::map<std::string, std::unique_ptr<sf::Music>> audios;
 
-    //Map containing all loaded shaders
+    /// @brief Map containing all loaded shaders
     static std::map<std::string, std::unique_ptr<sf::Shader>> shaders;
 };
 
