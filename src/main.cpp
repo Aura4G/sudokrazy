@@ -77,10 +77,16 @@ void updateView(sf::RenderTexture& target, sf::RenderWindow& win) {
 int main() {
     /* Load .dat files */
 
+    // Load all the completed games into the save manager's records vector
     SaveManager::LoadRecords("records.dat");
+
+    // Load all settings configurations previously left in the last settings menu session
     SaveManager::LoadSettings("settings.dat");
 
+    // Enable V-Sync according to the settings configuration
     vsync = SaveManager::getVSync();
+
+    // Enable Fullscreen according the settings configuration
     isFullscreen = SaveManager::getFullscreen();
 
 
@@ -125,7 +131,7 @@ int main() {
 
     /* Audio */
 
-    ResourceManager::loadAudio("main theme", "media/music/Boo_Night_Fever.ogg");
+    ResourceManager::loadAudio("main theme", "media/music/sudokrazy_main.ogg");
 
     /* Shaders */
 
@@ -213,7 +219,8 @@ int main() {
     volumeText.setFillColor(sf::Color::Black);
     volumeText.setPosition(sf::Vector2f(100.f, 320.f));
 
-    //Change Volume
+    //Changes the Volume
+    //Retrieves the saved volume setting for the initial setting
     Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), SaveManager::getVolume(), sf::Color::Black);
 
     sf::Text brightnessText;
@@ -223,7 +230,8 @@ int main() {
     brightnessText.setFillColor(sf::Color::Black);
     brightnessText.setPosition(sf::Vector2f(100.f, 400.f));
 
-    //Change Brightness
+    //Changes the Brightness
+    //Retrieves the saved brightness setting for the initial setting
     Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), SaveManager::getBrightness(), sf::Color::Black);
 
     sf::Text scrollerText;
@@ -233,7 +241,8 @@ int main() {
     scrollerText.setFillColor(sf::Color::Black);
     scrollerText.setPosition(sf::Vector2f(100.f, 480.f));
 
-    //Change Brightness
+    //Changes the background scroll speed
+    //Retrieves the saved speed setting for the initial setting
     Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getBSpeed(), sf::Color::Black);
 
 
@@ -402,11 +411,11 @@ int main() {
                         updateView(renderTexture, *window);
                         window->setPosition(sf::Vector2i(0,0));
 
-                        // Reapply timing policy (pick one of these approaches)
+                        // Reapply timing policy
 
                         window->setVerticalSyncEnabled(vsync);
 
-                        // Optional: reapply icon since it's a new window
+                        // reapply icon since it's a new window
                         window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
 
                         clock.restart(); // ensure next deltaTime is small/clean
