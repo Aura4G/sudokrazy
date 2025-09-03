@@ -28,7 +28,7 @@ sf::Color updateColour(sf::Color colour, sf::Color targetColour, float dt) {
 
 /* THEMES */
 //Background and text colour themes
-const Theme HOME_THEME =     {{32,32,224},   {16,16,192},   {61,216,227},  {56,0,127},   {0,0,48},    };
+const Theme HOME_THEME =     {{32,32,224},   {16,16,192},   {61,143,229},  {56,0,127},   {186,238,240},    };
 const Theme EASY_THEME =     {{0,192,0},     {64,224,64},   {168,229,130}, {12,96,0},    {0,64,0},    };
 const Theme MEDIUM_THEME =   {{142,235,20},  {235,220,20},  {235,113,20},  {200,197,54}, {64,64,0},   };
 const Theme HARD_THEME =     {{255,17,41},   {192,0,24},    {221,48,51},   {102,0,51},   {80,0,0},    };

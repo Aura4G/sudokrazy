@@ -128,6 +128,7 @@ int main() {
     ResourceManager::loadTexture("eraser", "media/images/eraser.png");
     ResourceManager::loadTexture("settings", "media/images/settings.png");
     ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
+    ResourceManager::loadTexture("lock", "media/images/lock.png");
 
     /* Audio */
 
@@ -168,10 +169,20 @@ int main() {
     title.setPosition(sf::Vector2f(300,150));
 
     // Home Menu Buttons
+
     Button easySwitch(200.0f, 100.0f, 50.0f, 300.0f, EASY_BUTTON, "Easy", "gameFont");
+
     Button mediumSwitch(200.0f, 100.0f, 350.0f, 300.0f, MEDIUM_BUTTON, "Medium", "gameFont");
+    mediumSwitch.setTexture(ResourceManager::getTexture("lock"), 5.f);
+    mediumSwitch.deactivate();
+
     Button hardSwitch(200.0f, 100.0f, 50.0f, 500.0f, HARD_BUTTON, "Hard", "gameFont");
+    hardSwitch.setTexture(ResourceManager::getTexture("lock"), 5.f);
+    hardSwitch.deactivate();
+
     Button krazySwitch(200.0f, 100.0f, 350.0f, 500.f, KRAZY_BUTTON, "KRAZY\nMODE!!", "gameFont");
+    krazySwitch.setTexture(ResourceManager::getTexture("lock"), 5.f);
+    krazySwitch.deactivate();
  
     //The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
@@ -260,6 +271,7 @@ int main() {
 
     sf::Clock timer;
     int score = 0;
+    int cumulativeScore = SaveManager::getTotalScore();
     float timeGap = 0;
     sf::Time previousHit = timer.getElapsedTime();
 
@@ -277,6 +289,18 @@ int main() {
     sf::FloatRect textRect = scoreText.getLocalBounds();
     scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     scoreText.setPosition(sf::Vector2f(300.f, 100.f));
+
+    sf::Text culScoreText;
+    culScoreText.setString("Total Score: 0");
+    culScoreText.setFont(ResourceManager::getFont("homeFont"));
+    culScoreText.setCharacterSize(42);
+    culScoreText.setFillColor(HOME_THEME.text);
+    culScoreText.setOutlineColor(sf::Color::Black);
+    culScoreText.setOutlineThickness(1);
+
+    textRect = culScoreText.getLocalBounds();
+    culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    culScoreText.setPosition(sf::Vector2f(300.f, 675.f));
 
     sf::Text timerText;
     timerText.setString("");
@@ -447,6 +471,7 @@ int main() {
                 
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     Record game(score, stateFlag, timer.getElapsedTime());
+                    cumulativeScore += score;
 
                     //Saves the new game to the records vector, and saves the records to appdata
                     SaveManager::addRecord(game);
@@ -536,9 +561,18 @@ int main() {
             krazySwitch.activateMovement(krazySwitch.getOriginalPos(), 400.f);
 
             easySwitch.activate();
-            mediumSwitch.activate();
-            hardSwitch.activate();
-            krazySwitch.activate();
+
+            if (cumulativeScore >= 1000) {
+                mediumSwitch.activate();
+            }
+
+            if (cumulativeScore >= 5000) {
+                hardSwitch.activate();
+            }
+
+            if (cumulativeScore >= 10000) {
+                krazySwitch.activate();
+            }
 
             exit.setText("x");
 
@@ -606,6 +640,11 @@ int main() {
             SaveManager::setBSpeed(scrollerSlider.getPercentage()/100);
         }
 
+        culScoreText.setString("Total Score: " + std::to_string(SaveManager::getTotalScore()));
+        textRect = culScoreText.getLocalBounds();
+        culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+        culScoreText.setPosition(sf::Vector2f(300.f, 675.f));
+
         scoreText.setString(std::to_string(score));
         scoreText.setFillColor(currentTheme->text);
         textRect = scoreText.getLocalBounds();
@@ -648,9 +687,21 @@ int main() {
 
         if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
             easySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-            mediumSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-            hardSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-            krazySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+
+            if (cumulativeScore >= 1000) {
+                mediumSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+                mediumSwitch.setTexture(ResourceManager::getTexture("placeholder"), 0.f);
+            }
+
+            if (cumulativeScore >= 5000) {
+                hardSwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+                hardSwitch.setTexture(ResourceManager::getTexture("placeholder"), 0.f);
+            }
+
+            if (cumulativeScore >= 10000) {
+                krazySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+                krazySwitch.setTexture(ResourceManager::getTexture("placeholder"), 0.f);
+            }
         } else if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //ensures the buttons have hover visuals when playing the game and not on the home screen
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
@@ -701,6 +752,7 @@ int main() {
             renderTexture.draw(timerText);
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
             renderTexture.draw(title);
+            renderTexture.draw(culScoreText);
         } else { //Draws for the settings menu
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);
