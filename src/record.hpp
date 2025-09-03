@@ -34,19 +34,28 @@ public:
     /// @return The time of the inquired game
     sf::Time getTime();
 
+    /**
+     * @brief converts the data to a string stream
+     * @return the string of data now to be obfuscated and written
+    */
     std::string serialise() const;
 
+    /**
+     * @brief Converts a string of information into each relevant attribute of a record object
+     * @param str The decrypted string read from the save file
+     * @return A record object with that string's information
+    */
     static Record deserialize(const std::string& str);
 
 private:
 
-    //The accrued score of the game
+    /// @brief The accrued score of the game
     int score;
 
-    //The difficulty played on
+    /// @brief The difficulty played on
     GameState difficulty;
 
-    //The time taken to correctly complete the board
+    /// @brief The time taken to correctly complete the board
     sf::Time time;
 
 };

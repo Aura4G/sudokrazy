@@ -10,9 +10,9 @@
 #include <windows.h>
 #endif
 
-
 #include "record.hpp"
 #include "sudoku.hpp"
+
 
 std::vector<Record> SaveManager::records;
 float SaveManager::volume = 1.f;
@@ -20,6 +20,9 @@ float SaveManager::brightness = 1.f;
 float SaveManager::backgroundSpeed = 0.5f;
 bool SaveManager::vsync = true;
 bool SaveManager::fullscreen = false;
+
+
+/// Record Class definitions ///
 
 Record::Record(int score, GameState difficulty, sf::Time time)
     : score(score), difficulty(difficulty), time(time)
@@ -59,7 +62,7 @@ Record Record::deserialize(const std::string& str) {
 }
 
 
-
+/// Save Manager definitions ///
 
 Record SaveManager::getRecord(int index) {
     return records.at(index);
@@ -70,11 +73,16 @@ void SaveManager::addRecord(Record game) {
 }
 
 void SaveManager::Save (const std::string& filename, const std::string& data) {
+    //The save destination is retrieved
     std::string fullPath = GetSavePath(filename);
 
+    //A character buffer stores all of the data...
     std::vector<char> buffer(data.begin(), data.end());
+
+    //... and encrypts the buffer
     Obfuscate(buffer);
 
+    //the encrypted buffer is written to the file
     std::ofstream file(fullPath, std::ios::binary);
     if (file) {
         file.write(buffer.data(), buffer.size());
@@ -82,11 +90,14 @@ void SaveManager::Save (const std::string& filename, const std::string& data) {
 }
 
 std::string SaveManager::loadSave(const std::string& filename) {
+    //The save's destination is retrieved
     std::string fullPath = GetSavePath(filename);
 
+    //No records are created if the file doesn't exists
     std::ifstream file (fullPath, std::ios::binary);
     if (!file) return "";
 
+    //A buffer captures the file's contents and decrypts them
     std::vector<char> buffer((std::istreambuf_iterator<char>(file)), {});
     Obfuscate(buffer);
 
@@ -94,7 +105,7 @@ std::string SaveManager::loadSave(const std::string& filename) {
 }
 
 void SaveManager::Obfuscate(std::vector<char>& buffer) {
-    const char key = 0x5A;
+    const char key = 0x5A; // A given XOR key used for encrypting and decrypting
     for (auto& c : buffer) {
         c ^= key;
     }
@@ -107,18 +118,19 @@ std::string SaveManager::GetSavePath(const std::string& filename) {
     static fs::path saveDir = []() -> fs::path {
         fs::path path;
 
-#ifdef _WIN32
+    #ifdef _WIN32 //Windows, saved in Roaming
         const char* appData = getenv("APPDATA");
         if (!appData) appData = ".";
         path = fs::path(appData) / "Sudokrazy";
-#elif __APPLE__
+    #elif __APPLE__ //MacOS
         const char* home = getenv("HOME");
         path = fs::path(home) / "Library" / "Application Support" / "Sudokrazy";
-#else // Linux/Unix
+    #else // Linux/Unix
         const char* home = getenv("HOME");
         path = fs::path(home) / ".local" / "share" / "sudokrazy";
-#endif
+    #endif
 
+        //Creates the directory if it doesn't already exist
         if (!fs::exists(path)) {
             fs::create_directories(path);
         }
@@ -134,14 +146,14 @@ std::string SaveManager::GetSavePath(const std::string& filename) {
 void SaveManager::SaveRecords(const std::string& filename) {
     std::ostringstream out;
     for (auto& r : records) {
-        std::string s = r.serialise();
-        out << s.size() << "\n" << s;
+        std::string s = r.serialise(); //serialise each value in each record to a single string
+        out << s.size() << "\n" << s; //Each value is delimited by a new line
     }
     Save(filename, out.str());
 }
 
 void SaveManager::LoadRecords(const std::string& filename) {
-    records.clear();
+    records.clear(); //Clears any overlap between prior records and the newly loaded records
     std::string data = loadSave(filename);
     std::istringstream in(data);
 
@@ -152,7 +164,7 @@ void SaveManager::LoadRecords(const std::string& filename) {
 
         if (!in) break;
 
-        std::string recordString(len, '\0');
+        std::string recordString(len, '\0'); //sets the size of the string (and thus data) before passing it as a character vector
         in.read(&recordString[0], len);
         records.emplace_back(Record::deserialize(recordString));
     }
@@ -161,6 +173,7 @@ void SaveManager::LoadRecords(const std::string& filename) {
 void SaveManager::SaveSettings(const std::string& filename) {
     std::ostringstream out;
 
+    //delimits values with new lines in a specific order
     out << std::to_string(volume) << "\n"
         << std::to_string(brightness) << "\n"
         << std::to_string(backgroundSpeed) << "\n"
@@ -173,6 +186,7 @@ void SaveManager::SaveSettings(const std::string& filename) {
 void SaveManager::LoadSettings(const std::string& filename) {
     std::string data = loadSave(filename);
 
+    //If there's no current settings configuration to load, a default is used instead
     if (data == "") {
         data = "1\n1\n0.5\n1\n0";
     }
@@ -181,31 +195,31 @@ void SaveManager::LoadSettings(const std::string& filename) {
 
     std::string line;
 
-    // --- Line 1: Volume ---
+    // Volume
     if (std::getline(in, line)) {
         std::istringstream iss(line);
         iss >> volume;
     }
 
-    // --- Line 2: Brightness ---
+    // Brightness
     if (std::getline(in, line)) {
         std::istringstream iss(line);
         iss >> brightness;
     }
 
-    // --- Line 3: Background scroll speed ---
+    // Background scroll speed
     if (std::getline(in, line)) {
         std::istringstream iss(line);
         iss >> backgroundSpeed;
     }
 
-    // --- Line 4: V-Sync ---
+    // V-Sync
     if (std::getline(in, line)) {
         std::istringstream iss(line);
         iss >> vsync;
     }
 
-    // --- Line 5: Fullscreen ---
+    // Fullscreen
     if (std::getline(in, line)) {
         std::istringstream iss(line);
         iss >> fullscreen;
