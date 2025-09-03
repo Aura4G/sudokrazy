@@ -147,7 +147,7 @@ void SaveManager::SaveRecords(const std::string& filename) {
     std::ostringstream out;
     for (auto& r : records) {
         std::string s = r.serialise(); //serialise each value in each record to a single string
-        out << s.size() << "\n" << s; //Each value is delimited by a new line
+        out << s.size() << "\n" << s << "\n"; //Each value is delimited by a new line
     }
     Save(filename, out.str());
 }

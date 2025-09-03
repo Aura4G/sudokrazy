@@ -470,7 +470,7 @@ int main() {
                 }
                 
                 if (grid.check()) { //checks if the grid has all its correct numbers
-                    Record game(score, stateFlag, timer.getElapsedTime());
+                    Record game(score, stateFlag, sf::seconds(timer.getElapsedTime().asSeconds() - totalTimeOut));
                     cumulativeScore += score;
 
                     //Saves the new game to the records vector, and saves the records to appdata
