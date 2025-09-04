@@ -112,7 +112,8 @@ bool Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
                             shuffled = false;
                         }
 
-                        if (playersBoard.getNumber(counter/9, counter%9) == finalBoard.getNumber(counter/9, counter%9)) {
+                        if (playersBoard.getNumber(counter/9, counter%9) == finalBoard.getNumber(counter/9, counter%9) && !block.isHit()) {
+                            block.setHit(true);
                             return true;
                         }
                         return false;
@@ -168,6 +169,7 @@ void Grid::appropriate() {
             whiteBlocks[i].setTheme(REGULAR_BUTTON);
             whiteBlocks[i].setColor(REGULAR_BUTTON.unhovered);
         }
+        whiteBlocks[i].setHit(false);
     }
 }
 

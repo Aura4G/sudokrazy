@@ -141,6 +141,10 @@ bool Button::isActive() {
     return active;
 }
 
+bool Button::isHit() const {
+    return hit;
+}
+
 bool Button::isHovering(const sf::Vector2f& mousePos) const {
     if (shapeType == ShapeType::Rectangle) { //returns whether or not the mouse is in the rectangle frame
         return frame.getGlobalBounds().contains(mousePos);
@@ -276,6 +280,10 @@ void Button::activate() {
 
 void Button::deactivate() {
     active = false;
+}
+
+void Button::setHit(bool flag) {
+    hit = flag;
 }
 
 void Button::activateMovement(const sf::Vector2f& destination, float moveSpeed = 150.f) {

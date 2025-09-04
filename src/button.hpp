@@ -135,6 +135,10 @@ public:
     bool isHovering(const sf::Vector2f& mousePos) const;
 
 
+    /// @return whether or not the button has been hit during the game's events
+    bool isHit() const;
+
+
     /**
      * @brief Changes the button frame cover according to mouse position and the button's action state
      * @param mousePos The mouse position relative to the window on the given frame 
@@ -155,6 +159,13 @@ public:
 
     /// @brief Sets active to false
     void deactivate();
+
+
+    /**
+     * @brief changes the button's hit status
+     * @param flag the new hit status
+    */
+    void setHit(bool flag);
 
 
     /**
@@ -197,6 +208,10 @@ private:
 
     /// @brief A flag to determine whether the button is stationary or travelling using its moveTarget and movespeed
     bool isMoving = false;
+
+    /// @brief A flag that determines whether a button has been previously clicked on,
+    ///        used exclusively on grid buttons to validate a correct placement only once.
+    bool hit = false;
 
     /// @brief The coordinates of the destination the button moves to if movement is active
     sf::Vector2f moveTarget;
