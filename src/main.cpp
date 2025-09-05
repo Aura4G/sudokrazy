@@ -52,6 +52,8 @@ void updateView(sf::RenderTexture& target, sf::RenderWindow& win) {
     //The aspect ratio of the virtual window, the desired aspect ration
     float virtualRatio = virtualSize.x / virtualSize.y;
 
+    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+
     //Describes the portion of the window where the view will be drawn. Starts out at 1 pixel
     sf::FloatRect viewport(0.f, 0.f, 1.f, 1.f);
 
@@ -102,7 +104,10 @@ int main() {
     renderTexture.create(window->getSize().x, window->getSize().y);
 
     updateView(renderTexture, *window);
-    window->setPosition(sf::Vector2i(0,0));
+
+    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+
+    window->setPosition(sf::Vector2i(static_cast<int>(desktopMode.width/2 - window->getSize().x/2),static_cast<int>(desktopMode.height/2 - window->getSize().y/2)));
 
     window->setVerticalSyncEnabled(vsync);
 
@@ -448,7 +453,7 @@ int main() {
                         renderTexture.create(window->getSize().x, window->getSize().y);
 
                         updateView(renderTexture, *window);
-                        window->setPosition(sf::Vector2i(0,0));
+                        window->setPosition(sf::Vector2i(static_cast<int>(desktopMode.width/2 - window->getSize().x/2),static_cast<int>(desktopMode.height/2 - window->getSize().y/2)));
 
                         // Reapply timing policy
 
