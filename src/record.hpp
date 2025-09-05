@@ -78,13 +78,13 @@ public:
      * @brief Formats record objects and parses into a save.dat 
      * @param filename the name of the .dat file in the app data folder
     */
-    static void SaveRecords(const std::string& filename);
+    static void saveRecords(const std::string& filename);
 
     /**
      * @brief Fills up the records vector from a save.dat 
      * @param filename the name of the .dat file in the app data folder
     */
-    static void LoadRecords(const std::string& filename);
+    static void loadRecords(const std::string& filename);
 
     /// @return The cumulative score across all recorded games in the records vector
     static int getTotalScore() {
@@ -103,13 +103,13 @@ public:
      * @brief Formats the settings variables and parses into a save.dat
      * @param filename the name of the .dat file in the app data folder
     */
-    static void SaveSettings(const std::string& filename);
+    static void saveSettings(const std::string& filename);
 
     /**
      * @brief Sets the settings variable values from a save.dat
      * @param filename the name of the .dat file in the app data folder
     */
-    static void LoadSettings(const std::string& filename);
+    static void loadSettings(const std::string& filename);
 
     /**
      * @brief Used when starting the game, to set the volume specified in the save file
@@ -171,6 +171,19 @@ public:
     */
     static void setFullscreen(bool flag);
 
+
+    /// METRICS ///
+
+    /**
+     * @brief Adds/subtracts points from the save manager's points counter
+     * @param newPoints The points being added to the total, use negative ints to subtract
+     *                  from the total
+    */
+    static void addPoints(int newPoints);
+
+    /// @return The number of points the player currently has
+    static int getPoints();
+
 private:
 
     //Vector storing all completed sudoku game instances, with their scores and times
@@ -183,27 +196,29 @@ private:
      * 
      * @param buffer The string stream containing all of the information loaded/to-be-stored
     */
-    static void Obfuscate(std::vector<char>& buffer);
+    static void obfuscate(std::vector<char>& buffer);
 
     /**
      * @brief Finds the file path for the game's saves, depending on the operating system
      * @param filename The name of the file being found/made in the path
      * @return The file path
     */
-    static std::string GetSavePath(const std::string& filename);
+    static std::string getSavePath(const std::string& filename);
 
     /**
      * @brief Parses the object/variable data to a buffer, obfuscates it, and writes it to a .dat file
      * @param filename The name of the file being saved to/created
      * @param data the data being saved
     */
-    static void Save(const std::string& filename, const std::string& data);
+    static void save(const std::string& filename, const std::string& data);
 
     /**
      * @brief Retrieves and decrypts a save file
      * @param filename The name of the file being loaded
     */
     static std::string loadSave(const std::string& filename);
+
+    /// Settings ///
 
     /// @brief The volume of the music
     static float volume;
@@ -220,6 +235,10 @@ private:
     ///@brief Indicates Window mode; fullscreen or windowed
     static bool fullscreen;
 
+
+    /// Metrics ///
+
+    static int points;
 };
 
 #endif

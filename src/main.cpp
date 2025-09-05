@@ -78,10 +78,10 @@ int main() {
     /* Load .dat files */
 
     // Load all the completed games into the save manager's records vector
-    SaveManager::LoadRecords("records.dat");
+    SaveManager::loadRecords("records.dat");
 
     // Load all settings configurations previously left in the last settings menu session
-    SaveManager::LoadSettings("settings.dat");
+    SaveManager::loadSettings("settings.dat");
 
     // Enable V-Sync according to the settings configuration
     vsync = SaveManager::getVSync();
@@ -300,7 +300,19 @@ int main() {
 
     textRect = culScoreText.getLocalBounds();
     culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
-    culScoreText.setPosition(sf::Vector2f(300.f, 675.f));
+    culScoreText.setPosition(sf::Vector2f(300.f, 650.f));
+
+    sf::Text pointsText;
+    pointsText.setString("Sudough: 0");
+    pointsText.setFont(ResourceManager::getFont("homeFont"));
+    pointsText.setCharacterSize(42);
+    pointsText.setFillColor(HOME_THEME.text);
+    pointsText.setOutlineColor(sf::Color::Black);
+    pointsText.setOutlineThickness(1);
+
+    textRect = pointsText.getLocalBounds();
+    pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    pointsText.setPosition(sf::Vector2f(300.f, 700.f));
 
     sf::Text timerText;
     timerText.setString("");
@@ -379,7 +391,7 @@ int main() {
                         if (!settingsToggle.isActive()) { //Condition when leaving settings menu
                             stateFlag = prevState;
                             prevState = STATE_SETTINGS;
-                            SaveManager::SaveSettings("settings.dat"); //saves settings when leaving
+                            SaveManager::saveSettings("settings.dat"); //saves settings when leaving
                         } else { //Condition for leaving an open game
                             prevState = stateFlag;
                             stateFlag = STATE_HOME;
@@ -463,7 +475,7 @@ int main() {
                     }
                 }
 
-                if (grid.updateNumbers(worldPos, number)) {
+                if (grid.updateNumbers(worldPos, number)) { //Score is added if the grid is updated with a correct number
                     timeGap = timer.getElapsedTime().asSeconds() - previousHit.asSeconds();
                     score += (timeGap >= 60.f ? 5 * stateFlag : static_cast<int>(stateFlag * (50 - 0.75 * (timeGap - totalTimeOut))));
                     previousHit = timer.getElapsedTime();
@@ -473,9 +485,11 @@ int main() {
                     Record game(score, stateFlag, sf::seconds(timer.getElapsedTime().asSeconds() - totalTimeOut));
                     cumulativeScore += score;
 
+                    SaveManager::addPoints(grid.calculatePoints(score, timer.getElapsedTime().asSeconds() - totalTimeOut));
+
                     //Saves the new game to the records vector, and saves the records to appdata
                     SaveManager::addRecord(game);
-                    SaveManager::SaveRecords("records.dat");
+                    SaveManager::saveRecords("records.dat");
 
                     prevState = stateFlag;
                     stateFlag = STATE_HOME;
@@ -643,7 +657,12 @@ int main() {
         culScoreText.setString("Total Score: " + std::to_string(SaveManager::getTotalScore()));
         textRect = culScoreText.getLocalBounds();
         culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
-        culScoreText.setPosition(sf::Vector2f(300.f, 675.f));
+        culScoreText.setPosition(sf::Vector2f(300.f, 650.f));
+
+        pointsText.setString("Sudough: " + std::to_string(SaveManager::getPoints()));
+        textRect = pointsText.getLocalBounds();
+        pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+        pointsText.setPosition(sf::Vector2f(300.f, 700.f));
 
         scoreText.setString(std::to_string(score));
         scoreText.setFillColor(currentTheme->text);
@@ -753,6 +772,7 @@ int main() {
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
             renderTexture.draw(title);
             renderTexture.draw(culScoreText);
+            renderTexture.draw(pointsText);
         } else { //Draws for the settings menu
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);

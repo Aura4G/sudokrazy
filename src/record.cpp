@@ -20,6 +20,7 @@ float SaveManager::brightness = 1.f;
 float SaveManager::backgroundSpeed = 0.5f;
 bool SaveManager::vsync = true;
 bool SaveManager::fullscreen = false;
+int SaveManager::points = 0;
 
 
 /// Record Class definitions ///
@@ -72,15 +73,15 @@ void SaveManager::addRecord(Record game) {
     records.emplace_back(game);
 }
 
-void SaveManager::Save (const std::string& filename, const std::string& data) {
+void SaveManager::save (const std::string& filename, const std::string& data) {
     //The save destination is retrieved
-    std::string fullPath = GetSavePath(filename);
+    std::string fullPath = getSavePath(filename);
 
     //A character buffer stores all of the data...
     std::vector<char> buffer(data.begin(), data.end());
 
     //... and encrypts the buffer
-    Obfuscate(buffer);
+    obfuscate(buffer);
 
     //the encrypted buffer is written to the file
     std::ofstream file(fullPath, std::ios::binary);
@@ -91,7 +92,7 @@ void SaveManager::Save (const std::string& filename, const std::string& data) {
 
 std::string SaveManager::loadSave(const std::string& filename) {
     //The save's destination is retrieved
-    std::string fullPath = GetSavePath(filename);
+    std::string fullPath = getSavePath(filename);
 
     //No records are created if the file doesn't exists
     std::ifstream file (fullPath, std::ios::binary);
@@ -99,19 +100,19 @@ std::string SaveManager::loadSave(const std::string& filename) {
 
     //A buffer captures the file's contents and decrypts them
     std::vector<char> buffer((std::istreambuf_iterator<char>(file)), {});
-    Obfuscate(buffer);
+    obfuscate(buffer);
 
     return std::string(buffer.begin(), buffer.end());
 }
 
-void SaveManager::Obfuscate(std::vector<char>& buffer) {
+void SaveManager::obfuscate(std::vector<char>& buffer) {
     const char key = 0x5A; // A given XOR key used for encrypting and decrypting
     for (auto& c : buffer) {
         c ^= key;
     }
 }
 
-std::string SaveManager::GetSavePath(const std::string& filename) {
+std::string SaveManager::getSavePath(const std::string& filename) {
     namespace fs = std::filesystem;
 
     // Static variable ensures this block runs only once
@@ -143,34 +144,49 @@ std::string SaveManager::GetSavePath(const std::string& filename) {
     return fullPath.string();
 }
 
-void SaveManager::SaveRecords(const std::string& filename) {
+void SaveManager::saveRecords(const std::string& filename) {
     std::ostringstream out;
     for (auto& r : records) {
         std::string s = r.serialise(); //serialise each value in each record to a single string
         out << s.size() << "\n" << s << "\n"; //Each value is delimited by a new line
     }
-    Save(filename, out.str());
+
+    out << "points " << std::to_string(points);
+
+    save(filename, out.str());
 }
 
-void SaveManager::LoadRecords(const std::string& filename) {
-    records.clear(); //Clears any overlap between prior records and the newly loaded records
+void SaveManager::loadRecords(const std::string& filename) {
+    records.clear();
     std::string data = loadSave(filename);
     std::istringstream in(data);
 
-    while (in) {
+    while (true) {
         std::size_t len;
-        in >> len;
-        in.get();
+        if (!(in >> len)) break; // not a number, therefore it must be the last line
+        in.get(); // skip newline
 
-        if (!in) break;
-
-        std::string recordString(len, '\0'); //sets the size of the string (and thus data) before passing it as a character vector
+        std::string recordString(len, '\0');
         in.read(&recordString[0], len);
-        records.emplace_back(Record::deserialize(recordString));
+        in.get(); // skip newline after record
+
+        records.emplace_back(Record::deserialize(recordString)); //Add record to vector
+    }
+
+    // now just read the last line as an integer
+    in.clear(); // reset stream state after the failed number read
+    
+    // Read the footer line
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.rfind("points ", 0) == 0) {
+            std::istringstream ls(line.substr(7)); //Have the stringstream continue from directly after the "points" text
+            ls >> points;
+        }
     }
 }
 
-void SaveManager::SaveSettings(const std::string& filename) {
+void SaveManager::saveSettings(const std::string& filename) {
     std::ostringstream out;
 
     //delimits values with new lines in a specific order
@@ -180,10 +196,10 @@ void SaveManager::SaveSettings(const std::string& filename) {
         << std::to_string(vsync) << "\n"
         << std::to_string(fullscreen);
 
-    Save(filename, out.str());
+    save(filename, out.str());
 }
 
-void SaveManager::LoadSettings(const std::string& filename) {
+void SaveManager::loadSettings(const std::string& filename) {
     std::string data = loadSave(filename);
 
     //If there's no current settings configuration to load, a default is used instead
@@ -264,4 +280,12 @@ bool SaveManager::getFullscreen() {
 
 void SaveManager::setFullscreen(bool flag) {
     fullscreen = flag;
+}
+
+void SaveManager::addPoints(int newPoints) {
+    points += newPoints;
+}
+
+int SaveManager::getPoints() {
+    return points;
 }

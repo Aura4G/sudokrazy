@@ -29,31 +29,15 @@ public:
 
 
     /**
-     * @brief Change the length of the slider line
-     * @param newLength the new length of the slider
-     * @todo
-    */
-    void setLength(float newLength);
-
-
-    /**
-     * @brief Change the colour of the slider line
-     * @param colour the new colour
-     * @todo
-    */
-    void setColor(sf::Color colour);
-
-
-    /**
-    * @brief "Activates" the slider, allowing for user interactions to affect the slider
-    *        and any settings attributed to the slider
+     * @brief "Activates" the slider, allowing for user interactions to affect the slider
+     *        and any settings attributed to the slider
     */
     void activate();
 
 
     /**
-    * @brief "Deactivates" the slider, prohibiting user interactions from affecting the slider
-    *        and any settings attributed to the slider
+     * @brief "Deactivates" the slider, prohibiting user interactions from affecting the slider
+     *        and any settings attributed to the slider
     */
     void deactivate();
 
@@ -66,9 +50,9 @@ public:
 
 
     /**
-    * @brief Handles the slider's button movement and bounds according to player-triggered events
-    * @param event the polled event passed from main, where the window is being rendered
-    * @param window the rendered window the game is running on 
+     * @brief Handles the slider's button movement and bounds according to player-triggered events
+     * @param event the polled event passed from main, where the window is being rendered
+     * @param window the rendered window the game is running on 
     */
     void handleEvent(const sf::Event& event, sf::RenderWindow& window);
 

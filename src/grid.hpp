@@ -76,6 +76,14 @@ public:
     /// @brief Triggers the board shuffles every 5 turns and visualises this change to the sfml grid
     void krazyMode();
 
+    /**
+     * @brief calculates the spendable currency the player earns for a completed game
+     * @param score the score reached in the game
+     * @param timeMS the time in seconds taken to beat the board
+     * @return the points earnt
+    */
+    int calculatePoints(int score, float time);
+
     /// @brief flag to identify whether the player is adding or removing numbers from the board
     static bool eraser_mode;
 
@@ -104,6 +112,12 @@ private:
 
     /// @brief Flag to ensure a shuffle occurs only once every 5 turns
     bool shuffled = false;
+
+    /// @brief Indicates how many correct placements the user has made in one game
+    int correct = 0;
+
+    /// @brief Indicates how many incorrect placements the user has made in one game
+    int incorrect = 0;
 };
 
 #endif

@@ -112,9 +112,14 @@ bool Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
                             shuffled = false;
                         }
 
-                        if (playersBoard.getNumber(counter/9, counter%9) == finalBoard.getNumber(counter/9, counter%9) && !block.isHit()) {
-                            block.setHit(true);
-                            return true;
+                        if (playersBoard.getNumber(counter/9, counter%9) == finalBoard.getNumber(counter/9, counter%9)) {
+                            if (!block.isHit()) {
+                                block.setHit(true);
+                                correct++;
+                                return true;
+                            }
+                        } else {
+                            incorrect++;
                         }
                         return false;
                     }
@@ -157,6 +162,8 @@ void Grid::appropriate() {
     playersBoard = finalBoard; //The player's board copies the new solution..
     playersBoard.removeNumbers(); //And randomly removes numbers from it
     turns = 0;
+    correct = 0;
+    incorrect = 0;
     shuffled = false;
 
     //Activates and deactivates buttons accordingly, also changing their text contents and themes.
@@ -212,25 +219,36 @@ void Grid::krazyMode() {
     playersBoard.selectiveRemoval(changeToRemove, incorrect);
     //Activates and deactivates buttons accordingly, also changing their text contents and themes.
     for (int i = 0; i < 81; i++) {
-        if (playersBoard.getNumber(i/9,i%9) == 0) {
+        if (playersBoard.getNumber(i/9,i%9) == 0) { //empty blocks to be entered
             whiteBlocks[i].setText("");
             whiteBlocks[i].setTheme(INPUT_BUTTON);
             whiteBlocks[i].activate();
-        } else if (changeableTotal[playersBoard.getNumber(i/9, i%9)-1] > 0 && playersBoard.getNumber(i/9,i%9) != 0) {
+            whiteBlocks[i].setHit(false);
+        } else if (changeableTotal[playersBoard.getNumber(i/9, i%9)-1] > 0 && playersBoard.getNumber(i/9,i%9) != 0) { //correct inputs the player has entered
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
             whiteBlocks[i].setTheme(INPUT_BUTTON);
             whiteBlocks[i].activate();
+            whiteBlocks[i].setHit(true);
             changeableTotal[playersBoard.getNumber(i/9, i%9)-1]--;
-        } else if (finalBoard.getNumber(i/9, i%9) != playersBoard.getNumber(i/9, i%9) && playersBoard.getNumber(i/9,i%9) != 0) {
+        } else if (finalBoard.getNumber(i/9, i%9) != playersBoard.getNumber(i/9, i%9) && playersBoard.getNumber(i/9,i%9) != 0) { //incorrect inputs that can be re-entered
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
             whiteBlocks[i].setTheme(INPUT_BUTTON);
             whiteBlocks[i].activate();
+            whiteBlocks[i].setHit(false);
             changeableTotal[playersBoard.getNumber(i/9, i%9)-1]--;
-        } else {
+        } else { //filled blocks present in the first board iteration
             whiteBlocks[i].setText(std::to_string(playersBoard.getNumber(i/9,i%9)));
             whiteBlocks[i].setTheme(REGULAR_BUTTON);
             whiteBlocks[i].setColor(whiteBlocks[i].getTheme().unhovered);
             whiteBlocks[i].deactivate();
         }
     }
+}
+
+int Grid::calculatePoints(int score, float time) {
+    float accuracy = static_cast<float>(correct) / static_cast<float>(correct + incorrect);
+    int scoreBonus = score / 20;
+    float timeBonus = (stateFlag * stateFlag * 120 - time) / 30;
+
+    return (scoreBonus + timeBonus) * accuracy;
 }
