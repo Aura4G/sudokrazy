@@ -136,6 +136,18 @@ public:
     static void setBrightness(float newBrightness);
 
     /**
+     * @brief Used when starting the game, to set the contrast specified in the save file
+     * @return The contrast of the game window
+    */
+    static float getContrast();
+
+    /**
+     * @brief Changes the contrast variable that'll be present in the settings save
+     * @param newContrast the new contrast value
+    */
+    static void setContrast(float newContrast);
+
+    /**
      * @brief Used when starting the game, to set the background scroll speed specified in the save file
      * @return The scroll speed of the background
     */
@@ -225,6 +237,9 @@ private:
 
     /// @brief The brightness of the window
     static float brightness;
+
+    /// @brief The colour contrast of the window
+    static float contrast;
 
     /// @brief The speed of the scrolling background
     static float backgroundSpeed;

@@ -99,7 +99,7 @@ int main() {
     /* Window with fixed size and cannot fullscreen */
     auto window = createWindow(isFullscreen);
 
-    //brightness shader activation
+    //create a render texture to draw everything to before post-processing and displaying
     sf::RenderTexture renderTexture;
     renderTexture.create(window->getSize().x, window->getSize().y);
 
@@ -141,10 +141,11 @@ int main() {
 
     /* Shaders */
 
-    ResourceManager::loadShader("brightness", "media/shaders/brightness.frag");
+    ResourceManager::loadShader("shader", "media/shaders/shader.frag");
 
-    sf::Shader& brightnessShader = ResourceManager::getShader("brightness");
+    sf::Shader& shader = ResourceManager::getShader("shader");
     float currentBrightness = 1.0f; //normal brightness
+    float contrast = 1.0f; //normal contrast
 
 
     /* Dynamic Background */
@@ -223,7 +224,7 @@ int main() {
     settingsTitle.setPosition(sf::Vector2f(300,100));
 
     //Button to toggle V-Sync on/off
-    Button vsyncToggle(150.f, 75.f, 100.f, 220.f, EASY_BUTTON, "V-Sync On", "gameFont");
+    Button vsyncToggle(150.f, 75.f, 100.f, 220.f, (vsync ? EASY_BUTTON : HARD_BUTTON), (vsync ? "V-Sync On" : "V-Sync Off"), "gameFont");
 
     //Button to toggle fullscreen on/off
     Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, (isFullscreen ? EASY_BUTTON : HARD_BUTTON), (isFullscreen ? "Fullscreen" : "Windowed"), "gameFont");
@@ -239,6 +240,7 @@ int main() {
     //Retrieves the saved volume setting for the initial setting
     Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), SaveManager::getVolume(), sf::Color::Black);
 
+
     sf::Text brightnessText;
     brightnessText.setString("Brightness:");
     brightnessText.setFont(ResourceManager::getFont("gameFont"));
@@ -250,16 +252,29 @@ int main() {
     //Retrieves the saved brightness setting for the initial setting
     Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), SaveManager::getBrightness(), sf::Color::Black);
 
+
+    sf::Text contrastText;
+    contrastText.setString("Contrast:");
+    contrastText.setFont(ResourceManager::getFont("gameFont"));
+    contrastText.setCharacterSize(16);
+    contrastText.setFillColor(sf::Color::Black);
+    contrastText.setPosition(sf::Vector2f(100.f, 480.f));
+
+    //Changes the Contrast
+    //Retrieves the saved contrast setting for the initial setting
+    Slider contrastSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getContrast(), sf::Color::Black);
+
+
     sf::Text scrollerText;
     scrollerText.setString("Background scroll speed:");
     scrollerText.setFont(ResourceManager::getFont("gameFont"));
     scrollerText.setCharacterSize(16);
     scrollerText.setFillColor(sf::Color::Black);
-    scrollerText.setPosition(sf::Vector2f(100.f, 480.f));
+    scrollerText.setPosition(sf::Vector2f(100.f, 560.f));
 
     //Changes the background scroll speed
     //Retrieves the saved speed setting for the initial setting
-    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getBSpeed(), sf::Color::Black);
+    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 600.f), SaveManager::getBSpeed(), sf::Color::Black);
 
 
     //Music to play while game is operational
@@ -508,6 +523,7 @@ int main() {
 
             volumeSlider.handleEvent(event, *window);
             brightnessSlider.handleEvent(event, *window);
+            contrastSlider.handleEvent(event, *window);
             scrollerSlider.handleEvent(event, *window);
         }
 
@@ -571,6 +587,7 @@ int main() {
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
+            contrastSlider.deactivate();
             scrollerSlider.deactivate();
         } else if (stateFlag == STATE_HOME){ //Home Menu State
             //activating menu buttons
@@ -609,6 +626,7 @@ int main() {
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
+            contrastSlider.deactivate();
             scrollerSlider.deactivate();
         } else { //Settings menu state
             //deactivating menu buttons
@@ -638,6 +656,7 @@ int main() {
             fullscreenToggle.activate();
             volumeSlider.activate();
             brightnessSlider.activate();
+            contrastSlider.activate();
             scrollerSlider.activate();
         }
 
@@ -651,6 +670,12 @@ int main() {
         brightnessSlider.displayPercentage("","%");
         if (brightnessSlider.getDragging()) {
             SaveManager::setBrightness(brightnessSlider.getPercentage()/100);
+        }
+
+        contrast = contrastSlider.getPercentage()/100.f;
+        contrastSlider.displayPercentage("","%");
+        if (contrastSlider.getDragging()) {
+            SaveManager::setContrast(contrastSlider.getPercentage()/100);
         }
 
         scrollSpeed = scrollerSlider.getPercentage()*1.5f;
@@ -782,11 +807,13 @@ int main() {
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);
             renderTexture.draw(brightnessText);
+            renderTexture.draw(contrastText);
             renderTexture.draw(scrollerText);
             vsyncToggle.display(renderTexture);
             fullscreenToggle.display(renderTexture);
             volumeSlider.display(renderTexture);
             brightnessSlider.display(renderTexture);
+            contrastSlider.display(renderTexture);
             scrollerSlider.display(renderTexture);
         }
         easySwitch.display(renderTexture);
@@ -802,8 +829,9 @@ int main() {
         //Apply shaders
         window->clear();
         sf::Sprite finalSprite(renderTexture.getTexture());
-        brightnessShader.setUniform("brightness", currentBrightness);
-        window->draw(finalSprite, &brightnessShader);
+        shader.setUniform("brightness", currentBrightness);
+        shader.setUniform("contrast", contrast);
+        window->draw(finalSprite, &shader);
         window->display();
     }
     music.stop();

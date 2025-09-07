@@ -17,6 +17,7 @@
 std::vector<Record> SaveManager::records;
 float SaveManager::volume = 1.f;
 float SaveManager::brightness = 1.f;
+float SaveManager::contrast = 1.f;
 float SaveManager::backgroundSpeed = 0.5f;
 bool SaveManager::vsync = true;
 bool SaveManager::fullscreen = false;
@@ -192,6 +193,7 @@ void SaveManager::saveSettings(const std::string& filename) {
     //delimits values with new lines in a specific order
     out << std::to_string(volume) << "\n"
         << std::to_string(brightness) << "\n"
+        << std::to_string(contrast) << "\n"
         << std::to_string(backgroundSpeed) << "\n"
         << std::to_string(vsync) << "\n"
         << std::to_string(fullscreen);
@@ -204,7 +206,7 @@ void SaveManager::loadSettings(const std::string& filename) {
 
     //If there's no current settings configuration to load, a default is used instead
     if (data == "") {
-        data = "1\n1\n0.5\n1\n0";
+        data = "1\n1\n1\n0.5\n1\n0";
     }
 
     std::istringstream in(data);
@@ -221,6 +223,12 @@ void SaveManager::loadSettings(const std::string& filename) {
     if (std::getline(in, line)) {
         std::istringstream iss(line);
         iss >> brightness;
+    }
+
+    // Contrast
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> contrast;
     }
 
     // Background scroll speed
@@ -256,6 +264,14 @@ float SaveManager::getBrightness() {
 
 void SaveManager::setBrightness(float newBrightness) {
     brightness = newBrightness;
+}
+
+float SaveManager::getContrast() {
+    return contrast;
+}
+
+void SaveManager::setContrast(float newContrast) {
+    contrast = newContrast;
 }
 
 float SaveManager::getBSpeed() {
