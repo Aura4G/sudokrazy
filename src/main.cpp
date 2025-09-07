@@ -323,7 +323,7 @@ int main() {
     culScoreText.setPosition(sf::Vector2f(300.f, 650.f));
 
     sf::Text pointsText;
-    pointsText.setString("Sudough: 0");
+    pointsText.setString("Kuukies: 0");
     pointsText.setFont(ResourceManager::getFont("homeFont"));
     pointsText.setCharacterSize(42);
     pointsText.setFillColor(HOME_THEME.text);
@@ -689,7 +689,7 @@ int main() {
         culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         culScoreText.setPosition(sf::Vector2f(300.f, 650.f));
 
-        pointsText.setString("Sudough: " + std::to_string(SaveManager::getPoints()));
+        pointsText.setString("Kuukies: " + std::to_string(SaveManager::getPoints()));
         textRect = pointsText.getLocalBounds();
         pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         pointsText.setPosition(sf::Vector2f(300.f, 700.f));
