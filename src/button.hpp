@@ -116,6 +116,8 @@ public:
     /// @return the button theme being used by the button
     ButtonTheme getTheme();
 
+    /// @return the text string of the button
+    std::string getString();
 
     /// @return the texture currently being used by the button
     sf::Sprite getSprite();

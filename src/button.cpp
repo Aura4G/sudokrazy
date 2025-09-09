@@ -133,6 +133,10 @@ ButtonTheme Button::getTheme() {
     return theme;
 }
 
+std::string Button::getString() {
+    return text.getString();
+}
+
 sf::Sprite Button::getSprite() {
     return subject;
 }

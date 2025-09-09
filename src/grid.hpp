@@ -8,6 +8,11 @@
 
 /**
  * 9*9 sudoku grid SFML visualisation and functionality
+ * 
+ * The sudoku grid makes use of the button class for each of the 81 panels,
+ * done to reinforce the modular and scalable nature behind the buttons and
+ * how they can be applied to a variety of structures and objects
+ * 
  * @author Aura4G (Aria Noroozi)
 */
 

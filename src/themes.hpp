@@ -50,4 +50,7 @@ extern const Theme KRAZY_THEME;
 /// @brief For the settings menu
 extern const Theme SETTINGS_THEME;
 
+/// @brief For the Shop
+extern const Theme SHOP_THEME;
+
 #endif
