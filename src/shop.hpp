@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <optional>
 #include <SFML/Graphics.hpp>
 #include "button.hpp"
 
@@ -17,6 +18,9 @@
  * @author Aura4G (Aria Noroozi)
 */
 
+/// @brief Specifies the type of reward gained from an item
+enum class ItemType {Theme, Music, SFX, Hint};
+
 /// @brief Stores all of the data regarding a purchasable
 class Item {
 public:
@@ -27,7 +31,7 @@ public:
      * @param name The item's name
      * @param description The item's description
     */
-    Item(int cost, std::string& name, std::string& description);
+    Item(int cost, std::string name, std::string texture = "placeholder");
 
     /// @return The item's ID
     int getID();
@@ -50,6 +54,12 @@ public:
     /// @param newDesc The new description of the item
     void setDescription(std::string& newDesc);
 
+    /// @return The preview key of the item
+    std::string getPreviewKey();
+
+    /// @param newPreview The new preview image displayed for the unlockable item
+    void setPreview(std::string& key);
+
     /// @return The purchase status of the item
     bool isPurchased();
 
@@ -70,6 +80,9 @@ private:
     /// @brief The description of the item
     std::string description;
 
+    /// @brief The preview image that appears
+    std::string previewKey;
+
     /// @brief Whether or not the item has been purchased
     bool purchased;
 
@@ -83,7 +96,7 @@ class Shop {
 public:
 
     /**
-     * @brief Adds an item object to the items map
+     * @brief Adds an item object to the items vector
      * @param item The newly created item
     */
     static void addItem(Item item);
@@ -91,9 +104,16 @@ public:
     /**
      * @brief Retrieves an item registered within the shop via its name
      * @param name The name of the item
-     * @return An item with a matching key
+     * @return An item with a matching name
     */
     static Item getItem(std::string name);
+
+    /**
+     * @brief Retrieves an item registered within the shop via its index in the vector of items
+     * @param index The item's index
+     * @return The item of that index
+    */
+    static std::optional<Item> getItem(int index);
 
 private:
 
@@ -122,6 +142,25 @@ public:
     */
     void display(sf::RenderTexture& renderTexture);
 
+    /**
+     * @brief takes the shop's contents from an index and applies them to the visualised shop shelf
+     *        until the shelf's limit is reached or the shop runs out of items from that index
+     * @param index the starting point for which the shelf is stocked with items
+    */
+    void pullShop(int index = 0);
+
+    /**
+     * @brief Iteratively calls the update-hover function for every item display in the shelf
+     * @param mousePos Mouse position relative to the window in the current frame
+    */
+    void updateHover(const sf::Vector2f& mousePos);
+
+    /// @brief Activates all the player-interactive buttons in the shelf
+    void activate();
+
+    /// @brief Deactivates all the player-interactive buttons in the shelf
+    void deactivate();
+
 private:
 
     /// @brief How many item columns are displayed along the x axis
@@ -144,6 +183,10 @@ private:
 
     /// @brief The captions of the items on display
     std::vector<Button> itemCaption;
+
+    /// @brief the number of times the quantity of shop items overflows the dimensions
+    ///        of the shelf
+    int sections;
 };
 
 #endif

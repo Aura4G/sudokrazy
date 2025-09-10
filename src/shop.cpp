@@ -2,22 +2,27 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <optional>
 #include <SFML/Graphics.hpp>
 
 #include "shop.hpp"
 #include "record.hpp"
 #include "sudoku.hpp"
 #include "button.hpp"
+#include "resource_manager.hpp"
 
 int Item::counter = 0;
 
 std::vector<Item> Shop::items;
 
-Item::Item(int cost, std::string& name, std::string& description)
-    : cost(cost), name(name), description(description)
+Item::Item(int cost, std::string name, std::string texture)
+    : cost(cost), name(name)
     {
         purchased = false;
         itemID = counter++;
+        previewKey = texture;
+
+        description = name + "\nCost: " + std::to_string(cost);
     }
 
 int Item::getID() {
@@ -48,6 +53,14 @@ void Item::setDescription(std::string& newDesc) {
     description = newDesc;
 }
 
+std::string Item::getPreviewKey() {
+    return previewKey;
+}
+
+void Item::setPreview(std::string& key) {
+    previewKey = key;
+}
+
 bool Item::isPurchased() {
     return purchased;
 }
@@ -74,6 +87,14 @@ Item Shop::getItem(std::string name) {
     exit(errno);
 }
 
+std::optional<Item> Shop::getItem(int index) {
+    if (index >= 0 && index < static_cast<int>(items.size())) {
+        return items[index];
+    }
+    return std::nullopt;
+}
+
+
 Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displaySize, sf::Vector2f gaps)
     : columns(columns), rows(rows), position(position), displaySize(displaySize), gaps(gaps)
     {
@@ -84,7 +105,7 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
 
         for (int i = 0; i < quantity; i++) {
             additiveX = (i % columns) * (gaps.x + displaySize.x);
-            additiveY = (i % rows) * (gaps.y + displaySize.y * 1.5f + 5.f);
+            additiveY = ((i / columns) % rows) * (gaps.y + displaySize.y * 1.5f + 5.f);
 
             itemDisplay.emplace_back(Button(displaySize.x, displaySize.y, position.x + additiveX, position.y + additiveY, MEDIUM_BUTTON, "", "gameFont"));
             itemCaption.emplace_back(Button(displaySize.x, displaySize.y/2.f, position.x + additiveX, position.y + displaySize.y + 5.f + additiveY, MEDIUM_BUTTON, "", "gameFont"));
@@ -101,5 +122,39 @@ void Shelf::display(sf::RenderTexture& renderTexture) {
             itemDisplay.at(i).display(renderTexture);
             itemCaption.at(i).display(renderTexture);
         }
+    }
+}
+
+void Shelf::pullShop(int index) {
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        if (!Shop::getItem(index)) {
+            break;
+        } else {
+            itemDisplay.at(i).setTexture(ResourceManager::getTexture(Shop::getItem(index)->getPreviewKey()));
+            itemCaption.at(i).setText(Shop::getItem(index)->getDescription());
+            index++;
+        }
+    }
+}
+
+void Shelf::updateHover(const sf::Vector2f& mousePos) {
+    for (Button& item : itemDisplay) {
+        if (item.isActive()) {
+            item.updateHover(mousePos);
+        }
+    }
+}
+
+void Shelf::activate() {
+    for (Button& item : itemDisplay) {
+        item.activate();
+    }
+}
+
+void Shelf::deactivate() {
+    for (Button& item : itemDisplay) {
+        item.deactivate();
     }
 }

@@ -281,7 +281,11 @@ int main() {
     /*SHOP*/
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
+    Shop::addItem(Item(20, "Outdoor Theme", "settings"));
+    Shop::addItem(Item(50, "Space Theme", "settings"));
+
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
+    shopShelf.pullShop();
 
     //Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
@@ -569,7 +573,7 @@ int main() {
                 break;
             case STATE_SHOP:
                 currentTheme = &SHOP_THEME;
-                exit.setTheme(REGULAR_BUTTON);
+                exit.setTheme(MEDIUM_BUTTON);
                 break;
         }
 
@@ -604,6 +608,8 @@ int main() {
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
             scrollerSlider.deactivate();
+
+            shopShelf.deactivate();
         } else if (stateFlag == STATE_HOME){ //Home Menu State
             //activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
@@ -643,6 +649,8 @@ int main() {
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
             scrollerSlider.deactivate();
+
+            shopShelf.deactivate();
         } else if (stateFlag == STATE_SETTINGS) { //Settings menu state
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
@@ -673,6 +681,8 @@ int main() {
             brightnessSlider.activate();
             contrastSlider.activate();
             scrollerSlider.activate();
+
+            shopShelf.deactivate();
         } else { //Shop state
             //deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
@@ -703,6 +713,8 @@ int main() {
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
             scrollerSlider.deactivate();
+
+            shopShelf.activate();
         }
 
         music.setVolume(volumeSlider.getPercentage());
@@ -811,7 +823,7 @@ int main() {
             vsyncToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
             fullscreenToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         } else { // Shop 
-
+            shopShelf.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         if (!Grid::eraser_mode) {

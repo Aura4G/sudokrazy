@@ -78,9 +78,10 @@ public:
 
     /**
      * @brief Changes the button sprite's texture
-     * @param newSprite The texture to replace the button's current sprite
+     * @param newTexture The texture to replace the button's current sprite
+     * @param padding pixel distance from the frame's smallest dimension
     */
-    void setTexture(const sf::Texture& newTexture, float padding);
+    void setTexture(const sf::Texture& newTexture, float padding = 10.f);
 
 
     /**

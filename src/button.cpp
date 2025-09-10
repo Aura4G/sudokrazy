@@ -81,7 +81,7 @@ void Button::setTheme(const ButtonTheme& newTheme) {
     text.setFillColor(theme.text);
 }
 
-void Button::setTexture(const sf::Texture& newTexture, float padding = 10.f) {
+void Button::setTexture(const sf::Texture& newTexture, float padding) {
     subject.setTexture(newTexture);
 
     //Scales the sprite to the button frame so the texture can use more space
