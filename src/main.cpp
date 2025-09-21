@@ -281,8 +281,8 @@ int main() {
     /*SHOP*/
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
-    Shop::addItem(Item(20, "Outdoor Theme", "settings"));
-    Shop::addItem(Item(50, "Space Theme", "settings"));
+    Shop::addItem(Item(20, "Outdoor Theme", "settings", ItemType::Theme));
+    Shop::addItem(Item(50, "Space Theme", "settings", ItemType::Theme));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
     shopShelf.pullShop();
@@ -515,6 +515,8 @@ int main() {
                     score += (timeGap >= 60.f ? 5 * stateFlag : static_cast<int>(stateFlag * (50 - 0.75 * (timeGap - totalTimeOut))));
                     previousHit = timer.getElapsedTime();
                 }
+
+                shopShelf.updateShelf(worldPos);
                 
                 if (grid.check()) { //checks if the grid has all its correct numbers
                     Record game(score, stateFlag, sf::seconds(timer.getElapsedTime().asSeconds() - totalTimeOut));

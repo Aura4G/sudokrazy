@@ -25,13 +25,17 @@ enum class ItemType {Theme, Music, SFX, Hint};
 class Item {
 public:
 
+    /// @brief Default constructor
+    Item();
+
     /**
      * @brief Parameterised constructor
      * @param cost The item's cost to purchase
      * @param name The item's name
      * @param description The item's description
+     * @param type The type of item it is
     */
-    Item(int cost, std::string name, std::string texture = "placeholder");
+    Item(int cost, std::string name, std::string texture = "placeholder", ItemType type = ItemType::Hint);
 
     /// @return The item's ID
     int getID();
@@ -88,6 +92,9 @@ private:
 
     /// @brief increments and assigns with each item creation
     static int counter;
+
+    /// @brief The type of item being sold
+    ItemType type;
 };
 
 
@@ -114,6 +121,9 @@ public:
      * @return The item of that index
     */
     static std::optional<Item> getItem(int index);
+
+    /// @return The number of items in the shop
+    static int getSize();
 
 private:
 
@@ -161,6 +171,13 @@ public:
     /// @brief Deactivates all the player-interactive buttons in the shelf
     void deactivate();
 
+    /**
+     * @brief Updates the purchase and equip status of items on the shelf
+     *        whenever a left-click event occurs
+     * @param mousePos The position of the mouse during that frame
+    */
+    void updateShelf(const sf::Vector2f& mousePos);
+
 private:
 
     /// @brief How many item columns are displayed along the x axis
@@ -183,6 +200,9 @@ private:
 
     /// @brief The captions of the items on display
     std::vector<Button> itemCaption;
+
+    /// @brief Vector storing the item data for each item on the shelf
+    std::vector<Item> itemsPulled;
 
     /// @brief the number of times the quantity of shop items overflows the dimensions
     ///        of the shelf

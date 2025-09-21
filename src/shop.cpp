@@ -15,8 +15,18 @@ int Item::counter = 0;
 
 std::vector<Item> Shop::items;
 
-Item::Item(int cost, std::string name, std::string texture)
-    : cost(cost), name(name)
+Item::Item() {
+    cost = 0;
+    name = "placeholder";
+    description = "";
+    itemID = -1;
+    previewKey = "placeholder";
+    type = ItemType::Hint;
+    purchased = false;
+}
+
+Item::Item(int cost, std::string name, std::string texture, ItemType type)
+    : cost(cost), name(name), type(type)
     {
         purchased = false;
         itemID = counter++;
@@ -68,6 +78,7 @@ bool Item::isPurchased() {
 void Item::purchase() {
     if (cost <= SaveManager::getPoints() && !purchased) {
         SaveManager::addPoints(-cost);
+        SaveManager::saveRecords("records.dat");
         purchased = true;
     }
 }
@@ -94,6 +105,10 @@ std::optional<Item> Shop::getItem(int index) {
     return std::nullopt;
 }
 
+int Shop::getSize() {
+    return items.size();
+}
+
 
 Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displaySize, sf::Vector2f gaps)
     : columns(columns), rows(rows), position(position), displaySize(displaySize), gaps(gaps)
@@ -102,6 +117,8 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
 
         float additiveX = 0.f;
         float additiveY = 0.f;
+
+        itemsPulled.resize(quantity);
 
         for (int i = 0; i < quantity; i++) {
             additiveX = (i % columns) * (gaps.x + displaySize.x);
@@ -127,13 +144,17 @@ void Shelf::display(sf::RenderTexture& renderTexture) {
 
 void Shelf::pullShop(int index) {
     int maximum = columns * rows;
+    sections = Shop::getSize() / maximum + 1;
 
     for (int i = 0; i < maximum; i++) {
-        if (!Shop::getItem(index)) {
+        auto optItem = Shop::getItem(index);
+
+        if (!optItem) {
             break;
         } else {
-            itemDisplay.at(i).setTexture(ResourceManager::getTexture(Shop::getItem(index)->getPreviewKey()));
-            itemCaption.at(i).setText(Shop::getItem(index)->getDescription());
+            itemDisplay.at(i).setTexture(ResourceManager::getTexture(optItem->getPreviewKey()));
+            itemCaption.at(i).setText(optItem->getDescription());
+            itemsPulled.at(i) = *optItem;
             index++;
         }
     }
@@ -156,5 +177,15 @@ void Shelf::activate() {
 void Shelf::deactivate() {
     for (Button& item : itemDisplay) {
         item.deactivate();
+    }
+}
+
+void Shelf::updateShelf(const sf::Vector2f& mousePos) {
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        if (itemDisplay.at(i).frame.getGlobalBounds().contains(mousePos) && itemDisplay.at(i).isActive()) {
+            itemsPulled.at(i).purchase();
+        }
     }
 }
