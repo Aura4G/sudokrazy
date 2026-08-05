@@ -14,7 +14,7 @@ const ButtonTheme HARD_BUTTON =    {{255,0,0},    {127,0,0},    {80,0,0}};
 const ButtonTheme KRAZY_BUTTON =   {{169,0,194},  {75,0,86},    {46,0,53}};
 const ButtonTheme EXIT_BUTTON =    {{32,32,32},   {0,0,0},      {144,0,32}};
 
-//Method declarations for Button class
+//Method definitions for Button class
 
 Button::Button() {
     width = 0;
