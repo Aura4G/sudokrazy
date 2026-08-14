@@ -27,7 +27,7 @@ public:
 
 
     /**
-     * @briefChecks if its two Board objects are equal, indicating game completion
+     * @brief Checks if its two Board objects are equal, indicating game completion
      * @return True if the two boards match
     */
     bool check();
@@ -63,6 +63,11 @@ public:
      * @param number The new number to replace the current number in the selected panel of the grid IF it is visible and active
     */
     bool updateNumbers(const sf::Vector2f& mousePos, int number);
+
+
+    /// @brief Darkens numbers on the grid that are equal to the player's selected number
+    /// @param number The selected number
+    void changeIndicator(int number);
 
 
     /// @brief Activates the grid and every player-input button on the grid

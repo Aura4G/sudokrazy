@@ -6,7 +6,7 @@
 
 //Button Colour Themes
 
-const ButtonTheme REGULAR_BUTTON = {{255,255,255},{127,127,127},{0,0,0}};
+const ButtonTheme REGULAR_BUTTON = {{255,255,255},{191,191,191},{0,0,0}};
 const ButtonTheme INPUT_BUTTON =   {{255,255,255},{255,255,0},  {25,151,230}};
 const ButtonTheme EASY_BUTTON =    {{0,255,0},    {0,127,0},    {0,64,0}};
 const ButtonTheme MEDIUM_BUTTON =  {{255,255,0},  {127,127,0},  {64,64,0}};
@@ -77,7 +77,8 @@ void Button::setText(const std::string& newText) {
 
 void Button::setTheme(const ButtonTheme& newTheme) {
     theme = newTheme;
-    //text colour isn't updated each frame, so it must be updated here
+    
+    setColor(theme.unhovered);
     text.setFillColor(theme.text);
 }
 

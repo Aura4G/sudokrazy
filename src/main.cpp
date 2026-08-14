@@ -503,6 +503,7 @@ int main() {
                     if (button.frame.getGlobalBounds().contains(worldPos)) { //switches the input number appropriately
                         if (button.isActive()) {
                             changeNumber(button, number);
+                            grid.changeIndicator(number);
                             chosenNumber->activate();
                             chosenNumber = &button;
                             chosenNumber->deactivate();

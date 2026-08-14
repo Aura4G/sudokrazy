@@ -8,7 +8,7 @@
  * @author Aura4G (Aria Noroozi)
 */
 
-/// @brief Contains all the colours needed for a button
+/// @brief Contains all the colours needed for a button {bg color, hover color, text colour}
 struct ButtonTheme {
     /// @brief when the mouse doesn't hover over a button
     sf::Color unhovered;
@@ -54,7 +54,7 @@ public:
     */
     Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const std::string& font, ShapeType type = ShapeType::Rectangle);
 
-
+    
     /**
      * @brief Changes the colour of the button frame
      * @param col The colour passed from the button theme
