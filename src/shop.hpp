@@ -19,7 +19,7 @@
 */
 
 /// @brief Specifies the type of reward gained from an item
-enum class ItemType {Theme, Music, SFX, Hint};
+enum class ItemType {Background, Music, SFX, Hint};
 
 /// @brief Stores all of the data regarding a purchasable
 class Item {
@@ -29,10 +29,10 @@ public:
     Item();
 
     /**
-     * @brief Parameterised constructor
+     * @brief Parameterised constructor to build an item with unique ID
      * @param cost The item's cost to purchase
      * @param name The item's name
-     * @param description The item's description
+     * @param texture The item's preview image in the shop
      * @param type The type of item it is
     */
     Item(int cost, std::string name, std::string texture = "placeholder", ItemType type = ItemType::Hint);
@@ -67,6 +67,8 @@ public:
     /// @return The purchase status of the item
     bool isPurchased();
 
+    void setPurchased();
+
     /// @brief Purchases the item with earnt points
     void purchase();
 
@@ -89,6 +91,9 @@ private:
 
     /// @brief Whether or not the item has been purchased
     bool purchased;
+
+    /// @brief Whether or not the item is currently equipped
+    bool equipped;
 
     /// @brief increments and assigns with each item creation
     static int counter;

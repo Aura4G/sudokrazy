@@ -10,10 +10,13 @@
 #include "sudoku.hpp"
 #include "button.hpp"
 #include "resource_manager.hpp"
+#include "shop_manager.hpp"
 
 int Item::counter = 0;
 
 std::vector<Item> Shop::items;
+
+/// Item class definitions ///
 
 Item::Item() {
     cost = 0;
@@ -29,6 +32,7 @@ Item::Item(int cost, std::string name, std::string texture, ItemType type)
     : cost(cost), name(name), type(type)
     {
         purchased = false;
+        equipped = false;
         itemID = counter++;
         previewKey = texture;
 
@@ -75,14 +79,21 @@ bool Item::isPurchased() {
     return purchased;
 }
 
+void Item::setPurchased() {
+    purchased = true;
+}
+
 void Item::purchase() {
     if (cost <= SaveManager::getPoints() && !purchased) {
         SaveManager::addPoints(-cost);
         SaveManager::saveRecords("records.dat");
         purchased = true;
+        ShopManager::saveShop("shop.dat", itemID);
     }
 }
 
+
+/// Shop class definitions ///
 
 void Shop::addItem(Item item) {
     items.emplace_back(item);
@@ -109,6 +120,8 @@ int Shop::getSize() {
     return items.size();
 }
 
+
+/// Shelf class definitions ///
 
 Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displaySize, sf::Vector2f gaps)
     : columns(columns), rows(rows), position(position), displaySize(displaySize), gaps(gaps)
@@ -155,6 +168,13 @@ void Shelf::pullShop(int index) {
             itemDisplay.at(i).setTexture(ResourceManager::getTexture(optItem->getPreviewKey()));
             itemCaption.at(i).setText(optItem->getDescription());
             itemsPulled.at(i) = *optItem;
+
+            if (ShopManager::queryPurchases(itemsPulled.at(i).getID())) {
+                itemsPulled.at(i).setPurchased();
+                itemDisplay.at(i).deactivate();
+                itemDisplay.at(i).frame.setFillColor(itemDisplay.at(i).getTheme().hovering);
+            }
+
             index++;
         }
     }
@@ -169,8 +189,12 @@ void Shelf::updateHover(const sf::Vector2f& mousePos) {
 }
 
 void Shelf::activate() {
-    for (Button& item : itemDisplay) {
-        item.activate();
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        if (!itemsPulled.at(i).isPurchased()) {
+            itemDisplay.at(i).activate();
+        }
     }
 }
 

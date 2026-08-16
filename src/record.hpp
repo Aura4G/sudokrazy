@@ -87,15 +87,7 @@ public:
     static void loadRecords(const std::string& filename);
 
     /// @return The cumulative score across all recorded games in the records vector
-    static int getTotalScore() {
-        int total = 0;
-
-        for (Record game : records) {
-            total += game.getScore();
-        }
-
-        return total;
-    }
+    static int getTotalScore();
 
     /// SETTINGS ///
 
