@@ -8,7 +8,7 @@
  * @author Aura4G (Aria Noroozi)
 */
 
-/// @brief Contains all the colours needed for a button
+/// @brief Contains all the colours needed for a button {bg color, hover color, text colour}
 struct ButtonTheme {
     /// @brief when the mouse doesn't hover over a button
     sf::Color unhovered;
@@ -54,7 +54,7 @@ public:
     */
     Button(float width, float height, float x, float y, const ButtonTheme& theme, const std::string& targetText, const std::string& font, ShapeType type = ShapeType::Rectangle);
 
-
+    
     /**
      * @brief Changes the colour of the button frame
      * @param col The colour passed from the button theme
@@ -78,9 +78,10 @@ public:
 
     /**
      * @brief Changes the button sprite's texture
-     * @param newSprite The texture to replace the button's current sprite
+     * @param newTexture The texture to replace the button's current sprite
+     * @param padding pixel distance from the frame's smallest dimension
     */
-    void setTexture(const sf::Texture& newTexture, float padding);
+    void setTexture(const sf::Texture& newTexture, float padding = 10.f);
 
 
     /**
@@ -116,6 +117,8 @@ public:
     /// @return the button theme being used by the button
     ButtonTheme getTheme();
 
+    /// @return the text string of the button
+    std::string getString();
 
     /// @return the texture currently being used by the button
     sf::Sprite getSprite();

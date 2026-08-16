@@ -6,7 +6,7 @@
 
 //Button Colour Themes
 
-const ButtonTheme REGULAR_BUTTON = {{255,255,255},{127,127,127},{0,0,0}};
+const ButtonTheme REGULAR_BUTTON = {{255,255,255},{191,191,191},{0,0,0}};
 const ButtonTheme INPUT_BUTTON =   {{255,255,255},{255,255,0},  {25,151,230}};
 const ButtonTheme EASY_BUTTON =    {{0,255,0},    {0,127,0},    {0,64,0}};
 const ButtonTheme MEDIUM_BUTTON =  {{255,255,0},  {127,127,0},  {64,64,0}};
@@ -14,7 +14,7 @@ const ButtonTheme HARD_BUTTON =    {{255,0,0},    {127,0,0},    {80,0,0}};
 const ButtonTheme KRAZY_BUTTON =   {{169,0,194},  {75,0,86},    {46,0,53}};
 const ButtonTheme EXIT_BUTTON =    {{32,32,32},   {0,0,0},      {144,0,32}};
 
-//Method declarations for Button class
+//Method definitions for Button class
 
 Button::Button() {
     width = 0;
@@ -77,11 +77,12 @@ void Button::setText(const std::string& newText) {
 
 void Button::setTheme(const ButtonTheme& newTheme) {
     theme = newTheme;
-    //text colour isn't updated each frame, so it must be updated here
+    
+    setColor(theme.unhovered);
     text.setFillColor(theme.text);
 }
 
-void Button::setTexture(const sf::Texture& newTexture, float padding = 10.f) {
+void Button::setTexture(const sf::Texture& newTexture, float padding) {
     subject.setTexture(newTexture);
 
     //Scales the sprite to the button frame so the texture can use more space
@@ -131,6 +132,10 @@ sf::Vector2f Button::getPosition() {
 
 ButtonTheme Button::getTheme() {
     return theme;
+}
+
+std::string Button::getString() {
+    return text.getString();
 }
 
 sf::Sprite Button::getSprite() {

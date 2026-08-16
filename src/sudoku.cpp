@@ -81,9 +81,9 @@ void Board::removeNumbers() {
     } else if (stateFlag == STATE_MEDIUM) { //krazy currently removes as much as normal
         countdown = rand() % 20 + 20; //countdown between 20 and 40 to be removed
     } else if (stateFlag == STATE_HARD) {
-        countdown = rand() % 15 + 40; //countdown between 40 and 55 to be removed
+        countdown = rand() % 15 + 47; //countdown between 47 and 62 to be removed
     } else if (stateFlag == STATE_KRAZY) {
-        countdown = rand() % 20 + 30; //countdown between 30 and 50 to be removed;
+        countdown = rand() % 20 + 35; //countdown between 30 and 55 to be removed;
     }
 
     //iterates through the whole grid

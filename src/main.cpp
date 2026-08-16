@@ -14,6 +14,8 @@
 #include "resource_manager.hpp"
 #include "slider.hpp"
 #include "record.hpp"
+#include "shop.hpp"
+#include "shop_manager.hpp"
 
 GameState stateFlag = STATE_HOME;
 
@@ -23,7 +25,7 @@ void changeNumber(Button& button, int& number) {
     try {
         number = std::stoi(button.text.getString().toAnsiString());
         // use value
-    } catch (const std::exception& e) { //error handling (this shouldn't occur at all given the buttons used)
+    } catch (const std::exception& e) { // Error handling (this shouldn't occur at all given the buttons used)
         std::cerr << "Error converting text to int: " << e.what() << std::endl;
         exit(errno);
     }
@@ -34,44 +36,44 @@ sf::Vector2f virtualSize(600.f, 800.f);
 sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
 
 std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen) {
-    if (fullscreen) { //Renders a window in exclusive fullscreen if the fullscreen flag is checked
+    if (fullscreen) { // Renders a window in exclusive fullscreen if the fullscreen flag is checked
         sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
         return std::make_unique<sf::RenderWindow>(desktopMode, "Sudokrazy", sf::Style::None);
-    } else { //Creates a smaller window using the virtual window otherwise
+    } else { // Creates a smaller window using the virtual window otherwise
         return std::make_unique<sf::RenderWindow>(sf::VideoMode(600, 800), "Sudokrazy", sf::Style::Titlebar | sf::Style::Close);
     }
 }
 
 void updateView(sf::RenderTexture& target, sf::RenderWindow& win) {
-    //Get window size in pixels
+    // Get window size in pixels
     sf::Vector2u windowSize = win.getSize();
 
-    //The aspect ratio of the actual window
+    // The aspect ratio of the actual window
     float windowRatio = static_cast<float>(windowSize.x) / windowSize.y;
 
-    //The aspect ratio of the virtual window, the desired aspect ration
+    // The aspect ratio of the virtual window, the desired aspect ration
     float virtualRatio = virtualSize.x / virtualSize.y;
 
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
 
-    //Describes the portion of the window where the view will be drawn. Starts out at 1 pixel
+    // Describes the portion of the window where the view will be drawn. Starts out at 1 pixel
     sf::FloatRect viewport(0.f, 0.f, 1.f, 1.f);
 
     if (windowRatio > virtualRatio) {
-        //The window is wider than desired
+        // The window is wider than desired
         float scale = virtualRatio / windowRatio;
-        viewport.left = (1.f - scale) / 2.f; //center horizontally
-        viewport.width = scale;              //shrink width to match ratio
+        viewport.left = (1.f - scale) / 2.f; // Center horizontally
+        viewport.width = scale;              // Shrink width to match ratio
     } else {
-        //The window is taller than desired
+        // The window is taller than desired
         float scale = windowRatio / virtualRatio;
-        viewport.top = (1.f - scale) / 2.f; //center vertically
-        viewport.height = scale;            //shrink height to match ratio
+        viewport.top = (1.f - scale) / 2.f; // Center vertically
+        viewport.height = scale;            // Shrink height to match ratio
     }
 
     gameView.setViewport(viewport); // Apply normalized rectangle to view
     
-    target.setView(gameView); //Apply view to the render texture
+    target.setView(gameView); // Apply view to the render texture
     
     win.setView(win.getDefaultView()); // Tell the window to use the adjusted view
 }
@@ -85,6 +87,9 @@ int main() {
     // Load all settings configurations previously left in the last settings menu session
     SaveManager::loadSettings("settings.dat");
 
+    // Load all purchases and equips from the shop
+    ShopManager::loadShop("shop.dat");
+
     // Enable V-Sync according to the settings configuration
     vsync = SaveManager::getVSync();
 
@@ -92,14 +97,14 @@ int main() {
     isFullscreen = SaveManager::getFullscreen();
 
 
-    /*Buttons that change the number the player puts on the board*/
+    /* Buttons that change the number the player puts on the board */
     std::vector<Button> numberChangers;
     numberChangers.reserve(9);
 
     /* Window with fixed size and cannot fullscreen */
     auto window = createWindow(isFullscreen);
 
-    //create a render texture to draw everything to before post-processing and displaying
+    // Create a render texture to draw everything to before post-processing and displaying
     sf::RenderTexture renderTexture;
     renderTexture.create(window->getSize().x, window->getSize().y);
 
@@ -144,12 +149,12 @@ int main() {
     ResourceManager::loadShader("shader", "media/shaders/shader.frag");
 
     sf::Shader& shader = ResourceManager::getShader("shader");
-    float currentBrightness = 1.0f; //normal brightness
-    float contrast = 1.0f; //normal contrast
+    float currentBrightness = 1.0f; // Normal brightness
+    float contrast = 1.0f; // Normal contrast
 
 
     /* Dynamic Background */
-    //Define size of each coloured background panel
+    // Define size of each coloured background panel
     float panelWidth = 300;
     float panelHeight = 800;
 
@@ -164,10 +169,10 @@ int main() {
 
     sf::Color clearTheme = {255,255,255};
 
-    float scrollSpeed = 100.f; //pixels per second
+    float scrollSpeed = 100.f; // Pixels per second
     sf::Clock clock;
 
-    //Title
+    // Title
     sf::Sprite title(ResourceManager::getTexture("title"));
     title.setScale(0.5f,0.5f);
     sf::FloatRect titleRect = title.getLocalBounds();
@@ -190,43 +195,43 @@ int main() {
     krazySwitch.setTexture(ResourceManager::getTexture("lock"), 5.f);
     krazySwitch.deactivate();
  
-    //The visualised sudoku grid the player plays on
+    // The visualised sudoku grid the player plays on
     Grid grid(sf::Vector2f(50.f, 150.f), 500.f);
     grid.deactivate();
 
-    //Indicates the number the player is currently using
+    // Indicates the number the player is currently using
     int number = 1;
-    //Iteration to construct the buttons used to switch numbers
+    // Iteration to construct the buttons used to switch numbers
     for (int i = 0; i < 9; ++i) {
         numberChangers.emplace_back(500.f/9.f-5.f, 60.f, 55 + (i % 9) * 500.f/9.f, 680.f, REGULAR_BUTTON, std::to_string(i+1), "gameFont");
     }
-    //Points to a number changing button to control its activity
+    // Points to a number changing button to control its activity
     Button* chosenNumber = &numberChangers[0];
     chosenNumber->deactivate();
 
-    //Back/Close button
+    // Back/Close button
     Button exit(25.f, 0.f, 35.f, 35.f, EXIT_BUTTON, "x", "homeFont", ShapeType::Circle);
 
-    //Eraser button
+    // Eraser button
     Button eraser(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "", "gameFont", ShapeType::Circle);
     eraser.setTexture(ResourceManager::getTexture("eraser"), 5.f);
 
 
-    /*SETTINGS MENU*/
+    /* SETTINGS MENU */
 
     Button settingsToggle(37.5f, 0.f, 550.f, 47.5f, REGULAR_BUTTON, "", "gameFont", ShapeType::Circle);
     settingsToggle.setTexture(ResourceManager::getTexture("settings"), 10.f);
 
-    //The settings menu art
+    // The settings menu art
     sf::Sprite settingsTitle(ResourceManager::getTexture("settings title"));
     titleRect = settingsTitle.getLocalBounds();
     settingsTitle.setOrigin(titleRect.left + titleRect.width/2.0f, titleRect.top  + titleRect.height/2.0f);
     settingsTitle.setPosition(sf::Vector2f(300,100));
 
-    //Button to toggle V-Sync on/off
+    // Button to toggle V-Sync on/off
     Button vsyncToggle(150.f, 75.f, 100.f, 220.f, (vsync ? EASY_BUTTON : HARD_BUTTON), (vsync ? "V-Sync On" : "V-Sync Off"), "gameFont");
 
-    //Button to toggle fullscreen on/off
+    // Button to toggle fullscreen on/off
     Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, (isFullscreen ? EASY_BUTTON : HARD_BUTTON), (isFullscreen ? "Fullscreen" : "Windowed"), "gameFont");
 
     sf::Text volumeText;
@@ -236,8 +241,8 @@ int main() {
     volumeText.setFillColor(sf::Color::Black);
     volumeText.setPosition(sf::Vector2f(100.f, 320.f));
 
-    //Changes the Volume
-    //Retrieves the saved volume setting for the initial setting
+    // Changes the Volume
+    // Retrieves the saved volume setting for the initial setting
     Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), SaveManager::getVolume(), sf::Color::Black);
 
 
@@ -248,8 +253,8 @@ int main() {
     brightnessText.setFillColor(sf::Color::Black);
     brightnessText.setPosition(sf::Vector2f(100.f, 400.f));
 
-    //Changes the Brightness
-    //Retrieves the saved brightness setting for the initial setting
+    // Changes the Brightness
+    // Retrieves the saved brightness setting for the initial setting
     Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), SaveManager::getBrightness(), sf::Color::Black);
 
 
@@ -260,8 +265,8 @@ int main() {
     contrastText.setFillColor(sf::Color::Black);
     contrastText.setPosition(sf::Vector2f(100.f, 480.f));
 
-    //Changes the Contrast
-    //Retrieves the saved contrast setting for the initial setting
+    // Changes the Contrast
+    // Retrieves the saved contrast setting for the initial setting
     Slider contrastSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getContrast(), sf::Color::Black);
 
 
@@ -272,18 +277,27 @@ int main() {
     scrollerText.setFillColor(sf::Color::Black);
     scrollerText.setPosition(sf::Vector2f(100.f, 560.f));
 
-    //Changes the background scroll speed
-    //Retrieves the saved speed setting for the initial setting
+    // Changes the background scroll speed
+    // Retrieves the saved speed setting for the initial setting
     Slider scrollerSlider(400.f, sf::Vector2f(100.f, 600.f), SaveManager::getBSpeed(), sf::Color::Black);
 
 
-    //Music to play while game is operational
+    /* SHOP */
+    Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
+
+    Shop::addItem(Item(2, "Outdoor Theme", "settings", ItemType::Background));
+    Shop::addItem(Item(5, "Space Theme", "settings", ItemType::Background));
+
+    Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
+    shopShelf.pullShop();
+
+    // Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
     music.setLoop(true);
     music.play();
 
 
-    //Points to a color theme that matches the game state
+    // Points to a color theme that matches the game state
     const Theme* currentTheme = &HOME_THEME;
 
     stateFlag = STATE_HOME;
@@ -346,7 +360,7 @@ int main() {
     timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     timerText.setPosition(sf::Vector2f(300.f, 50.f));
 
-    //game loop
+    // Game loop
     while (window->isOpen()) {
         sf::Event event;
         while (window->pollEvent(event)) {
@@ -354,12 +368,12 @@ int main() {
                 window->close();
             }
 
-            //Conditions for each button when clicked on
+            // Conditions for each button when clicked on
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 sf::Vector2i pixelPos = sf::Mouse::getPosition(*window);
                 sf::Vector2f worldPos = window->mapPixelToCoords(pixelPos, gameView);
                 
-                if (easySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts an easy game
+                if (easySwitch.frame.getGlobalBounds().contains(worldPos)) { // Starts an easy game
                     if (easySwitch.isActive()) {
                         timer.restart();
                         previousHit = timer.getElapsedTime();
@@ -370,7 +384,7 @@ int main() {
                         stateFlag = STATE_EASY;
                         grid.appropriate();
                     }
-                } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a medium game
+                } else if (mediumSwitch.frame.getGlobalBounds().contains(worldPos)) { // Starts a medium game
                     if (mediumSwitch.isActive()) {
                         timer.restart();
                         previousHit = timer.getElapsedTime();
@@ -381,7 +395,7 @@ int main() {
                         stateFlag = STATE_MEDIUM;
                         grid.appropriate();
                     }
-                } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { //starts a hard game
+                } else if (hardSwitch.frame.getGlobalBounds().contains(worldPos)) { // Starts a hard game
                     if (hardSwitch.isActive()) {
                         timer.restart();
                         previousHit = timer.getElapsedTime();
@@ -392,7 +406,7 @@ int main() {
                         stateFlag = STATE_HARD;
                         grid.appropriate();
                     }
-                } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { //starts krazy mode
+                } else if (krazySwitch.frame.getGlobalBounds().contains(worldPos)) { // Starts krazy mode
                     if (krazySwitch.isActive()) {
                         timer.restart();
                         previousHit = timer.getElapsedTime();
@@ -404,31 +418,31 @@ int main() {
                         grid.appropriate();
                     }
                 } else if (exit.circleFrame.getGlobalBounds().contains(worldPos) && exit.isActive()) {
-                    if (stateFlag == STATE_HOME) { //clicking the exit button on the home screen closes the game
+                    if (stateFlag == STATE_HOME) { // Clicking the exit button on the home screen closes the game
                         window->close();
-                    } else { //clicking the exit button mid-game goes back to the home screen
+                    } else { // Clicking the exit button mid-game goes back to the home screen
                         Grid::eraser_mode = false;
-                        if (!settingsToggle.isActive()) { //Condition when leaving settings menu
+                        if (!settingsToggle.isActive()) { // Condition when leaving settings menu
                             stateFlag = prevState;
                             prevState = STATE_SETTINGS;
-                            SaveManager::saveSettings("settings.dat"); //saves settings when leaving
-                        } else { //Condition for leaving an open game
+                            SaveManager::saveSettings("settings.dat"); // Saves settings when leaving
+                        } else { // Condition for leaving an open game
                             prevState = stateFlag;
                             stateFlag = STATE_HOME;
                         }
 
                         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
-                            //Calculates the total time spent in the settings menu outside of an active game
-                            //So that it can deduct that time-out from the in-game timer
+                            // Calculates the total time spent in the settings menu outside of an active game
+                            // So that it can deduct that time-out from the in-game timer
 
                             timeOut = timer.getElapsedTime().asSeconds() - timeOut;
                             totalTimeOut += timeOut;
                         }
                     }
                 } else if (eraser.circleFrame.getGlobalBounds().contains(worldPos) && eraser.isActive()) {
-                    if (!Grid::eraser_mode) { //clicking the exit button on the home screen closes the game
+                    if (!Grid::eraser_mode) { // Clicking the exit button on the home screen closes the game
                         Grid::eraser_mode = true;
-                    } else { //clicking the exit button mid-game goes back to the home screen
+                    } else { // Clicking the exit button mid-game goes back to the home screen
                         Grid::eraser_mode = false;
                     }
                 } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
@@ -444,23 +458,23 @@ int main() {
                     if (vsyncToggle.isActive()) {
                         if (vsync) {
                             vsync = false;
-                            SaveManager::setVSync(vsync); //saves vsync setting
+                            SaveManager::setVSync(vsync); // Saves vsync setting
                             vsyncToggle.setTheme(HARD_BUTTON);
                             vsyncToggle.setText("V-Sync Off");
                         } else {
                             vsync = true;
-                            SaveManager::setVSync(vsync); //saves vsync setting
+                            SaveManager::setVSync(vsync); // Saves vsync setting
                             vsyncToggle.setTheme(EASY_BUTTON);
                             vsyncToggle.setText("V-Sync On");
                         }
                         window->setVerticalSyncEnabled(vsync);
-                        window->setFramerateLimit(vsync ? 0 : 60); // optional cap when vsync off
+                        window->setFramerateLimit(vsync ? 0 : 60); // Optional cap when vsync off
                         clock.restart();
                     }
                 } else if (fullscreenToggle.frame.getGlobalBounds().contains(worldPos)) {
                     if (fullscreenToggle.isActive()) {
                         isFullscreen = !isFullscreen;
-                        SaveManager::setFullscreen(isFullscreen); //saves window setting
+                        SaveManager::setFullscreen(isFullscreen); // Saves window setting
                         window->close();
 
                         window = createWindow(isFullscreen);
@@ -474,20 +488,26 @@ int main() {
 
                         window->setVerticalSyncEnabled(vsync);
 
-                        // reapply icon since it's a new window
+                        // Reapply icon since it's a new window
                         window->setIcon(winIcon.getSize().x, winIcon.getSize().y, winIcon.getPixelsPtr());
 
-                        clock.restart(); // ensure next deltaTime is small/clean
+                        clock.restart(); // Ensure next deltaTime is small/clean
 
                         fullscreenToggle.setTheme(isFullscreen ? EASY_BUTTON : HARD_BUTTON);
                         fullscreenToggle.setText(isFullscreen ? "Fullscreen" : "Windowed");
                     }
+                } else if (shopToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
+                    if (shopToggle.isActive()) {
+                        prevState = stateFlag;
+                        stateFlag = STATE_SHOP;
+                    }
                 }
 
                 for (Button& button : numberChangers) {
-                    if (button.frame.getGlobalBounds().contains(worldPos)) { //switches the input number appropriately
+                    if (button.frame.getGlobalBounds().contains(worldPos)) { // Switches the input number appropriately
                         if (button.isActive()) {
                             changeNumber(button, number);
+                            grid.changeIndicator(number);
                             chosenNumber->activate();
                             chosenNumber = &button;
                             chosenNumber->deactivate();
@@ -495,19 +515,21 @@ int main() {
                     }
                 }
 
-                if (grid.updateNumbers(worldPos, number)) { //Score is added if the grid is updated with a correct number
+                if (grid.updateNumbers(worldPos, number)) { // Score is added if the grid is updated with a correct number
                     timeGap = timer.getElapsedTime().asSeconds() - previousHit.asSeconds();
                     score += (timeGap >= 60.f ? 5 * stateFlag : static_cast<int>(stateFlag * (50 - 0.75 * (timeGap - totalTimeOut))));
                     previousHit = timer.getElapsedTime();
                 }
+
+                shopShelf.updateShelf(worldPos);
                 
-                if (grid.check()) { //checks if the grid has all its correct numbers
+                if (grid.check()) { // Checks if the grid has all its correct numbers
                     Record game(score, stateFlag, sf::seconds(timer.getElapsedTime().asSeconds() - totalTimeOut));
                     cumulativeScore += score;
 
                     SaveManager::addPoints(grid.calculatePoints(score, timer.getElapsedTime().asSeconds() - totalTimeOut));
 
-                    //Saves the new game to the records vector, and saves the records to appdata
+                    // Saves the new game to the records vector, and saves the records to appdata
                     SaveManager::addRecord(game);
                     SaveManager::saveRecords("records.dat");
 
@@ -518,7 +540,7 @@ int main() {
             }
 
             if (event.type == sf::Event::Resized) {
-                updateView(renderTexture, *window); //updates the window if resized in this frame
+                updateView(renderTexture, *window); // Updates the window if resized in this frame
             }
 
             volumeSlider.handleEvent(event, *window);
@@ -527,7 +549,7 @@ int main() {
             scrollerSlider.handleEvent(event, *window);
         }
 
-        switch (stateFlag) { //switch graphical themes depending on the game state
+        switch (stateFlag) { // Switch graphical themes depending on the game state
             case STATE_HOME:
                 currentTheme = &HOME_THEME;
                 exit.setTheme(EXIT_BUTTON);
@@ -556,10 +578,14 @@ int main() {
                 currentTheme = &SETTINGS_THEME;
                 exit.setTheme(REGULAR_BUTTON);
                 break;
+            case STATE_SHOP:
+                currentTheme = &SHOP_THEME;
+                exit.setTheme(MEDIUM_BUTTON);
+                break;
         }
 
-        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Gameplay state
-            //deactivating menu buttons
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Gameplay state
+            // Deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
             mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
             hardSwitch.activateMovement(sf::Vector2f(-210.f,hardSwitch.getOriginalPos().y), 600.f);
@@ -572,14 +598,14 @@ int main() {
 
             exit.setText("<-");
 
-            //activating number choice buttons
+            // Activating number choice buttons
             for (Button& button : numberChangers) {
                 if (&button != chosenNumber) {
                     button.activate();
                 }
             }
 
-            //activates the grid and its buttons
+            // Activates the grid and its buttons
             grid.activate();
             eraser.activate();
             settingsToggle.activate();
@@ -589,8 +615,10 @@ int main() {
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
             scrollerSlider.deactivate();
-        } else if (stateFlag == STATE_HOME){ //Home Menu State
-            //activating menu buttons
+
+            shopShelf.deactivate();
+        } else if (stateFlag == STATE_HOME){ // Home Menu State
+            // Activating menu buttons
             easySwitch.activateMovement(easySwitch.getOriginalPos(), 400.f);
             mediumSwitch.activateMovement(mediumSwitch.getOriginalPos(), 400.f);
             hardSwitch.activateMovement(hardSwitch.getOriginalPos(), 400.f);
@@ -612,12 +640,12 @@ int main() {
 
             exit.setText("x");
 
-            //deactivating number choice buttons
+            // Deactivating number choice buttons
             for (Button& button : numberChangers) {
                 button.deactivate();
             }
 
-            //ensures no inputs on the invisible grid can be made when outside gameplay mode
+            // Ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
 
@@ -628,8 +656,10 @@ int main() {
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
             scrollerSlider.deactivate();
-        } else { //Settings menu state
-            //deactivating menu buttons
+
+            shopShelf.deactivate();
+        } else if (stateFlag == STATE_SETTINGS) { // Settings menu state
+            // Deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
             mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
             hardSwitch.activateMovement(sf::Vector2f(-210.f,hardSwitch.getOriginalPos().y), 600.f);
@@ -642,12 +672,12 @@ int main() {
 
             exit.setText("<-");
 
-            //deactivating number choice buttons
+            // Deactivating number choice buttons
             for (Button& button : numberChangers) {
                 button.deactivate();
             }
 
-            //ensures no inputs on the invisible grid can be made when outside gameplay mode
+            // Ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
 
@@ -658,6 +688,40 @@ int main() {
             brightnessSlider.activate();
             contrastSlider.activate();
             scrollerSlider.activate();
+
+            shopShelf.deactivate();
+        } else { // Shop state
+            // Deactivating menu buttons
+            easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
+            mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
+            hardSwitch.activateMovement(sf::Vector2f(-210.f,hardSwitch.getOriginalPos().y), 600.f);
+            krazySwitch.activateMovement(sf::Vector2f(610.f,krazySwitch.getOriginalPos().y), 600.f);
+
+            easySwitch.deactivate();
+            mediumSwitch.deactivate();
+            hardSwitch.deactivate();
+            krazySwitch.deactivate();
+
+            exit.setText("<-");
+
+            // Deactivating number choice buttons
+            for (Button& button : numberChangers) {
+                button.deactivate();
+            }
+
+            // Ensures no inputs on the invisible grid can be made when outside gameplay mode
+            grid.deactivate();
+            eraser.deactivate();
+
+            settingsToggle.deactivate();
+            vsyncToggle.deactivate();
+            fullscreenToggle.deactivate();
+            volumeSlider.deactivate();
+            brightnessSlider.deactivate();
+            contrastSlider.deactivate();
+            scrollerSlider.deactivate();
+
+            shopShelf.activate();
         }
 
         music.setVolume(volumeSlider.getPercentage());
@@ -710,13 +774,13 @@ int main() {
         timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         timerText.setPosition(sf::Vector2f(300.f, 50.f));
 
-        //move panels to the right
+        // Move panels to the right
         float deltaTime = clock.restart().asSeconds();
         panel1.move(scrollSpeed*deltaTime, 0);
         panel2.move(scrollSpeed*deltaTime, 0);
         panel3.move(scrollSpeed*deltaTime, 0);
 
-        //loop the panels when they go off-screen
+        // Loop the panels when they go off-screen
         if (panel1.getPosition().x > 600) {
             panel1.setPosition(panel2.getPosition().x - 300, 0);
         }
@@ -729,12 +793,12 @@ int main() {
             panel3.setPosition(panel1.getPosition().x - 300, 0);
         }
 
-        //set the colors to the theme
+        // Set the colors to the theme
         panel1.setFillColor(updateColour(panel1.getFillColor(), currentTheme->bg1, deltaTime));
         panel2.setFillColor(updateColour(panel2.getFillColor(), currentTheme->bg2, deltaTime));
         panel3.setFillColor(updateColour(panel3.getFillColor(), currentTheme->bg3, deltaTime));
 
-        if (stateFlag == STATE_HOME) { //menu buttons have hover visuals when on the home screen
+        if (stateFlag == STATE_HOME) { // Menu buttons have hover visuals when on the home screen
             easySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
 
             if (cumulativeScore >= 1000) {
@@ -751,7 +815,9 @@ int main() {
                 krazySwitch.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
                 krazySwitch.setTexture(ResourceManager::getTexture("placeholder"), 0.f);
             }
-        } else if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //ensures the buttons have hover visuals when playing the game and not on the home screen
+
+            shopToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+        } else if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Ensures the buttons have hover visuals when playing the game and not on the home screen
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
                     button.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
@@ -760,9 +826,11 @@ int main() {
                 }
             }
             grid.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-        } else { //Settings menu
+        } else if (stateFlag == STATE_SETTINGS) { // Settings menu
             vsyncToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
             fullscreenToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+        } else { // Shop 
+            shopShelf.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         if (!Grid::eraser_mode) {
@@ -770,7 +838,7 @@ int main() {
         }
         settingsToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
 
-        //update the menu buttons each frame for gradual movement
+        // update the menu buttons each frame for gradual movement
         easySwitch.update(deltaTime);
         mediumSwitch.update(deltaTime);
         hardSwitch.update(deltaTime);
@@ -781,17 +849,18 @@ int main() {
             numberChangers.at(i).update(deltaTime);
         }
         settingsToggle.update(deltaTime);
+        shopToggle.update(deltaTime);
         vsyncToggle.update(deltaTime);
         fullscreenToggle.update(deltaTime);
 
-        //Draw everything necessary
+        // Draw everything necessary
         clearTheme = updateColour(clearTheme, currentTheme->bgClear, deltaTime);
         renderTexture.clear(clearTheme);
         renderTexture.setView(gameView);
         renderTexture.draw(panel1);
         renderTexture.draw(panel2);
         renderTexture.draw(panel3);
-        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { //Draws for an active sudoku game
+        if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Draws for an active sudoku game
             grid.display(renderTexture);
             for (Button& button : numberChangers) {
                 button.display(renderTexture);
@@ -803,7 +872,8 @@ int main() {
             renderTexture.draw(title);
             renderTexture.draw(culScoreText);
             renderTexture.draw(pointsText);
-        } else { //Draws for the settings menu
+            shopToggle.display(renderTexture);
+        } else if (stateFlag == STATE_SETTINGS) { // Draws for the settings menu
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);
             renderTexture.draw(brightnessText);
@@ -815,6 +885,8 @@ int main() {
             brightnessSlider.display(renderTexture);
             contrastSlider.display(renderTexture);
             scrollerSlider.display(renderTexture);
+        } else { // Draws for the shop
+            shopShelf.display(renderTexture);
         }
         easySwitch.display(renderTexture);
         mediumSwitch.display(renderTexture);
@@ -826,7 +898,7 @@ int main() {
         }
         renderTexture.display();
 
-        //Apply shaders
+        // Apply shaders
         window->clear();
         sf::Sprite finalSprite(renderTexture.getTexture());
         shader.setUniform("brightness", currentBrightness);

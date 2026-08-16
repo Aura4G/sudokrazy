@@ -8,6 +8,11 @@
 
 /**
  * 9*9 sudoku grid SFML visualisation and functionality
+ * 
+ * The sudoku grid makes use of the button class for each of the 81 panels,
+ * done to reinforce the modular and scalable nature behind the buttons and
+ * how they can be applied to a variety of structures and objects
+ * 
  * @author Aura4G (Aria Noroozi)
 */
 
@@ -22,7 +27,7 @@ public:
 
 
     /**
-     * @briefChecks if its two Board objects are equal, indicating game completion
+     * @brief Checks if its two Board objects are equal, indicating game completion
      * @return True if the two boards match
     */
     bool check();
@@ -58,6 +63,11 @@ public:
      * @param number The new number to replace the current number in the selected panel of the grid IF it is visible and active
     */
     bool updateNumbers(const sf::Vector2f& mousePos, int number);
+
+
+    /// @brief Darkens numbers on the grid that are equal to the player's selected number
+    /// @param number The selected number
+    void changeIndicator(int number);
 
 
     /// @brief Activates the grid and every player-input button on the grid

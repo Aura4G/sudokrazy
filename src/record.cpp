@@ -75,16 +75,16 @@ void SaveManager::addRecord(Record game) {
 }
 
 void SaveManager::save (const std::string& filename, const std::string& data) {
-    //The save destination is retrieved
+    // The save destination is retrieved
     std::string fullPath = getSavePath(filename);
 
-    //A character buffer stores all of the data...
+    // A character buffer stores all of the data...
     std::vector<char> buffer(data.begin(), data.end());
 
-    //... and encrypts the buffer
+    // ... and encrypts the buffer
     obfuscate(buffer);
 
-    //the encrypted buffer is written to the file
+    // The encrypted buffer is written to the file
     std::ofstream file(fullPath, std::ios::binary);
     if (file) {
         file.write(buffer.data(), buffer.size());
@@ -92,14 +92,14 @@ void SaveManager::save (const std::string& filename, const std::string& data) {
 }
 
 std::string SaveManager::loadSave(const std::string& filename) {
-    //The save's destination is retrieved
+    // The save's destination is retrieved
     std::string fullPath = getSavePath(filename);
 
-    //No records are created if the file doesn't exists
+    // No records are created if the file doesn't exists
     std::ifstream file (fullPath, std::ios::binary);
     if (!file) return "";
 
-    //A buffer captures the file's contents and decrypts them
+    // A buffer captures the file's contents and decrypts them
     std::vector<char> buffer((std::istreambuf_iterator<char>(file)), {});
     obfuscate(buffer);
 
@@ -107,7 +107,7 @@ std::string SaveManager::loadSave(const std::string& filename) {
 }
 
 void SaveManager::obfuscate(std::vector<char>& buffer) {
-    const char key = 0x5A; // A given XOR key used for encrypting and decrypting
+    const char key = 0x5A; // XOR key used for encrypting and decrypting
     for (auto& c : buffer) {
         c ^= key;
     }
@@ -120,7 +120,7 @@ std::string SaveManager::getSavePath(const std::string& filename) {
     static fs::path saveDir = []() -> fs::path {
         fs::path path;
 
-    #ifdef _WIN32 //Windows, saved in Roaming
+    #ifdef _WIN32 // Windows, saved in Roaming
         const char* appData = getenv("APPDATA");
         if (!appData) appData = ".";
         path = fs::path(appData) / "Sudokrazy";
@@ -132,7 +132,7 @@ std::string SaveManager::getSavePath(const std::string& filename) {
         path = fs::path(home) / ".local" / "share" / "sudokrazy";
     #endif
 
-        //Creates the directory if it doesn't already exist
+        // Creates the directory if it doesn't already exist
         if (!fs::exists(path)) {
             fs::create_directories(path);
         }
@@ -148,8 +148,8 @@ std::string SaveManager::getSavePath(const std::string& filename) {
 void SaveManager::saveRecords(const std::string& filename) {
     std::ostringstream out;
     for (auto& r : records) {
-        std::string s = r.serialise(); //serialise each value in each record to a single string
-        out << s.size() << "\n" << s << "\n"; //Each value is delimited by a new line
+        std::string s = r.serialise(); // Serialise each value in each record to a single string
+        out << s.size() << "\n" << s << "\n"; // Each value is delimited by a new line
     }
 
     out << "points " << std::to_string(points);
@@ -164,27 +164,37 @@ void SaveManager::loadRecords(const std::string& filename) {
 
     while (true) {
         std::size_t len;
-        if (!(in >> len)) break; // not a number, therefore it must be the last line
-        in.get(); // skip newline
+        if (!(in >> len)) break; // Not a number, therefore it must be the last line
+        in.get(); // Skip newline
 
         std::string recordString(len, '\0');
         in.read(&recordString[0], len);
-        in.get(); // skip newline after record
+        in.get(); // Skip newline after record
 
-        records.emplace_back(Record::deserialize(recordString)); //Add record to vector
+        records.emplace_back(Record::deserialize(recordString)); // Add record to vector
     }
 
-    // now just read the last line as an integer
-    in.clear(); // reset stream state after the failed number read
+    // Now just read the last line as an integer
+    in.clear(); // Reset stream state after the failed number read
     
     // Read the footer line
     std::string line;
     while (std::getline(in, line)) {
         if (line.rfind("points ", 0) == 0) {
-            std::istringstream ls(line.substr(7)); //Have the stringstream continue from directly after the "points" text
+            std::istringstream ls(line.substr(7)); // Have the stringstream continue from directly after the "points" text
             ls >> points;
         }
     }
+}
+
+int SaveManager::getTotalScore() {
+    int total = 0;
+
+    for (Record game : records) {
+        total += game.getScore();
+    }
+
+    return total;
 }
 
 void SaveManager::saveSettings(const std::string& filename) {
@@ -204,7 +214,7 @@ void SaveManager::saveSettings(const std::string& filename) {
 void SaveManager::loadSettings(const std::string& filename) {
     std::string data = loadSave(filename);
 
-    //If there's no current settings configuration to load, a default is used instead
+    // If there's no current settings configuration to load, a default is used instead
     if (data == "") {
         data = "1\n1\n1\n0.5\n1\n0";
     }

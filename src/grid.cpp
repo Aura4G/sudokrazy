@@ -136,6 +136,16 @@ bool Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
     return false;
 }
 
+void Grid::changeIndicator(int number) {
+    for (int i = 0; i < 81; i++) {
+        if (number == playersBoard.getNumber(i/9,i%9)) {
+            whiteBlocks[i].setColor(whiteBlocks[i].getTheme().hovering);
+        } else {
+            whiteBlocks[i].setColor(whiteBlocks[i].getTheme().unhovered);
+        }
+    }
+}
+
 void Grid::activate() {
     for (Button& block : whiteBlocks) {
         if (block.text.getString() == "" || block.getTheme().hovering == INPUT_BUTTON.hovering) { //only allows button functionality if the block starts out as empty

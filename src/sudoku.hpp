@@ -13,7 +13,8 @@ enum GameState {
     STATE_MEDIUM,
     STATE_HARD,
     STATE_KRAZY,
-    STATE_SETTINGS
+    STATE_SETTINGS,
+    STATE_SHOP
 };
 
 /// @brief Backend logic and structure of a sudoku board, with appropriate methods to fill and remove from the board

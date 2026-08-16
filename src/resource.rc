@@ -15,10 +15,10 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904b0"   // Language = U.S. English, Unicode
+        BLOCK "080904b0"   // Language = U.K. English, Unicode
         BEGIN
             VALUE "CompanyName", "Rodeo Ghost"
-            VALUE "FileDescription", "Sudoku with a twist"
+            VALUE "FileDescription", "Sudokrazy"
             VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "sudokrazy.exe"
             VALUE "OriginalFilename", "sudokrazy.exe"
@@ -28,6 +28,6 @@ BEGIN
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1200
+        VALUE "Translation", 0x809, 1200
     END
 END
