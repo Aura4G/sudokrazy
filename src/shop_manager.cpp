@@ -16,7 +16,11 @@
 
 std::vector<int> ShopManager::purchases;
 
-std::vector<int> ShopManager::equips;
+std::vector<int> ShopManager::equipIDs;
+
+std::vector<Item> ShopManager::equips;
+
+int ShopManager::hints;
 
 void ShopManager::save (const std::string& filename, const std::string& data) {
     // The save destination is retrieved
@@ -89,10 +93,32 @@ std::string ShopManager::getSavePath(const std::string& filename) {
     return fullPath.string();
 }
 
-void ShopManager::saveShop(const std::string& filename, int ID) {
+void ShopManager::saveShop(const std::string& filename, Item& item) {
 
-    purchases.push_back(ID);
-    equips.push_back(ID);
+    if (item.getType() == ItemType::Hint) {
+        hints++;
+    } else {
+        purchases.push_back(item.getID());
+
+        bool flag = false;
+
+        for (int i = 0; i < equipIDs.size(); i++) {
+            int comparator = equipIDs.at(i);
+            Item compareItem = equips.at(i);
+
+            if (item.getType() == compareItem.getType() && comparator != item.getID()) {
+                std::replace(equipIDs.begin(), equipIDs.end(), comparator, item.getID());
+                std::replace_if(equips.begin(), equips.end(), [&](const Item& obj) { return obj.getID() == comparator; }, item);
+                flag = true;
+                break;
+            }
+        }
+        
+        if (!flag) {
+            equipIDs.push_back(item.getID());
+            equips.push_back(item);
+        }
+    }
 
     // String stream to format purchased/equipped item IDs into comma-separated strings
     std::stringstream ss;
@@ -111,9 +137,9 @@ void ShopManager::saveShop(const std::string& filename, int ID) {
     ss.str("");
     ss.clear();
 
-    for (int i = 0; i < equips.size(); ++i) {
-        ss << equips[i];
-        if (i < equips.size() - 1) {
+    for (int i = 0; i < equipIDs.size(); ++i) {
+        ss << equipIDs[i];
+        if (i < equipIDs.size() - 1) {
             ss << ",";
         }
     }
@@ -133,7 +159,7 @@ void ShopManager::saveShop(const std::string& filename, int ID) {
 
 void ShopManager::loadShop(const std::string& filename) {
     purchases.clear();
-    equips.clear();
+    equipIDs.clear();
 
     std::string data = loadSave(filename);
     std::istringstream in(data);
@@ -153,7 +179,15 @@ void ShopManager::loadShop(const std::string& filename) {
         std::istringstream ls(line);
         std::string field;
         while (std::getline(ls, field, ',')) {
-            equips.push_back(std::stoi(line));
+            equipIDs.push_back(std::stoi(line));
+        }
+    }
+
+    for (int ID : equipIDs) {
+        std::optional<Item> temp = Shop::getItemByID(ID);
+
+        if (temp) {
+            equips.push_back(temp.value());
         }
     }
 }
@@ -163,7 +197,7 @@ std::vector<int> ShopManager::getPurchases() {
 }
 
 std::vector<int> ShopManager::getEquips() {
-    return equips;
+    return equipIDs;
 }
 
 bool ShopManager::queryPurchases(int ID) {

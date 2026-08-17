@@ -39,7 +39,7 @@ Item::Item(int cost, std::string name, std::string texture, ItemType type)
         description = name + "\nCost: " + std::to_string(cost);
     }
 
-int Item::getID() {
+int Item::getID() const {
     return itemID;
 }
 
@@ -75,6 +75,10 @@ void Item::setPreview(std::string& key) {
     previewKey = key;
 }
 
+ItemType Item::getType() {
+    return type;
+}
+
 bool Item::isPurchased() {
     return purchased;
 }
@@ -88,7 +92,7 @@ bool Item::purchase() {
         SaveManager::addPoints(-cost);
         SaveManager::saveRecords("records.dat");
         purchased = true;
-        ShopManager::saveShop("shop.dat", itemID);
+        ShopManager::saveShop("shop.dat", *this);
 
         return true;
     }
@@ -117,6 +121,16 @@ std::optional<Item> Shop::getItem(int index) {
     if (index >= 0 && index < static_cast<int>(items.size())) {
         return items[index];
     }
+    return std::nullopt;
+}
+
+std::optional<Item> Shop::getItemByID(int ID) {
+    for (Item item : items) {
+        if (item.getID() == ID) {
+            return item;
+        }
+    }
+
     return std::nullopt;
 }
 

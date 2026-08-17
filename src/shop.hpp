@@ -38,7 +38,7 @@ public:
     Item(int cost, std::string name, std::string texture = "placeholder", ItemType type = ItemType::Hint);
 
     /// @return The item's ID
-    int getID();
+    int getID() const;
 
     /// @return The cost of the item
     int getCost();
@@ -63,6 +63,9 @@ public:
 
     /// @param newPreview The new preview image displayed for the unlockable item
     void setPreview(std::string& key);
+
+    /// @return The type of the item
+    ItemType getType();
 
     /// @return The purchase status of the item
     bool isPurchased();
@@ -126,6 +129,8 @@ public:
      * @return The item of that index
     */
     static std::optional<Item> getItem(int index);
+
+    static std::optional<Item> getItemByID(int ID);
 
     /// @return The number of items in the shop
     static int getSize();

@@ -23,7 +23,7 @@ public:
      * @param filename Name of file to save in app data
      * @param ID The item id being purchased
     */
-    static void saveShop(const std::string& filename, int ID);
+    static void saveShop(const std::string& filename, Item& item);
 
     /**
      * @brief Loads the purchase information of the shop, preventing the player from paying for the same item twice
@@ -50,7 +50,12 @@ private:
     static std::vector<int> purchases;
 
     /// @brief Vector of all equipped items
-    static std::vector<int> equips;
+    static std::vector<int> equipIDs;
+
+    static std::vector<Item> equips;
+
+    /// @brief Purchased hint tokens
+    static int hints;
 
     /**
      * @brief Writes string data to .dat file
