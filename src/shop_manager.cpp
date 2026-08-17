@@ -92,6 +92,7 @@ std::string ShopManager::getSavePath(const std::string& filename) {
 void ShopManager::saveShop(const std::string& filename, int ID) {
 
     purchases.push_back(ID);
+    equips.push_back(ID);
 
     // String stream to format purchased/equipped item IDs into comma-separated strings
     std::stringstream ss;
@@ -107,6 +108,7 @@ void ShopManager::saveShop(const std::string& filename, int ID) {
     std::string purchasesString = ss.str();
 
     // Clear the stream to do the same for equippables
+    ss.str("");
     ss.clear();
 
     for (int i = 0; i < equips.size(); ++i) {
