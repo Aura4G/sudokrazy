@@ -83,13 +83,17 @@ void Item::setPurchased() {
     purchased = true;
 }
 
-void Item::purchase() {
+bool Item::purchase() {
     if (cost <= SaveManager::getPoints() && !purchased) {
         SaveManager::addPoints(-cost);
         SaveManager::saveRecords("records.dat");
         purchased = true;
         ShopManager::saveShop("shop.dat", itemID);
+
+        return true;
     }
+
+    return false;
 }
 
 
@@ -172,7 +176,7 @@ void Shelf::pullShop(int index) {
             if (ShopManager::queryPurchases(itemsPulled.at(i).getID())) {
                 itemsPulled.at(i).setPurchased();
                 itemDisplay.at(i).deactivate();
-                itemDisplay.at(i).frame.setFillColor(itemDisplay.at(i).getTheme().hovering);
+                itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
             }
 
             index++;
@@ -194,6 +198,8 @@ void Shelf::activate() {
     for (int i = 0; i < maximum; i++) {
         if (!itemsPulled.at(i).isPurchased()) {
             itemDisplay.at(i).activate();
+        } else {
+            itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
         }
     }
 }
@@ -209,7 +215,10 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
 
     for (int i = 0; i < maximum; i++) {
         if (itemDisplay.at(i).frame.getGlobalBounds().contains(mousePos) && itemDisplay.at(i).isActive()) {
-            itemsPulled.at(i).purchase();
+            if (itemsPulled.at(i).purchase()) {
+                itemDisplay.at(i).deactivate();
+                itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+            }
         }
     }
 }

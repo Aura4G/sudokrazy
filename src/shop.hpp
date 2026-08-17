@@ -70,7 +70,7 @@ public:
     void setPurchased();
 
     /// @brief Purchases the item with earnt points
-    void purchase();
+    bool purchase();
 
 private:
 
