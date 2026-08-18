@@ -63,14 +63,24 @@ public:
     */
     static bool queryEquips(int ID);
 
+    /**
+     * @brief Change the number of hints the player has
+     * @param additive The number of hints being added to the player's total hints. Negative values reduce hint count
+    */
+    static void alterHints(int additive);
+
+    /// @return The total number of hints the player has
+    static int getHints();
+
 private:
 
     /// @brief Vector of all purchased items
     static std::vector<int> purchases;
 
-    /// @brief Vector of all equipped items
+    /// @brief Vector of all equipped items IDs
     static std::vector<int> equipIDs;
 
+    /// @brief Vector of all equipped items
     static std::vector<Item> equips;
 
     /// @brief Purchased hint tokens

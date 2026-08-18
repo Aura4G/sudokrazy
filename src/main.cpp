@@ -282,14 +282,16 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
+    Shop::addItem(Item(1, "Hint", "lock", ItemType::Hint));
     Shop::addItem(Item(2, "Outdoor Theme", "settings", ItemType::Background));
     Shop::addItem(Item(5, "Space Theme", "settings", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
 
-    // Load all purchases and equips from the shop
+    // Load all purchases and equips from the shop AFTER the shop items have been added
     ShopManager::loadShop("shop.dat");
 
+    // Put shop's content onto button grid "shelf"
     shopShelf.pullShop();
 
     // Music to play while game is operational

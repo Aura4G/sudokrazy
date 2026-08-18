@@ -156,7 +156,8 @@ void ShopManager::savePurchase(const std::string& filename, Item& item) {
 
     //delimits values with new lines in a specific order
     out << purchasesString << "\n"
-        << equipsString;
+        << equipsString << "\n"
+        << std::to_string(hints);
 
     ShopManager::save(filename, out.str());    
 }
@@ -194,7 +195,8 @@ void ShopManager::saveInfo(const std::string& filename) {
 
     //delimits values with new lines in a specific order
     out << purchasesString << "\n"
-        << equipsString;
+        << equipsString << "\n"
+        << std::to_string(hints);
 
     ShopManager::save(filename, out.str());  
 }
@@ -232,24 +234,31 @@ void ShopManager::loadShop(const std::string& filename) {
     std::istringstream in(data);
     std::string line;
 
-    // Purchased items
+    // Purchased item IDs
     if (std::getline(in, line)) {
-        std::istringstream ls(line);
+        std::istringstream iss(line);
         std::string field;
-        while (std::getline(ls, field, ',')) { 
+        while (std::getline(iss, field, ',')) { 
             purchases.push_back(std::stoi(field));
         }
     }
 
-    // Equipped items
+    // Equipped item IDs
     if (std::getline(in, line)) {
-        std::istringstream ls(line);
+        std::istringstream iss(line);
         std::string field;
-        while (std::getline(ls, field, ',')) {
+        while (std::getline(iss, field, ',')) {
             equipIDs.push_back(std::stoi(line));
         }
     }
 
+    // Hint count
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> hints;
+    }
+
+    // Items Vector
     for (int ID : equipIDs) {
         std::optional<Item> item = Shop::getItemByID(ID);
 
@@ -277,4 +286,12 @@ bool ShopManager::queryEquips(int ID) {
     bool found = std::find(equipIDs.begin(), equipIDs.end(), ID) != equipIDs.end();
 
     return found;
+}
+
+void ShopManager::alterHints(int additive) {
+    hints += additive;
+}
+
+int ShopManager::getHints() {
+    return hints;
 }

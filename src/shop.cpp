@@ -91,7 +91,7 @@ bool Item::purchase() {
     if (cost <= SaveManager::getPoints() && !purchased) {
         SaveManager::addPoints(-cost);
         SaveManager::saveRecords("records.dat");
-        purchased = true;
+        purchased = (type == ItemType::Hint) ? false : true;
         ShopManager::savePurchase("shop.dat", *this);
 
         return true;
@@ -255,16 +255,20 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
     for (int i = 0; i < maximum; i++) {
         if (itemDisplay.at(i).frame.getGlobalBounds().contains(mousePos) && itemDisplay.at(i).isActive()) {
             if (itemsPulled.at(i).purchase()) {
-                itemDisplay.at(i).deactivate();
-                itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
-                toggleCaption(itemCaption.at(i), true);
+                if (itemsPulled.at(i).getType() == ItemType::Hint) {
+                    itemCaption.at(i).setText(itemsPulled.at(i).getName() + "\nCost: " + std::to_string(itemsPulled.at(i).getCost()) + "\nTotal: " + std::to_string(ShopManager::getHints()));
+                } else {
+                    itemDisplay.at(i).deactivate();
+                    itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+                    toggleCaption(itemCaption.at(i), true);
 
-                for (int j = 0; j < maximum; j++) {
-                if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID() && itemsPulled.at(j).isPurchased()) {
-                    itemsPulled.at(j).setEquip(false);
-                    toggleCaption(itemCaption.at(j), false);
+                    for (int j = 0; j < maximum; j++) {
+                        if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID() && itemsPulled.at(j).isPurchased()) {
+                            itemsPulled.at(j).setEquip(false);
+                            toggleCaption(itemCaption.at(j), false);
+                        }
+                    }
                 }
-            }
             }
             break;
         }
