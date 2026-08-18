@@ -225,9 +225,15 @@ private:
     /// @brief Vector storing the item data for each item on the shelf
     std::vector<Item> itemsPulled;
 
-    /// @brief the number of times the quantity of shop items overflows the dimensions
-    ///        of the shelf
+    /// @brief the number of times the quantity of shop items overflows the dimensions of the shelf
     int sections;
+
+    /**
+     * @brief Toggles the caption section of a button to become the equip/equipped functionality button
+     * @param caption The button becoming the equip toggle
+     * @param val True if the item is equipped, false otherwise
+    */
+    void toggleCaption(Button& caption, bool val);
 };
 
 #endif

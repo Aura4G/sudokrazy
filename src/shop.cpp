@@ -204,16 +204,12 @@ void Shelf::pullShop(int index) {
                 itemsPulled.at(i).setPurchased();
                 itemDisplay.at(i).deactivate();
                 itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
-                itemCaption.at(i).activate();
-                itemCaption.at(i).setTheme(HARD_BUTTON);
-                itemCaption.at(i).setText("Equip");
+                toggleCaption(itemCaption.at(i), false);
             }
 
             if (ShopManager::queryEquips(itemsPulled.at(i).getID())) {
                 itemsPulled.at(i).setEquip();
-                itemCaption.at(i).deactivate();
-                itemCaption.at(i).setTheme(EASY_BUTTON);
-                itemCaption.at(i).setText("Equipped!");
+                toggleCaption(itemCaption.at(i), true);
             }
 
             index++;
@@ -261,22 +257,26 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
             if (itemsPulled.at(i).purchase()) {
                 itemDisplay.at(i).deactivate();
                 itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+                toggleCaption(itemCaption.at(i), true);
+
+                for (int j = 0; j < maximum; j++) {
+                if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID() && itemsPulled.at(j).isPurchased()) {
+                    itemsPulled.at(j).setEquip(false);
+                    toggleCaption(itemCaption.at(j), false);
+                }
+            }
             }
             break;
         }
 
         if (itemCaption.at(i).frame.getGlobalBounds().contains(mousePos) && itemCaption.at(i).isActive()) {
             itemsPulled.at(i).setEquip();
-            itemCaption.at(i).deactivate();
-            itemCaption.at(i).setTheme(EASY_BUTTON);
-            itemCaption.at(i).setText("Equipped!");
+            toggleCaption(itemCaption.at(i), true);
 
             for (int j = 0; j < maximum; j++) {
                 if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
                     itemsPulled.at(j).setEquip(false);
-                    itemCaption.at(j).activate();
-                    itemCaption.at(j).setTheme(HARD_BUTTON);
-                    itemCaption.at(j).setText("Equip");
+                    toggleCaption(itemCaption.at(j), false);
                 }
             }
 
@@ -285,5 +285,17 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
 
             break;
         }
+    }
+}
+
+void Shelf::toggleCaption(Button& caption, bool val) {
+    if (val) {
+        caption.deactivate();
+        caption.setTheme(EASY_BUTTON);
+        caption.setText("Equipped!");
+    } else {
+        caption.activate();
+        caption.setTheme(HARD_BUTTON);
+        caption.setText("Equip");
     }
 }
