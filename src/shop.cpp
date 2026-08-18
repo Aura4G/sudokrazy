@@ -83,8 +83,8 @@ bool Item::isPurchased() {
     return purchased;
 }
 
-void Item::setPurchased() {
-    purchased = true;
+void Item::setPurchased(bool val) {
+    purchased = val;
 }
 
 bool Item::purchase() {
@@ -92,12 +92,25 @@ bool Item::purchase() {
         SaveManager::addPoints(-cost);
         SaveManager::saveRecords("records.dat");
         purchased = true;
-        ShopManager::saveShop("shop.dat", *this);
+        ShopManager::savePurchase("shop.dat", *this);
 
         return true;
     }
 
     return false;
+}
+
+bool Item::isEquipped() {
+    return equipped;
+}
+
+void Item::setEquip(bool val) {
+    equipped = val;
+}
+
+void Item::changeEquips(bool val) {
+    equipped = val;
+    ShopManager::changeEquips(*this);
 }
 
 
@@ -191,6 +204,16 @@ void Shelf::pullShop(int index) {
                 itemsPulled.at(i).setPurchased();
                 itemDisplay.at(i).deactivate();
                 itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+                itemCaption.at(i).activate();
+                itemCaption.at(i).setTheme(HARD_BUTTON);
+                itemCaption.at(i).setText("Equip");
+            }
+
+            if (ShopManager::queryEquips(itemsPulled.at(i).getID())) {
+                itemsPulled.at(i).setEquip();
+                itemCaption.at(i).deactivate();
+                itemCaption.at(i).setTheme(EASY_BUTTON);
+                itemCaption.at(i).setText("Equipped!");
             }
 
             index++;
@@ -202,6 +225,12 @@ void Shelf::updateHover(const sf::Vector2f& mousePos) {
     for (Button& item : itemDisplay) {
         if (item.isActive()) {
             item.updateHover(mousePos);
+        }
+    }
+
+    for (Button& caption: itemCaption) {
+        if (caption.isActive()) {
+            caption.updateHover(mousePos);
         }
     }
 }
@@ -233,6 +262,28 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
                 itemDisplay.at(i).deactivate();
                 itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
             }
+            break;
+        }
+
+        if (itemCaption.at(i).frame.getGlobalBounds().contains(mousePos) && itemCaption.at(i).isActive()) {
+            itemsPulled.at(i).setEquip();
+            itemCaption.at(i).deactivate();
+            itemCaption.at(i).setTheme(EASY_BUTTON);
+            itemCaption.at(i).setText("Equipped!");
+
+            for (int j = 0; j < maximum; j++) {
+                if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
+                    itemsPulled.at(j).setEquip(false);
+                    itemCaption.at(j).activate();
+                    itemCaption.at(j).setTheme(HARD_BUTTON);
+                    itemCaption.at(j).setText("Equip");
+                }
+            }
+
+            ShopManager::changeEquips(itemsPulled.at(i));
+            ShopManager::saveInfo("shop.dat");
+
+            break;
         }
     }
 }

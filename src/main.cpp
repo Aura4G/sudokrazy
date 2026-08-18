@@ -87,9 +87,6 @@ int main() {
     // Load all settings configurations previously left in the last settings menu session
     SaveManager::loadSettings("settings.dat");
 
-    // Load all purchases and equips from the shop
-    ShopManager::loadShop("shop.dat");
-
     // Enable V-Sync according to the settings configuration
     vsync = SaveManager::getVSync();
 
@@ -289,6 +286,10 @@ int main() {
     Shop::addItem(Item(5, "Space Theme", "settings", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
+
+    // Load all purchases and equips from the shop
+    ShopManager::loadShop("shop.dat");
+
     shopShelf.pullShop();
 
     // Music to play while game is operational

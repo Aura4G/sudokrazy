@@ -21,12 +21,24 @@ public:
     /**
      * @brief Saves the purchase information of the shop
      * @param filename Name of file to save in app data
-     * @param ID The item id being purchased
+     * @param item The item being purchased
     */
-    static void saveShop(const std::string& filename, Item& item);
+    static void savePurchase(const std::string& filename, Item& item);
 
     /**
-     * @brief Loads the purchase information of the shop, preventing the player from paying for the same item twice
+     * @brief Saves shop information
+     * @param filename Name of file to save in app data
+    */
+    static void saveInfo(const std::string& filename);
+
+    /**
+     * @brief Changes equips vector according to the selected item
+     * @param item The item being equipped.
+    */
+    static void changeEquips(Item& item);
+
+    /**
+     * @brief Loads the purchase & equip information of the shop, preventing the player from paying for the same item twice
      * @param filename Name of file to save in app data
     */
     static void loadShop(const std::string& filename);
@@ -43,6 +55,13 @@ public:
      * @return true if the ID is present in the vector, false otherwise
     */
     static bool queryPurchases(int ID);
+
+    /**
+     * @brief Finds a specific item ID in the equips vector to see if the player was equipping the item
+     * @param ID The item's ID
+     * @return true if the ID is present in the vector, false otherwise
+    */
+    static bool queryEquips(int ID);
 
 private:
 

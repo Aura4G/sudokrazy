@@ -70,10 +70,21 @@ public:
     /// @return The purchase status of the item
     bool isPurchased();
 
-    void setPurchased();
+    /// @brief Sets purchased to true
+    void setPurchased(bool val=true);
 
-    /// @brief Purchases the item with earnt points
+    /**
+     * @brief Purchases the item with earnt points
+     * @return True if the transaction goes through, false otherwise.
+    */
     bool purchase();
+
+    /// @return The equip status of the item
+    bool isEquipped();
+
+    void setEquip(bool val=true);
+
+    void changeEquips(bool val = true);
 
 private:
 
