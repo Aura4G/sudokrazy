@@ -125,7 +125,7 @@ bool Grid::updateNumbers(const sf::Vector2f& mousePos, int number) {
                     }
                 } else {
                     block.setText("");
-                    playersBoard.setNumber(counter / 9, counter % 9, 0);
+                    playersBoard.setNumber(counter/9, counter%9, 0);
                 }
                 block.setColor(block.getTheme().unhovered);
             }
@@ -256,9 +256,23 @@ void Grid::krazyMode() {
 }
 
 int Grid::calculatePoints(int score, float time) {
+    if (correct == 0) {
+        return 0;
+    }
+
     float accuracy = static_cast<float>(correct) / static_cast<float>(correct + incorrect);
     int scoreBonus = score / 20;
     float timeBonus = (stateFlag * stateFlag * 120 - time) / 30;
 
     return (scoreBonus + timeBonus) * accuracy;
+}
+
+void Grid::useHint() {
+    for (int i = 0; i < 81; i++) {
+        if (playersBoard.getNumber(i/9, i%9) != finalBoard.getNumber(i/9, i%9)) {
+            playersBoard.setNumber(i/9, i%9, finalBoard.getNumber(i/9, i%9));
+            whiteBlocks[i].setText(std::to_string(finalBoard.getNumber(i/9, i%9)));
+            break;
+        }
+    }
 }

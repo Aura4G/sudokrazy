@@ -465,6 +465,7 @@ int main() {
                 } else if (hint.circleFrame.getGlobalBounds().contains(worldPos) && hint.isActive() && ShopManager::getHints() > 0) {
                     ShopManager::alterHints(-1);
                     ShopManager::saveInfo("shop.dat");
+                    grid.useHint();
                 } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
                     if (settingsToggle.isActive()) {
                         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
