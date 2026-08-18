@@ -62,9 +62,9 @@ public:
      * 
      * MEDIUM: 20-40 numbers removed
      * 
-     * HARD: 40-55 numbers removed
+     * HARD: 47-62 numbers removed
      * 
-     * KRAZY: 30-50 numbers removed
+     * KRAZY: 35-55 numbers removed
     */ 
     void removeNumbers();
 

@@ -38,7 +38,7 @@ public:
     Item(int cost, std::string name, std::string texture = "placeholder", ItemType type = ItemType::Hint);
 
     /// @return The item's ID
-    int getID();
+    int getID() const;
 
     /// @return The cost of the item
     int getCost();
@@ -64,13 +64,27 @@ public:
     /// @param newPreview The new preview image displayed for the unlockable item
     void setPreview(std::string& key);
 
+    /// @return The type of the item
+    ItemType getType();
+
     /// @return The purchase status of the item
     bool isPurchased();
 
-    void setPurchased();
+    /// @brief Sets purchased to true
+    void setPurchased(bool val=true);
 
-    /// @brief Purchases the item with earnt points
-    void purchase();
+    /**
+     * @brief Purchases the item with earnt points
+     * @return True if the transaction goes through, false otherwise.
+    */
+    bool purchase();
+
+    /// @return The equip status of the item
+    bool isEquipped();
+
+    void setEquip(bool val=true);
+
+    void changeEquips(bool val = true);
 
 private:
 
@@ -126,6 +140,8 @@ public:
      * @return The item of that index
     */
     static std::optional<Item> getItem(int index);
+
+    static std::optional<Item> getItemByID(int ID);
 
     /// @return The number of items in the shop
     static int getSize();
@@ -209,9 +225,15 @@ private:
     /// @brief Vector storing the item data for each item on the shelf
     std::vector<Item> itemsPulled;
 
-    /// @brief the number of times the quantity of shop items overflows the dimensions
-    ///        of the shelf
+    /// @brief the number of times the quantity of shop items overflows the dimensions of the shelf
     int sections;
+
+    /**
+     * @brief Toggles the caption section of a button to become the equip/equipped functionality button
+     * @param caption The button becoming the equip toggle
+     * @param val True if the item is equipped, false otherwise
+    */
+    void toggleCaption(Button& caption, bool val);
 };
 
 #endif

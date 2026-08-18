@@ -244,7 +244,7 @@ private:
 
 
     /// Metrics ///
-
+    /// @brief The in-game currency "kuukies"
     static int points;
 };
 

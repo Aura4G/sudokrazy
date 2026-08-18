@@ -94,6 +94,9 @@ public:
     */
     int calculatePoints(int score, float time);
 
+    /// @brief Reveals a correct number on the sudoku grid
+    void useHint();
+
     /// @brief flag to identify whether the player is adding or removing numbers from the board
     static bool eraser_mode;
 

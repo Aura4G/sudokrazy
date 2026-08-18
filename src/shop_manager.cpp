@@ -16,7 +16,11 @@
 
 std::vector<int> ShopManager::purchases;
 
-std::vector<int> ShopManager::equips;
+std::vector<int> ShopManager::equipIDs;
+
+std::vector<Item> ShopManager::equips;
+
+int ShopManager::hints;
 
 void ShopManager::save (const std::string& filename, const std::string& data) {
     // The save destination is retrieved
@@ -89,9 +93,36 @@ std::string ShopManager::getSavePath(const std::string& filename) {
     return fullPath.string();
 }
 
-void ShopManager::saveShop(const std::string& filename, int ID) {
+void ShopManager::savePurchase(const std::string& filename, Item& item) {
 
-    purchases.push_back(ID);
+    if (item.getType() == ItemType::Hint) {
+        hints++; // The hint item type is not added towards the vector of purchases; they're expendables to be used during sudoku games
+    } else {
+        purchases.push_back(item.getID()); // Purchased item pushed to the back of the vector
+
+        // Flag becomes true to signify if an equippable replacement is made
+        bool flag = false;
+
+        // When purchasing a particular item type, if the player already has an item of that type equipped, said equipped item is replaced
+        // by the new item.
+        for (int i = 0; i < equipIDs.size(); i++) {
+            int comparator = equipIDs.at(i);
+            Item compareItem = equips.at(i);
+
+            if (item.getType() == compareItem.getType() && comparator != item.getID()) {
+                std::replace(equipIDs.begin(), equipIDs.end(), comparator, item.getID());
+                std::replace_if(equips.begin(), equips.end(), [&](const Item& obj) { return obj.getID() == comparator; }, item);
+                flag = true;
+                break;
+            }
+        }
+        
+        // If it's the first of that type of item, it just gets pushed to the back of the equips vector.
+        if (!flag) {
+            equipIDs.push_back(item.getID());
+            equips.push_back(item);
+        }
+    }
 
     // String stream to format purchased/equipped item IDs into comma-separated strings
     std::stringstream ss;
@@ -107,11 +138,12 @@ void ShopManager::saveShop(const std::string& filename, int ID) {
     std::string purchasesString = ss.str();
 
     // Clear the stream to do the same for equippables
+    ss.str("");
     ss.clear();
 
-    for (int i = 0; i < equips.size(); ++i) {
-        ss << equips[i];
-        if (i < equips.size() - 1) {
+    for (int i = 0; i < equipIDs.size(); ++i) {
+        ss << equipIDs[i];
+        if (i < equipIDs.size() - 1) {
             ss << ",";
         }
     }
@@ -124,34 +156,114 @@ void ShopManager::saveShop(const std::string& filename, int ID) {
 
     //delimits values with new lines in a specific order
     out << purchasesString << "\n"
-        << equipsString;
+        << equipsString << "\n"
+        << std::to_string(hints);
 
     ShopManager::save(filename, out.str());    
 }
 
+void ShopManager::saveInfo(const std::string& filename) {
+    // String stream to format purchased/equipped item IDs into comma-separated strings
+    std::stringstream ss;
+
+    for (int i = 0; i < purchases.size(); ++i) {
+        ss << purchases[i];
+        if (i < purchases.size() - 1) {
+            ss << ",";
+        }
+    }
+
+    // Store the comma-separated IDs into a string that can be written to a .dat file
+    std::string purchasesString = ss.str();
+
+    // Clear the stream to do the same for equippables
+    ss.str("");
+    ss.clear();
+
+    for (int i = 0; i < equipIDs.size(); ++i) {
+        ss << equipIDs[i];
+        if (i < equipIDs.size() - 1) {
+            ss << ",";
+        }
+    }
+
+    // Store comma-separated IDs into a string
+    std::string equipsString = ss.str();
+
+
+    std::ostringstream out;
+
+    //delimits values with new lines in a specific order
+    out << purchasesString << "\n"
+        << equipsString << "\n"
+        << std::to_string(hints);
+
+    ShopManager::save(filename, out.str());  
+}
+
+void ShopManager::changeEquips(Item& item) {
+    // Flag becomes true to signify if an equippable replacement is made
+    bool flag = false;
+
+    // When purchasing a particular item type, if the player already has an item of that type equipped, said equipped item is replaced
+    // by the new item.
+    for (int i = 0; i < equipIDs.size(); i++) {
+        int comparator = equipIDs.at(i);
+        Item compareItem = equips.at(i);
+
+        if (item.getType() == compareItem.getType() && comparator != item.getID()) {
+            std::replace(equipIDs.begin(), equipIDs.end(), comparator, item.getID());
+            std::replace_if(equips.begin(), equips.end(), [&](const Item& obj) { return obj.getID() == comparator; }, item);
+            flag = true;
+            break;
+        }
+    }
+        
+    // If it's the first of that type of item, it just gets pushed to the back of the equips vector.
+    if (!flag) {
+        equipIDs.push_back(item.getID());
+        equips.push_back(item);
+    }
+}
+
 void ShopManager::loadShop(const std::string& filename) {
     purchases.clear();
-    equips.clear();
+    equipIDs.clear();
 
     std::string data = loadSave(filename);
     std::istringstream in(data);
     std::string line;
 
-    // Purchased items
+    // Purchased item IDs
     if (std::getline(in, line)) {
-        std::istringstream ls(line);
+        std::istringstream iss(line);
         std::string field;
-        while (std::getline(ls, field, ',')) { 
+        while (std::getline(iss, field, ',')) { 
             purchases.push_back(std::stoi(field));
         }
     }
 
-    // Equipped items
+    // Equipped item IDs
     if (std::getline(in, line)) {
-        std::istringstream ls(line);
+        std::istringstream iss(line);
         std::string field;
-        while (std::getline(ls, field, ',')) {
-            equips.push_back(std::stoi(line));
+        while (std::getline(iss, field, ',')) {
+            equipIDs.push_back(std::stoi(line));
+        }
+    }
+
+    // Hint count
+    if (std::getline(in, line)) {
+        std::istringstream iss(line);
+        iss >> hints;
+    }
+
+    // Items Vector
+    for (int ID : equipIDs) {
+        std::optional<Item> item = Shop::getItemByID(ID);
+
+        if (item) {
+            equips.push_back(item.value());
         }
     }
 }
@@ -161,11 +273,25 @@ std::vector<int> ShopManager::getPurchases() {
 }
 
 std::vector<int> ShopManager::getEquips() {
-    return equips;
+    return equipIDs;
 }
 
 bool ShopManager::queryPurchases(int ID) {
     bool found = std::find(purchases.begin(), purchases.end(), ID) != purchases.end();
 
     return found;
+}
+
+bool ShopManager::queryEquips(int ID) {
+    bool found = std::find(equipIDs.begin(), equipIDs.end(), ID) != equipIDs.end();
+
+    return found;
+}
+
+void ShopManager::alterHints(int additive) {
+    hints += additive;
+}
+
+int ShopManager::getHints() {
+    return hints;
 }

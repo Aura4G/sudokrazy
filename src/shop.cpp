@@ -39,7 +39,7 @@ Item::Item(int cost, std::string name, std::string texture, ItemType type)
         description = name + "\nCost: " + std::to_string(cost);
     }
 
-int Item::getID() {
+int Item::getID() const {
     return itemID;
 }
 
@@ -75,21 +75,42 @@ void Item::setPreview(std::string& key) {
     previewKey = key;
 }
 
+ItemType Item::getType() {
+    return type;
+}
+
 bool Item::isPurchased() {
     return purchased;
 }
 
-void Item::setPurchased() {
-    purchased = true;
+void Item::setPurchased(bool val) {
+    purchased = val;
 }
 
-void Item::purchase() {
+bool Item::purchase() {
     if (cost <= SaveManager::getPoints() && !purchased) {
         SaveManager::addPoints(-cost);
         SaveManager::saveRecords("records.dat");
-        purchased = true;
-        ShopManager::saveShop("shop.dat", itemID);
+        purchased = (type == ItemType::Hint) ? false : true;
+        ShopManager::savePurchase("shop.dat", *this);
+
+        return true;
     }
+
+    return false;
+}
+
+bool Item::isEquipped() {
+    return equipped;
+}
+
+void Item::setEquip(bool val) {
+    equipped = val;
+}
+
+void Item::changeEquips(bool val) {
+    equipped = val;
+    ShopManager::changeEquips(*this);
 }
 
 
@@ -113,6 +134,16 @@ std::optional<Item> Shop::getItem(int index) {
     if (index >= 0 && index < static_cast<int>(items.size())) {
         return items[index];
     }
+    return std::nullopt;
+}
+
+std::optional<Item> Shop::getItemByID(int ID) {
+    for (Item item : items) {
+        if (item.getID() == ID) {
+            return item;
+        }
+    }
+
     return std::nullopt;
 }
 
@@ -172,7 +203,13 @@ void Shelf::pullShop(int index) {
             if (ShopManager::queryPurchases(itemsPulled.at(i).getID())) {
                 itemsPulled.at(i).setPurchased();
                 itemDisplay.at(i).deactivate();
-                itemDisplay.at(i).frame.setFillColor(itemDisplay.at(i).getTheme().hovering);
+                itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+                toggleCaption(itemCaption.at(i), false);
+            }
+
+            if (ShopManager::queryEquips(itemsPulled.at(i).getID())) {
+                itemsPulled.at(i).setEquip();
+                toggleCaption(itemCaption.at(i), true);
             }
 
             index++;
@@ -186,6 +223,12 @@ void Shelf::updateHover(const sf::Vector2f& mousePos) {
             item.updateHover(mousePos);
         }
     }
+
+    for (Button& caption: itemCaption) {
+        if (caption.isActive()) {
+            caption.updateHover(mousePos);
+        }
+    }
 }
 
 void Shelf::activate() {
@@ -194,6 +237,8 @@ void Shelf::activate() {
     for (int i = 0; i < maximum; i++) {
         if (!itemsPulled.at(i).isPurchased()) {
             itemDisplay.at(i).activate();
+        } else {
+            itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
         }
     }
 }
@@ -209,7 +254,52 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
 
     for (int i = 0; i < maximum; i++) {
         if (itemDisplay.at(i).frame.getGlobalBounds().contains(mousePos) && itemDisplay.at(i).isActive()) {
-            itemsPulled.at(i).purchase();
+            if (itemsPulled.at(i).purchase()) {
+                if (itemsPulled.at(i).getType() == ItemType::Hint) {
+                    itemCaption.at(i).setText(itemsPulled.at(i).getName() + "\nCost: " + std::to_string(itemsPulled.at(i).getCost()) + "\nTotal: " + std::to_string(ShopManager::getHints()));
+                } else {
+                    itemDisplay.at(i).deactivate();
+                    itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+                    toggleCaption(itemCaption.at(i), true);
+
+                    for (int j = 0; j < maximum; j++) {
+                        if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID() && itemsPulled.at(j).isPurchased()) {
+                            itemsPulled.at(j).setEquip(false);
+                            toggleCaption(itemCaption.at(j), false);
+                        }
+                    }
+                }
+            }
+            break;
         }
+
+        if (itemCaption.at(i).frame.getGlobalBounds().contains(mousePos) && itemCaption.at(i).isActive()) {
+            itemsPulled.at(i).setEquip();
+            toggleCaption(itemCaption.at(i), true);
+
+            for (int j = 0; j < maximum; j++) {
+                if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
+                    itemsPulled.at(j).setEquip(false);
+                    toggleCaption(itemCaption.at(j), false);
+                }
+            }
+
+            ShopManager::changeEquips(itemsPulled.at(i));
+            ShopManager::saveInfo("shop.dat");
+
+            break;
+        }
+    }
+}
+
+void Shelf::toggleCaption(Button& caption, bool val) {
+    if (val) {
+        caption.deactivate();
+        caption.setTheme(EASY_BUTTON);
+        caption.setText("Equipped!");
+    } else {
+        caption.activate();
+        caption.setTheme(HARD_BUTTON);
+        caption.setText("Equip");
     }
 }

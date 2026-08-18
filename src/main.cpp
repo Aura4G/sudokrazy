@@ -87,9 +87,6 @@ int main() {
     // Load all settings configurations previously left in the last settings menu session
     SaveManager::loadSettings("settings.dat");
 
-    // Load all purchases and equips from the shop
-    ShopManager::loadShop("shop.dat");
-
     // Enable V-Sync according to the settings configuration
     vsync = SaveManager::getVSync();
 
@@ -216,6 +213,9 @@ int main() {
     Button eraser(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "", "gameFont", ShapeType::Circle);
     eraser.setTexture(ResourceManager::getTexture("eraser"), 5.f);
 
+    // Hint button
+    Button hint(37.5f, 0.f, 390.f, 47.5f, REGULAR_BUTTON, "0", "gameFont", ShapeType::Circle);
+
 
     /* SETTINGS MENU */
 
@@ -234,6 +234,9 @@ int main() {
     // Button to toggle fullscreen on/off
     Button fullscreenToggle(150.f, 75.f, 350.f, 220.f, (isFullscreen ? EASY_BUTTON : HARD_BUTTON), (isFullscreen ? "Fullscreen" : "Windowed"), "gameFont");
 
+
+    /* Volume */
+
     sf::Text volumeText;
     volumeText.setString("Volume:");
     volumeText.setFont(ResourceManager::getFont("gameFont"));
@@ -245,6 +248,8 @@ int main() {
     // Retrieves the saved volume setting for the initial setting
     Slider volumeSlider(400.f, sf::Vector2f(100.f, 360.f), SaveManager::getVolume(), sf::Color::Black);
 
+
+    /* Brightness */
 
     sf::Text brightnessText;
     brightnessText.setString("Brightness:");
@@ -258,6 +263,8 @@ int main() {
     Slider brightnessSlider(400.f, sf::Vector2f(100.f, 440.f), SaveManager::getBrightness(), sf::Color::Black);
 
 
+    /* Contrast */
+
     sf::Text contrastText;
     contrastText.setString("Contrast:");
     contrastText.setFont(ResourceManager::getFont("gameFont"));
@@ -269,6 +276,8 @@ int main() {
     // Retrieves the saved contrast setting for the initial setting
     Slider contrastSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getContrast(), sf::Color::Black);
 
+
+    /* Bg Scroller */
 
     sf::Text scrollerText;
     scrollerText.setString("Background scroll speed:");
@@ -285,11 +294,19 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
+    Shop::addItem(Item(1, "Hint", "lock", ItemType::Hint));
     Shop::addItem(Item(2, "Outdoor Theme", "settings", ItemType::Background));
     Shop::addItem(Item(5, "Space Theme", "settings", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
+
+    // Load all purchases and equips from the shop AFTER the shop items have been added
+    ShopManager::loadShop("shop.dat");
+
+    // Put shop's content onto button grid "shelf"
     shopShelf.pullShop();
+
+    hint.setText(std::to_string(ShopManager::getHints()));
 
     // Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
@@ -445,6 +462,10 @@ int main() {
                     } else { // Clicking the exit button mid-game goes back to the home screen
                         Grid::eraser_mode = false;
                     }
+                } else if (hint.circleFrame.getGlobalBounds().contains(worldPos) && hint.isActive() && ShopManager::getHints() > 0) {
+                    ShopManager::alterHints(-1);
+                    ShopManager::saveInfo("shop.dat");
+                    grid.useHint();
                 } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
                     if (settingsToggle.isActive()) {
                         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
@@ -522,6 +543,7 @@ int main() {
                 }
 
                 shopShelf.updateShelf(worldPos);
+                hint.setText(std::to_string(ShopManager::getHints()));
                 
                 if (grid.check()) { // Checks if the grid has all its correct numbers
                     Record game(score, stateFlag, sf::seconds(timer.getElapsedTime().asSeconds() - totalTimeOut));
@@ -558,21 +580,25 @@ int main() {
                 currentTheme = &EASY_THEME;
                 exit.setTheme(EASY_BUTTON);
                 eraser.setTheme(EASY_BUTTON);
+                hint.setTheme(EASY_BUTTON);
                 break;
             case STATE_MEDIUM:
                 currentTheme = &MEDIUM_THEME;
                 exit.setTheme(MEDIUM_BUTTON);
                 eraser.setTheme(MEDIUM_BUTTON);
+                hint.setTheme(MEDIUM_BUTTON);
                 break;
             case STATE_HARD:
                 currentTheme = &HARD_THEME;
                 exit.setTheme(HARD_BUTTON);
                 eraser.setTheme(HARD_BUTTON);
+                hint.setTheme(HARD_BUTTON);
                 break;
             case STATE_KRAZY:
                 currentTheme = &KRAZY_THEME;
                 exit.setTheme(KRAZY_BUTTON);
                 eraser.setTheme(KRAZY_BUTTON);
+                hint.setTheme(KRAZY_BUTTON);
                 break;
             case STATE_SETTINGS:
                 currentTheme = &SETTINGS_THEME;
@@ -608,6 +634,7 @@ int main() {
             // Activates the grid and its buttons
             grid.activate();
             eraser.activate();
+            hint.activate();
             settingsToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
@@ -648,7 +675,7 @@ int main() {
             // Ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
-
+            hint.deactivate();
             settingsToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
@@ -680,7 +707,7 @@ int main() {
             // Ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
-
+            hint.deactivate();
             settingsToggle.deactivate();
             vsyncToggle.activate();
             fullscreenToggle.activate();
@@ -712,7 +739,7 @@ int main() {
             // Ensures no inputs on the invisible grid can be made when outside gameplay mode
             grid.deactivate();
             eraser.deactivate();
-
+            hint.deactivate();
             settingsToggle.deactivate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
@@ -836,6 +863,7 @@ int main() {
         if (!Grid::eraser_mode) {
             eraser.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
+        hint.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         settingsToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
 
         // update the menu buttons each frame for gradual movement
@@ -845,6 +873,7 @@ int main() {
         krazySwitch.update(deltaTime);
         exit.update(deltaTime);
         eraser.update(deltaTime);
+        hint.update(deltaTime);
         for (int i = 0; i < 9; i++) {
             numberChangers.at(i).update(deltaTime);
         }
@@ -866,6 +895,7 @@ int main() {
                 button.display(renderTexture);
             }
             eraser.display(renderTexture);
+            hint.display(renderTexture);
             renderTexture.draw(scoreText);
             renderTexture.draw(timerText);
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
