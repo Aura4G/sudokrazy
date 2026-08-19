@@ -35,7 +35,7 @@ public:
      * @param texture The item's preview image in the shop
      * @param type The type of item it is
     */
-    Item(int cost, std::string name, std::string texture = "placeholder", ItemType type = ItemType::Hint);
+    Item(int cost, std::string name, std::string texture = "placeholder", std::string equipKey = "hint", ItemType type = ItemType::Hint);
 
     /// @return The item's ID
     int getID() const;
@@ -86,6 +86,10 @@ public:
 
     void changeEquips(bool val = true);
 
+    void setEquipKey(std::string newKey);
+
+    std::string getEquipKey();
+
 private:
 
     /// @brief the unique ID of the item 
@@ -108,6 +112,9 @@ private:
 
     /// @brief Whether or not the item is currently equipped
     bool equipped;
+
+    /// @brief String variable to be plugged into resource manager queries to find the right media for the equip
+    std::string equipKey;
 
     /// @brief increments and assigns with each item creation
     static int counter;
@@ -197,7 +204,7 @@ public:
      *        whenever a left-click event occurs
      * @param mousePos The position of the mouse during that frame
     */
-    void updateShelf(const sf::Vector2f& mousePos);
+    bool updateShelf(const sf::Vector2f& mousePos);
 
 private:
 

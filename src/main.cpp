@@ -31,6 +31,47 @@ void changeNumber(Button& button, int& number) {
     }
 }
 
+void applyBackground(std::vector<sf::RectangleShape*>& panels, std::vector<sf::Sprite*>& bgs) {
+    std::string key;
+
+    for (Item item : ShopManager::getEquips()) {
+        if (item.getType() == ItemType::Background) {
+            key = item.getEquipKey();
+        }
+    }
+
+    if (key == "") return;
+
+    for (int i = 0; i < 3; i++) {
+        bgs.at(i)->setTexture(ResourceManager::getTexture(key + std::to_string(i+1)));
+        bgs.at(i)->setTextureRect(sf::IntRect(0, 0, ResourceManager::getTexture(key + std::to_string(i+1)).getSize().x, ResourceManager::getTexture(key + std::to_string(i+1)).getSize().y));
+
+        // Get bounds of the sprite
+        sf::FloatRect subjectBounds = bgs.at(i)->getLocalBounds();
+        sf::FloatRect targetRect = panels.at(i)->getLocalBounds();
+
+        // Get available width and height from button frame
+        float availableWidth = targetRect.width;
+        float availableHeight = targetRect.height;
+
+        // Calculate a scale factor from our available widths and heights
+        float scaleX = availableWidth / subjectBounds.width;
+        float scaleY = availableHeight / subjectBounds.height;
+        float scale = std::min(scaleX, scaleY); //choose the minimum between the two scales to ensure it fits in the bounds
+
+        // Apply scale
+        bgs.at(i)->setScale(scale,scale);
+
+        sf::Vector2f pos = panels.at(i)->getPosition();
+        sf::Vector2f size = panels.at(i)->getSize();
+
+        // Center the origin of the scaled sprite
+        subjectBounds = bgs.at(i)->getLocalBounds();
+        bgs.at(i)->setOrigin(subjectBounds.left + subjectBounds.width / 2.0f, subjectBounds.top + subjectBounds.height / 2.0f);
+        bgs.at(i)->setPosition(pos.x + size.x / 2.0f, pos.y + size.y / 2.0f);
+    }
+}
+
 bool isFullscreen = false;
 sf::Vector2f virtualSize(600.f, 800.f);
 sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
@@ -137,6 +178,17 @@ int main() {
     ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
     ResourceManager::loadTexture("lock", "media/images/lock.png");
 
+    /* Backgrounds */
+    // Test
+    ResourceManager::loadTexture("test1", "media/images/backgrounds/test1.png");
+    ResourceManager::loadTexture("test2", "media/images/backgrounds/test2.png");
+    ResourceManager::loadTexture("test3", "media/images/backgrounds/test3.png");
+
+    // Space
+    ResourceManager::loadTexture("space1", "media/images/backgrounds/space1.png");
+    ResourceManager::loadTexture("space2", "media/images/backgrounds/space2.png");
+    ResourceManager::loadTexture("space3", "media/images/backgrounds/space3.png");
+
     /* Audio */
 
     ResourceManager::loadAudio("main theme", "media/music/sudokrazy_main.ogg");
@@ -157,12 +209,15 @@ int main() {
 
     sf:: RectangleShape panel1(sf::Vector2f(panelWidth, panelHeight));
     panel1.setPosition(0,0);
+    sf::Sprite bg1(ResourceManager::getTexture("placeholder"), sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
     sf:: RectangleShape panel2(sf::Vector2f(panelWidth, panelHeight));
     panel2.setPosition(panelWidth,0);
+    sf::Sprite bg2(ResourceManager::getTexture("placeholder"), sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
     sf:: RectangleShape panel3(sf::Vector2f(panelWidth, panelHeight));
     panel3.setPosition(-panelWidth,0);
+    sf::Sprite bg3(ResourceManager::getTexture("placeholder"), sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
     sf::Color clearTheme = {255,255,255};
 
@@ -294,9 +349,9 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
-    Shop::addItem(Item(1, "Hint", "lock", ItemType::Hint));
-    Shop::addItem(Item(2, "Outdoor Theme", "settings", ItemType::Background));
-    Shop::addItem(Item(5, "Space Theme", "settings", ItemType::Background));
+    Shop::addItem(Item(1, "Hint", "lock"));
+    Shop::addItem(Item(2, "Outdoor Theme", "settings", "test", ItemType::Background));
+    Shop::addItem(Item(5, "Space Theme", "settings", "space", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
 
@@ -306,7 +361,10 @@ int main() {
     // Put shop's content onto button grid "shelf"
     shopShelf.pullShop();
 
+    // The number of hints read from the save file must appear initially
     hint.setText(std::to_string(ShopManager::getHints()));
+
+    /* EQUIPS */
 
     // Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
@@ -376,6 +434,10 @@ int main() {
     textRect = timerText.getLocalBounds();
     timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     timerText.setPosition(sf::Vector2f(300.f, 50.f));
+
+    std::vector<sf::RectangleShape*> panels = {&panel1, &panel2, &panel3};
+    std::vector<sf::Sprite*> bgs = {&bg1, &bg2, &bg3};
+    applyBackground(panels, bgs);
 
     // Game loop
     while (window->isOpen()) {
@@ -542,7 +604,10 @@ int main() {
                     previousHit = timer.getElapsedTime();
                 }
 
-                shopShelf.updateShelf(worldPos);
+                if (shopShelf.updateShelf(worldPos)) {
+                    applyBackground(panels, bgs);
+                }
+
                 hint.setText(std::to_string(ShopManager::getHints()));
                 
                 if (grid.check()) { // Checks if the grid has all its correct numbers
@@ -807,6 +872,10 @@ int main() {
         panel2.move(scrollSpeed*deltaTime, 0);
         panel3.move(scrollSpeed*deltaTime, 0);
 
+        bg1.move(scrollSpeed*deltaTime, 0);
+        bg2.move(scrollSpeed*deltaTime, 0);
+        bg3.move(scrollSpeed*deltaTime, 0);
+
         // Loop the panels when they go off-screen
         if (panel1.getPosition().x > 600) {
             panel1.setPosition(panel2.getPosition().x - 300, 0);
@@ -818,6 +887,19 @@ int main() {
 
         if (panel3.getPosition().x > 600) {
             panel3.setPosition(panel1.getPosition().x - 300, 0);
+        }
+
+
+        if (bg1.getPosition().x > 750) {
+            bg1.setPosition(bg2.getPosition().x - 300, 400);
+        }
+
+        if (bg2.getPosition().x > 750) {
+            bg2.setPosition(bg3.getPosition().x - 300, 400);
+        }
+
+        if (bg3.getPosition().x > 750) {
+            bg3.setPosition(bg1.getPosition().x - 300, 400);
         }
 
         // Set the colors to the theme
@@ -889,6 +971,11 @@ int main() {
         renderTexture.draw(panel1);
         renderTexture.draw(panel2);
         renderTexture.draw(panel3);
+        if (bg1.getTexture() != &ResourceManager::getTexture("placeholder")) {
+            renderTexture.draw(bg1);
+            renderTexture.draw(bg2);
+            renderTexture.draw(bg3);
+        }
         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Draws for an active sudoku game
             grid.display(renderTexture);
             for (Button& button : numberChangers) {

@@ -47,7 +47,10 @@ public:
     static std::vector<int> getPurchases();
 
     /// @return A the vector of integers representing equipped item IDs
-    static std::vector<int> getEquips();
+    static std::vector<int> getEquipIDs();
+
+    /// @return A vector of the "equipped" items
+    static std::vector<Item> getEquips();
 
     /**
      * @brief Finds a specific item ID in the purchases vector to see if the player already has this item

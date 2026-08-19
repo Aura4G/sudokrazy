@@ -28,8 +28,8 @@ Item::Item() {
     purchased = false;
 }
 
-Item::Item(int cost, std::string name, std::string texture, ItemType type)
-    : cost(cost), name(name), type(type)
+Item::Item(int cost, std::string name, std::string texture, std::string equipKey, ItemType type)
+    : cost(cost), name(name), equipKey(equipKey), type(type)
     {
         purchased = false;
         equipped = false;
@@ -111,6 +111,14 @@ void Item::setEquip(bool val) {
 void Item::changeEquips(bool val) {
     equipped = val;
     ShopManager::changeEquips(*this);
+}
+
+void Item::setEquipKey(std::string newKey) {
+    equipKey = newKey;
+} 
+
+std::string Item::getEquipKey() {
+    return equipKey;
 }
 
 
@@ -197,7 +205,7 @@ void Shelf::pullShop(int index) {
             break;
         } else {
             itemDisplay.at(i).setTexture(ResourceManager::getTexture(optItem->getPreviewKey()));
-            itemCaption.at(i).setText(optItem->getDescription() + "\nTotal: " + std::to_string(ShopManager::getHints()));
+            itemCaption.at(i).setText(optItem->getDescription());
             itemsPulled.at(i) = *optItem;
 
             if (ShopManager::queryPurchases(itemsPulled.at(i).getID())) {
@@ -249,7 +257,7 @@ void Shelf::deactivate() {
     }
 }
 
-void Shelf::updateShelf(const sf::Vector2f& mousePos) {
+bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
     int maximum = columns * rows;
 
     for (int i = 0; i < maximum; i++) {
@@ -270,7 +278,7 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
                     }
                 }
             }
-            break;
+            return true;
         }
 
         if (itemCaption.at(i).frame.getGlobalBounds().contains(mousePos) && itemCaption.at(i).isActive()) {
@@ -287,9 +295,11 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
             ShopManager::changeEquips(itemsPulled.at(i));
             ShopManager::saveInfo("shop.dat");
 
-            break;
+            return true;
         }
     }
+
+    return false;
 }
 
 void Shelf::toggleCaption(Button& caption, bool val) {

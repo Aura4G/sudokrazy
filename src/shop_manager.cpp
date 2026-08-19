@@ -272,8 +272,12 @@ std::vector<int> ShopManager::getPurchases() {
     return purchases;
 }
 
-std::vector<int> ShopManager::getEquips() {
+std::vector<int> ShopManager::getEquipIDs() {
     return equipIDs;
+}
+
+std::vector<Item> ShopManager::getEquips() {
+    return equips;
 }
 
 bool ShopManager::queryPurchases(int ID) {
