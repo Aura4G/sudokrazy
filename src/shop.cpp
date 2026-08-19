@@ -197,7 +197,7 @@ void Shelf::pullShop(int index) {
             break;
         } else {
             itemDisplay.at(i).setTexture(ResourceManager::getTexture(optItem->getPreviewKey()));
-            itemCaption.at(i).setText(optItem->getDescription());
+            itemCaption.at(i).setText(optItem->getDescription() + "\nTotal: " + std::to_string(ShopManager::getHints()));
             itemsPulled.at(i) = *optItem;
 
             if (ShopManager::queryPurchases(itemsPulled.at(i).getID())) {
