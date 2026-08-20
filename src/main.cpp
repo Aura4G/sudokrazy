@@ -40,7 +40,13 @@ void applyBackground(std::vector<sf::RectangleShape*>& panels, std::vector<sf::S
         }
     }
 
-    if (key == "") return;
+    if (key == "") {
+        for (sf::Sprite* bg : bgs) {
+            bg->setTexture(ResourceManager::getTexture("placeholder"));
+        }
+        
+        return;
+    }
 
     for (int i = 0; i < 3; i++) {
         bgs.at(i)->setTexture(ResourceManager::getTexture(key + std::to_string(i+1)));

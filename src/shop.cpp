@@ -282,17 +282,25 @@ bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
         }
 
         if (itemCaption.at(i).frame.getGlobalBounds().contains(mousePos) && itemCaption.at(i).isActive()) {
-            itemsPulled.at(i).setEquip();
-            toggleCaption(itemCaption.at(i), true);
+            if (itemsPulled.at(i).isEquipped()) {
+                itemsPulled.at(i).setEquip(false);
+                toggleCaption(itemCaption.at(i), false);
 
-            for (int j = 0; j < maximum; j++) {
-                if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
-                    itemsPulled.at(j).setEquip(false);
-                    toggleCaption(itemCaption.at(j), false);
+                ShopManager::removeEquip(itemsPulled.at(i));
+            } else {
+                itemsPulled.at(i).setEquip();
+                toggleCaption(itemCaption.at(i), true);
+
+                for (int j = 0; j < maximum; j++) {
+                    if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
+                        itemsPulled.at(j).setEquip(false);
+                        toggleCaption(itemCaption.at(j), false);
+                    }
                 }
+
+                ShopManager::changeEquips(itemsPulled.at(i));
             }
 
-            ShopManager::changeEquips(itemsPulled.at(i));
             ShopManager::saveInfo("shop.dat");
 
             return true;
@@ -304,7 +312,7 @@ bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
 
 void Shelf::toggleCaption(Button& caption, bool val) {
     if (val) {
-        caption.deactivate();
+        caption.activate();
         caption.setTheme(EASY_BUTTON);
         caption.setText("Equipped!");
     } else {
