@@ -310,6 +310,18 @@ bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
     return false;
 }
 
+void Shelf::updateHintCount() {
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        if (itemsPulled.at(i).getType() == ItemType::Hint) {
+            itemCaption.at(i).setText(itemsPulled.at(i).getName() + "\nCost: " + std::to_string(itemsPulled.at(i).getCost()) + "\nTotal: " + std::to_string(ShopManager::getHints()));
+
+            break;
+        }
+    }
+}
+
 void Shelf::toggleCaption(Button& caption, bool val) {
     if (val) {
         caption.activate();

@@ -206,6 +206,9 @@ public:
     */
     bool updateShelf(const sf::Vector2f& mousePos);
 
+    /// @brief Updates the hint total text under the hint purchase button of the shop shelf
+    void updateHintCount();
+
 private:
 
     /// @brief How many item columns are displayed along the x axis

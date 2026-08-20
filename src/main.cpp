@@ -44,7 +44,7 @@ void applyBackground(std::vector<sf::RectangleShape*>& panels, std::vector<sf::S
         for (sf::Sprite* bg : bgs) {
             bg->setTexture(ResourceManager::getTexture("placeholder"));
         }
-        
+
         return;
     }
 
@@ -534,6 +534,7 @@ int main() {
                     ShopManager::alterHints(-1);
                     ShopManager::saveInfo("shop.dat");
                     grid.useHint();
+                    shopShelf.updateHintCount();
                 } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
                     if (settingsToggle.isActive()) {
                         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
