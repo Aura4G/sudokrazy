@@ -195,6 +195,11 @@ int main() {
     ResourceManager::loadTexture("space2", "media/images/backgrounds/space2.png");
     ResourceManager::loadTexture("space3", "media/images/backgrounds/space3.png");
 
+    // Mod
+    ResourceManager::loadTexture("test1", "media/images/backgrounds/test1.png");
+    ResourceManager::loadTexture("test2", "media/images/backgrounds/test2.png");
+    ResourceManager::loadTexture("test3", "media/images/backgrounds/test3.png");
+
     /* Audio */
 
     ResourceManager::loadAudio("main theme", "media/music/sudokrazy_main.ogg");
@@ -355,9 +360,10 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
-    Shop::addItem(Item(1, "Hint", "lock"));
+    Shop::addItem(Item(20, "Hint", "lock"));
     Shop::addItem(Item(2, "Outdoor Theme", "settings", "outside", ItemType::Background));
     Shop::addItem(Item(5, "Space Theme", "settings", "space", ItemType::Background));
+    Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
 

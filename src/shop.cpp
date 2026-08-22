@@ -247,13 +247,17 @@ void Shelf::activate() {
             itemDisplay.at(i).activate();
         } else {
             itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+            itemCaption.at(i).activate();
         }
     }
 }
 
 void Shelf::deactivate() {
-    for (Button& item : itemDisplay) {
-        item.deactivate();
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        itemDisplay.at(i).deactivate();
+        itemCaption.at(i).deactivate();
     }
 }
 
