@@ -186,14 +186,22 @@ int main() {
 
     /* Backgrounds */
     // Outside
+    ResourceManager::loadTexture("outside-full", "media/images/backgrounds/outside-full.png");
     ResourceManager::loadTexture("outside1", "media/images/backgrounds/outside1.png");
     ResourceManager::loadTexture("outside2", "media/images/backgrounds/outside2.png");
     ResourceManager::loadTexture("outside3", "media/images/backgrounds/outside3.png");
 
     // Space
+    ResourceManager::loadTexture("space-full", "media/images/backgrounds/space-full.png");
     ResourceManager::loadTexture("space1", "media/images/backgrounds/space1.png");
     ResourceManager::loadTexture("space2", "media/images/backgrounds/space2.png");
     ResourceManager::loadTexture("space3", "media/images/backgrounds/space3.png");
+
+    // Beach
+    ResourceManager::loadTexture("beach-full", "media/images/backgrounds/beach-full.png");
+    ResourceManager::loadTexture("beach1", "media/images/backgrounds/beach1.png");
+    ResourceManager::loadTexture("beach2", "media/images/backgrounds/beach2.png");
+    ResourceManager::loadTexture("beach3", "media/images/backgrounds/beach3.png");
 
     // Mod
     ResourceManager::loadTexture("test1", "media/images/backgrounds/test1.png");
@@ -361,8 +369,9 @@ int main() {
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
     Shop::addItem(Item(20, "Hint", "lock"));
-    Shop::addItem(Item(2, "Outdoor Theme", "settings", "outside", ItemType::Background));
-    Shop::addItem(Item(5, "Space Theme", "settings", "space", ItemType::Background));
+    Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
+    Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
+    Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
     Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
