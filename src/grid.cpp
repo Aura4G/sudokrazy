@@ -276,3 +276,15 @@ void Grid::useHint() {
         }
     }
 }
+
+int Grid::getTurns() {
+    return turns;
+}
+
+bool Grid::getEraserMode() {
+    return eraser_mode;
+}
+
+void Grid::setEraserMode(bool val) {
+    eraser_mode = val;
+}

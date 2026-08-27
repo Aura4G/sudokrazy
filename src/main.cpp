@@ -408,11 +408,12 @@ int main() {
     float timeOut = 0;
     float totalTimeOut = 0;
 
+    // Text display of the score during a sudoku game
     sf::Text scoreText;
     scoreText.setString("");
     scoreText.setFont(ResourceManager::getFont("gameFont"));
     scoreText.setCharacterSize(30);
-    scoreText.setFillColor(currentTheme->text);
+    scoreText.setFillColor(sf::Color::White);
     scoreText.setOutlineColor(sf::Color::Black);
     scoreText.setOutlineThickness(1);
 
@@ -420,6 +421,7 @@ int main() {
     scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     scoreText.setPosition(sf::Vector2f(300.f, 100.f));
 
+    // Total "culminating" score from all sudoku games.
     sf::Text culScoreText;
     culScoreText.setString("Total Score: 0");
     culScoreText.setFont(ResourceManager::getFont("homeFont"));
@@ -432,6 +434,7 @@ int main() {
     culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     culScoreText.setPosition(sf::Vector2f(300.f, 650.f));
 
+    // "Kuukies" points text on home screen
     sf::Text pointsText;
     pointsText.setString("Kuukies: 0");
     pointsText.setFont(ResourceManager::getFont("homeFont"));
@@ -444,17 +447,44 @@ int main() {
     pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     pointsText.setPosition(sf::Vector2f(300.f, 700.f));
 
+    // "Kuukies" points text displaying in the shop
+    sf::Text shopPointsText;
+    shopPointsText.setString("Kuukies: 0");
+    shopPointsText.setFont(ResourceManager::getFont("homeFont"));
+    shopPointsText.setCharacterSize(36);
+    shopPointsText.setFillColor(sf::Color::Yellow);
+    shopPointsText.setOutlineColor(sf::Color::Black);
+    shopPointsText.setOutlineThickness(1);
+
+    textRect = shopPointsText.getLocalBounds();
+    shopPointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    shopPointsText.setPosition(sf::Vector2f(300.f, 700.f));
+
+    // Timer text displaying during a sudoku game
     sf::Text timerText;
     timerText.setString("");
     timerText.setFont(ResourceManager::getFont("gameFont"));
     timerText.setCharacterSize(30);
-    timerText.setFillColor(currentTheme->text);
+    timerText.setFillColor(sf::Color::White);
     timerText.setOutlineColor(sf::Color::Black);
     timerText.setOutlineThickness(1);
 
     textRect = timerText.getLocalBounds();
     timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     timerText.setPosition(sf::Vector2f(300.f, 50.f));
+
+    // Turns text that appears on krazy mode
+    sf::Text turnsText;
+    turnsText.setString("5 turns until shuffle...");
+    turnsText.setFont(ResourceManager::getFont("gameFont"));
+    turnsText.setCharacterSize(24);
+    turnsText.setFillColor(sf::Color::White);
+    turnsText.setOutlineColor(sf::Color::Black);
+    turnsText.setOutlineThickness(1);
+
+    textRect = turnsText.getLocalBounds();
+    turnsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    turnsText.setPosition(sf::Vector2f(300.f, 700.f));
 
     std::vector<sf::RectangleShape*> panels = {&panel1, &panel2, &panel3};
     std::vector<sf::Sprite*> bgs = {&bg1, &bg2, &bg3};
@@ -521,7 +551,7 @@ int main() {
                     if (stateFlag == STATE_HOME) { // Clicking the exit button on the home screen closes the game
                         window->close();
                     } else { // Clicking the exit button mid-game goes back to the home screen
-                        Grid::eraser_mode = false;
+                        Grid::setEraserMode(false);
                         if (!settingsToggle.isActive()) { // Condition when leaving settings menu
                             stateFlag = prevState;
                             prevState = STATE_SETTINGS;
@@ -540,10 +570,10 @@ int main() {
                         }
                     }
                 } else if (eraser.circleFrame.getGlobalBounds().contains(worldPos) && eraser.isActive()) {
-                    if (!Grid::eraser_mode) { // Clicking the exit button on the home screen closes the game
-                        Grid::eraser_mode = true;
+                    if (!Grid::getEraserMode()) { // Clicking the exit button on the home screen closes the game
+                        Grid::setEraserMode(true);
                     } else { // Clicking the exit button mid-game goes back to the home screen
-                        Grid::eraser_mode = false;
+                        Grid::setEraserMode(false);
                     }
                 } else if (hint.circleFrame.getGlobalBounds().contains(worldPos) && hint.isActive() && ShopManager::getHints() > 0) {
                     ShopManager::alterHints(-1);
@@ -644,7 +674,7 @@ int main() {
 
                     prevState = stateFlag;
                     stateFlag = STATE_HOME;
-                    Grid::eraser_mode = false;
+                    Grid::setEraserMode(false);
                 }
             }
 
@@ -827,7 +857,7 @@ int main() {
             grid.deactivate();
             eraser.deactivate();
             hint.deactivate();
-            settingsToggle.deactivate();
+            settingsToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -872,8 +902,12 @@ int main() {
         pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         pointsText.setPosition(sf::Vector2f(300.f, 700.f));
 
+        shopPointsText.setString("Kuukies: " + std::to_string(SaveManager::getPoints()));
+        textRect = shopPointsText.getLocalBounds();
+        shopPointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+        shopPointsText.setPosition(sf::Vector2f(300.f, 150.f));
+
         scoreText.setString(std::to_string(score));
-        scoreText.setFillColor(currentTheme->text);
         textRect = scoreText.getLocalBounds();
         scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         scoreText.setPosition(sf::Vector2f(300.f, 100.f));
@@ -883,10 +917,14 @@ int main() {
         int seconds = elapsed % 60;
 
         timerText.setString(std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
-        timerText.setFillColor(currentTheme->text);
         textRect = timerText.getLocalBounds();
         timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         timerText.setPosition(sf::Vector2f(300.f, 50.f));
+
+        turnsText.setString(std::to_string(5 - grid.getTurns() % 5) + " turns until shuffle...");
+        textRect = turnsText.getLocalBounds();
+        turnsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+        turnsText.setPosition(sf::Vector2f(175.f, 130.f));
 
         // Move panels to the right
         float deltaTime = clock.restart().asSeconds();
@@ -964,8 +1002,10 @@ int main() {
             shopShelf.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-        if (!Grid::eraser_mode) {
+        if (!Grid::getEraserMode()) {
             eraser.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+        } else {
+            eraser.setColor(eraser.getTheme().hovering);
         }
         hint.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         settingsToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
@@ -1007,6 +1047,9 @@ int main() {
             hint.display(renderTexture);
             renderTexture.draw(scoreText);
             renderTexture.draw(timerText);
+            if (stateFlag == STATE_KRAZY) {
+                renderTexture.draw(turnsText);
+            }
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
             renderTexture.draw(title);
             renderTexture.draw(culScoreText);
@@ -1026,6 +1069,7 @@ int main() {
             scrollerSlider.display(renderTexture);
         } else { // Draws for the shop
             shopShelf.display(renderTexture);
+            renderTexture.draw(shopPointsText);
         }
         easySwitch.display(renderTexture);
         mediumSwitch.display(renderTexture);
