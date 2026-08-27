@@ -226,6 +226,20 @@ void ShopManager::changeEquips(Item& item) {
     }
 }
 
+void ShopManager::removeEquip(Item& item) {
+    int id = item.getID();
+
+    auto it1 = std::find(equipIDs.begin(), equipIDs.end(), id);
+    if (it1 != equipIDs.end()) {
+        equipIDs.erase(it1);
+    }
+
+    auto it2 = std::find_if(equips.begin(), equips.end(), [&](const Item& obj) { return obj.getID() == id; });
+    if (it2 != equips.end()) {
+        equips.erase(it2);
+    }
+}
+
 void ShopManager::loadShop(const std::string& filename) {
     purchases.clear();
     equipIDs.clear();
@@ -272,8 +286,12 @@ std::vector<int> ShopManager::getPurchases() {
     return purchases;
 }
 
-std::vector<int> ShopManager::getEquips() {
+std::vector<int> ShopManager::getEquipIDs() {
     return equipIDs;
+}
+
+std::vector<Item> ShopManager::getEquips() {
+    return equips;
 }
 
 bool ShopManager::queryPurchases(int ID) {

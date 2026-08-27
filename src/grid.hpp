@@ -97,8 +97,17 @@ public:
     /// @brief Reveals a correct number on the sudoku grid
     void useHint();
 
-    /// @brief flag to identify whether the player is adding or removing numbers from the board
-    static bool eraser_mode;
+    /// @return The number of turns taken in the sudoku game
+    int getTurns();
+
+    /// @return The status of eraser mode
+    static bool getEraserMode();
+
+    /**
+     * @brief Sets the status of eraser mode
+     * @param val The new status 
+    */ 
+    static void setEraserMode(bool val);
 
 private:
     /// @brief The black frame of the sudoku grid
@@ -131,6 +140,9 @@ private:
 
     /// @brief Indicates how many incorrect placements the user has made in one game
     int incorrect = 0;
+
+    /// @brief flag to identify whether the player is adding or removing numbers from the board
+    static bool eraser_mode;
 };
 
 #endif

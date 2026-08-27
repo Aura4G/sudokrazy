@@ -30,6 +30,8 @@ extern bool vsync;
 */
 void changeNumber(Button& button, int& number);
 
+void applyBackground(std::vector<sf::RectangleShape*>& panels, std::vector<sf::Sprite*>& bgs);
+
 /**
  * @brief Creates an SFML window, either windowed or in exclusive fullscreen
  * @param fullscreen A flag to determine whether the window being created will be windowed

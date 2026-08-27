@@ -28,8 +28,8 @@ Item::Item() {
     purchased = false;
 }
 
-Item::Item(int cost, std::string name, std::string texture, ItemType type)
-    : cost(cost), name(name), type(type)
+Item::Item(int cost, std::string name, std::string texture, std::string equipKey, ItemType type)
+    : cost(cost), name(name), equipKey(equipKey), type(type)
     {
         purchased = false;
         equipped = false;
@@ -111,6 +111,14 @@ void Item::setEquip(bool val) {
 void Item::changeEquips(bool val) {
     equipped = val;
     ShopManager::changeEquips(*this);
+}
+
+void Item::setEquipKey(std::string newKey) {
+    equipKey = newKey;
+} 
+
+std::string Item::getEquipKey() {
+    return equipKey;
 }
 
 
@@ -239,17 +247,21 @@ void Shelf::activate() {
             itemDisplay.at(i).activate();
         } else {
             itemDisplay.at(i).setColor(itemDisplay.at(i).getTheme().hovering);
+            itemCaption.at(i).activate();
         }
     }
 }
 
 void Shelf::deactivate() {
-    for (Button& item : itemDisplay) {
-        item.deactivate();
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        itemDisplay.at(i).deactivate();
+        itemCaption.at(i).deactivate();
     }
 }
 
-void Shelf::updateShelf(const sf::Vector2f& mousePos) {
+bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
     int maximum = columns * rows;
 
     for (int i = 0; i < maximum; i++) {
@@ -270,22 +282,44 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
                     }
                 }
             }
-            break;
+            return true;
         }
 
         if (itemCaption.at(i).frame.getGlobalBounds().contains(mousePos) && itemCaption.at(i).isActive()) {
-            itemsPulled.at(i).setEquip();
-            toggleCaption(itemCaption.at(i), true);
+            if (itemsPulled.at(i).isEquipped()) {
+                itemsPulled.at(i).setEquip(false);
+                toggleCaption(itemCaption.at(i), false);
 
-            for (int j = 0; j < maximum; j++) {
-                if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
-                    itemsPulled.at(j).setEquip(false);
-                    toggleCaption(itemCaption.at(j), false);
+                ShopManager::removeEquip(itemsPulled.at(i));
+            } else {
+                itemsPulled.at(i).setEquip();
+                toggleCaption(itemCaption.at(i), true);
+
+                for (int j = 0; j < maximum; j++) {
+                    if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
+                        itemsPulled.at(j).setEquip(false);
+                        toggleCaption(itemCaption.at(j), false);
+                    }
                 }
+
+                ShopManager::changeEquips(itemsPulled.at(i));
             }
 
-            ShopManager::changeEquips(itemsPulled.at(i));
             ShopManager::saveInfo("shop.dat");
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void Shelf::updateHintCount() {
+    int maximum = columns * rows;
+
+    for (int i = 0; i < maximum; i++) {
+        if (itemsPulled.at(i).getType() == ItemType::Hint) {
+            itemCaption.at(i).setText(itemsPulled.at(i).getName() + "\nCost: " + std::to_string(itemsPulled.at(i).getCost()) + "\nTotal: " + std::to_string(ShopManager::getHints()));
 
             break;
         }
@@ -294,7 +328,7 @@ void Shelf::updateShelf(const sf::Vector2f& mousePos) {
 
 void Shelf::toggleCaption(Button& caption, bool val) {
     if (val) {
-        caption.deactivate();
+        caption.activate();
         caption.setTheme(EASY_BUTTON);
         caption.setText("Equipped!");
     } else {

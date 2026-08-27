@@ -38,6 +38,12 @@ public:
     static void changeEquips(Item& item);
 
     /**
+     * @brief Removes an item from the equips vector
+     * @param item The item being removed
+    */
+    static void removeEquip(Item& item);
+
+    /**
      * @brief Loads the purchase & equip information of the shop, preventing the player from paying for the same item twice
      * @param filename Name of file to save in app data
     */
@@ -47,7 +53,10 @@ public:
     static std::vector<int> getPurchases();
 
     /// @return A the vector of integers representing equipped item IDs
-    static std::vector<int> getEquips();
+    static std::vector<int> getEquipIDs();
+
+    /// @return A vector of the "equipped" items
+    static std::vector<Item> getEquips();
 
     /**
      * @brief Finds a specific item ID in the purchases vector to see if the player already has this item

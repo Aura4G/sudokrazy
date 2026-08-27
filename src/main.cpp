@@ -31,6 +31,53 @@ void changeNumber(Button& button, int& number) {
     }
 }
 
+void applyBackground(std::vector<sf::RectangleShape*>& panels, std::vector<sf::Sprite*>& bgs) {
+    std::string key;
+
+    for (Item item : ShopManager::getEquips()) {
+        if (item.getType() == ItemType::Background) {
+            key = item.getEquipKey();
+        }
+    }
+
+    if (key == "") {
+        for (sf::Sprite* bg : bgs) {
+            bg->setTexture(ResourceManager::getTexture("placeholder"));
+        }
+
+        return;
+    }
+
+    for (int i = 0; i < 3; i++) {
+        bgs.at(i)->setTexture(ResourceManager::getTexture(key + std::to_string(i+1)));
+        bgs.at(i)->setTextureRect(sf::IntRect(0, 0, ResourceManager::getTexture(key + std::to_string(i+1)).getSize().x, ResourceManager::getTexture(key + std::to_string(i+1)).getSize().y));
+
+        // Get bounds of the sprite
+        sf::FloatRect subjectBounds = bgs.at(i)->getLocalBounds();
+        sf::FloatRect targetRect = panels.at(i)->getLocalBounds();
+
+        // Get available width and height from button frame
+        float availableWidth = targetRect.width;
+        float availableHeight = targetRect.height;
+
+        // Calculate a scale factor from our available widths and heights
+        float scaleX = availableWidth / subjectBounds.width;
+        float scaleY = availableHeight / subjectBounds.height;
+        float scale = std::min(scaleX, scaleY); //choose the minimum between the two scales to ensure it fits in the bounds
+
+        // Apply scale
+        bgs.at(i)->setScale(scale,scale);
+
+        sf::Vector2f pos = panels.at(i)->getPosition();
+        sf::Vector2f size = panels.at(i)->getSize();
+
+        // Center the origin of the scaled sprite
+        subjectBounds = bgs.at(i)->getLocalBounds();
+        bgs.at(i)->setOrigin(subjectBounds.left + subjectBounds.width / 2.0f, subjectBounds.top + subjectBounds.height / 2.0f);
+        bgs.at(i)->setPosition(pos.x + size.x / 2.0f, pos.y + size.y / 2.0f);
+    }
+}
+
 bool isFullscreen = false;
 sf::Vector2f virtualSize(600.f, 800.f);
 sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
@@ -137,6 +184,30 @@ int main() {
     ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
     ResourceManager::loadTexture("lock", "media/images/lock.png");
 
+    /* Backgrounds */
+    // Outside
+    ResourceManager::loadTexture("outside-full", "media/images/backgrounds/outside-full.png");
+    ResourceManager::loadTexture("outside1", "media/images/backgrounds/outside1.png");
+    ResourceManager::loadTexture("outside2", "media/images/backgrounds/outside2.png");
+    ResourceManager::loadTexture("outside3", "media/images/backgrounds/outside3.png");
+
+    // Space
+    ResourceManager::loadTexture("space-full", "media/images/backgrounds/space-full.png");
+    ResourceManager::loadTexture("space1", "media/images/backgrounds/space1.png");
+    ResourceManager::loadTexture("space2", "media/images/backgrounds/space2.png");
+    ResourceManager::loadTexture("space3", "media/images/backgrounds/space3.png");
+
+    // Beach
+    ResourceManager::loadTexture("beach-full", "media/images/backgrounds/beach-full.png");
+    ResourceManager::loadTexture("beach1", "media/images/backgrounds/beach1.png");
+    ResourceManager::loadTexture("beach2", "media/images/backgrounds/beach2.png");
+    ResourceManager::loadTexture("beach3", "media/images/backgrounds/beach3.png");
+
+    // Mod
+    ResourceManager::loadTexture("test1", "media/images/backgrounds/test1.png");
+    ResourceManager::loadTexture("test2", "media/images/backgrounds/test2.png");
+    ResourceManager::loadTexture("test3", "media/images/backgrounds/test3.png");
+
     /* Audio */
 
     ResourceManager::loadAudio("main theme", "media/music/sudokrazy_main.ogg");
@@ -157,12 +228,15 @@ int main() {
 
     sf:: RectangleShape panel1(sf::Vector2f(panelWidth, panelHeight));
     panel1.setPosition(0,0);
+    sf::Sprite bg1(ResourceManager::getTexture("placeholder"), sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
     sf:: RectangleShape panel2(sf::Vector2f(panelWidth, panelHeight));
     panel2.setPosition(panelWidth,0);
+    sf::Sprite bg2(ResourceManager::getTexture("placeholder"), sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
     sf:: RectangleShape panel3(sf::Vector2f(panelWidth, panelHeight));
     panel3.setPosition(-panelWidth,0);
+    sf::Sprite bg3(ResourceManager::getTexture("placeholder"), sf::IntRect(0, 0, ResourceManager::getTexture("placeholder").getSize().x, ResourceManager::getTexture("placeholder").getSize().y));
 
     sf::Color clearTheme = {255,255,255};
 
@@ -294,9 +368,11 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
-    Shop::addItem(Item(1, "Hint", "lock", ItemType::Hint));
-    Shop::addItem(Item(2, "Outdoor Theme", "settings", ItemType::Background));
-    Shop::addItem(Item(5, "Space Theme", "settings", ItemType::Background));
+    Shop::addItem(Item(20, "Hint", "lock"));
+    Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
+    Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
+    Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
+    Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
 
     Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
 
@@ -306,7 +382,10 @@ int main() {
     // Put shop's content onto button grid "shelf"
     shopShelf.pullShop();
 
+    // The number of hints read from the save file must appear initially
     hint.setText(std::to_string(ShopManager::getHints()));
+
+    /* EQUIPS */
 
     // Music to play while game is operational
     sf::Music& music = ResourceManager::getAudio("main theme");
@@ -329,11 +408,12 @@ int main() {
     float timeOut = 0;
     float totalTimeOut = 0;
 
+    // Text display of the score during a sudoku game
     sf::Text scoreText;
     scoreText.setString("");
     scoreText.setFont(ResourceManager::getFont("gameFont"));
     scoreText.setCharacterSize(30);
-    scoreText.setFillColor(currentTheme->text);
+    scoreText.setFillColor(sf::Color::White);
     scoreText.setOutlineColor(sf::Color::Black);
     scoreText.setOutlineThickness(1);
 
@@ -341,6 +421,7 @@ int main() {
     scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     scoreText.setPosition(sf::Vector2f(300.f, 100.f));
 
+    // Total "culminating" score from all sudoku games.
     sf::Text culScoreText;
     culScoreText.setString("Total Score: 0");
     culScoreText.setFont(ResourceManager::getFont("homeFont"));
@@ -353,6 +434,7 @@ int main() {
     culScoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     culScoreText.setPosition(sf::Vector2f(300.f, 650.f));
 
+    // "Kuukies" points text on home screen
     sf::Text pointsText;
     pointsText.setString("Kuukies: 0");
     pointsText.setFont(ResourceManager::getFont("homeFont"));
@@ -365,17 +447,48 @@ int main() {
     pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     pointsText.setPosition(sf::Vector2f(300.f, 700.f));
 
+    // "Kuukies" points text displaying in the shop
+    sf::Text shopPointsText;
+    shopPointsText.setString("Kuukies: 0");
+    shopPointsText.setFont(ResourceManager::getFont("homeFont"));
+    shopPointsText.setCharacterSize(36);
+    shopPointsText.setFillColor(sf::Color::Yellow);
+    shopPointsText.setOutlineColor(sf::Color::Black);
+    shopPointsText.setOutlineThickness(1);
+
+    textRect = shopPointsText.getLocalBounds();
+    shopPointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    shopPointsText.setPosition(sf::Vector2f(300.f, 700.f));
+
+    // Timer text displaying during a sudoku game
     sf::Text timerText;
     timerText.setString("");
     timerText.setFont(ResourceManager::getFont("gameFont"));
     timerText.setCharacterSize(30);
-    timerText.setFillColor(currentTheme->text);
+    timerText.setFillColor(sf::Color::White);
     timerText.setOutlineColor(sf::Color::Black);
     timerText.setOutlineThickness(1);
 
     textRect = timerText.getLocalBounds();
     timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
     timerText.setPosition(sf::Vector2f(300.f, 50.f));
+
+    // Turns text that appears on krazy mode
+    sf::Text turnsText;
+    turnsText.setString("5 turns until shuffle...");
+    turnsText.setFont(ResourceManager::getFont("gameFont"));
+    turnsText.setCharacterSize(24);
+    turnsText.setFillColor(sf::Color::White);
+    turnsText.setOutlineColor(sf::Color::Black);
+    turnsText.setOutlineThickness(1);
+
+    textRect = turnsText.getLocalBounds();
+    turnsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+    turnsText.setPosition(sf::Vector2f(300.f, 700.f));
+
+    std::vector<sf::RectangleShape*> panels = {&panel1, &panel2, &panel3};
+    std::vector<sf::Sprite*> bgs = {&bg1, &bg2, &bg3};
+    applyBackground(panels, bgs);
 
     // Game loop
     while (window->isOpen()) {
@@ -438,7 +551,7 @@ int main() {
                     if (stateFlag == STATE_HOME) { // Clicking the exit button on the home screen closes the game
                         window->close();
                     } else { // Clicking the exit button mid-game goes back to the home screen
-                        Grid::eraser_mode = false;
+                        Grid::setEraserMode(false);
                         if (!settingsToggle.isActive()) { // Condition when leaving settings menu
                             stateFlag = prevState;
                             prevState = STATE_SETTINGS;
@@ -457,15 +570,16 @@ int main() {
                         }
                     }
                 } else if (eraser.circleFrame.getGlobalBounds().contains(worldPos) && eraser.isActive()) {
-                    if (!Grid::eraser_mode) { // Clicking the exit button on the home screen closes the game
-                        Grid::eraser_mode = true;
+                    if (!Grid::getEraserMode()) { // Clicking the exit button on the home screen closes the game
+                        Grid::setEraserMode(true);
                     } else { // Clicking the exit button mid-game goes back to the home screen
-                        Grid::eraser_mode = false;
+                        Grid::setEraserMode(false);
                     }
                 } else if (hint.circleFrame.getGlobalBounds().contains(worldPos) && hint.isActive() && ShopManager::getHints() > 0) {
                     ShopManager::alterHints(-1);
                     ShopManager::saveInfo("shop.dat");
                     grid.useHint();
+                    shopShelf.updateHintCount();
                 } else if (settingsToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
                     if (settingsToggle.isActive()) {
                         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) {
@@ -542,7 +656,10 @@ int main() {
                     previousHit = timer.getElapsedTime();
                 }
 
-                shopShelf.updateShelf(worldPos);
+                if (shopShelf.updateShelf(worldPos)) {
+                    applyBackground(panels, bgs);
+                }
+
                 hint.setText(std::to_string(ShopManager::getHints()));
                 
                 if (grid.check()) { // Checks if the grid has all its correct numbers
@@ -557,7 +674,7 @@ int main() {
 
                     prevState = stateFlag;
                     stateFlag = STATE_HOME;
-                    Grid::eraser_mode = false;
+                    Grid::setEraserMode(false);
                 }
             }
 
@@ -740,7 +857,7 @@ int main() {
             grid.deactivate();
             eraser.deactivate();
             hint.deactivate();
-            settingsToggle.deactivate();
+            settingsToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -785,8 +902,12 @@ int main() {
         pointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         pointsText.setPosition(sf::Vector2f(300.f, 700.f));
 
+        shopPointsText.setString("Kuukies: " + std::to_string(SaveManager::getPoints()));
+        textRect = shopPointsText.getLocalBounds();
+        shopPointsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+        shopPointsText.setPosition(sf::Vector2f(300.f, 150.f));
+
         scoreText.setString(std::to_string(score));
-        scoreText.setFillColor(currentTheme->text);
         textRect = scoreText.getLocalBounds();
         scoreText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         scoreText.setPosition(sf::Vector2f(300.f, 100.f));
@@ -796,16 +917,24 @@ int main() {
         int seconds = elapsed % 60;
 
         timerText.setString(std::to_string(minutes) + ":" + (seconds < 10 ? "0" : "") + std::to_string(seconds));
-        timerText.setFillColor(currentTheme->text);
         textRect = timerText.getLocalBounds();
         timerText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
         timerText.setPosition(sf::Vector2f(300.f, 50.f));
+
+        turnsText.setString(std::to_string(5 - grid.getTurns() % 5) + " turns until shuffle...");
+        textRect = turnsText.getLocalBounds();
+        turnsText.setOrigin(textRect.left + textRect.width/2, textRect.top + textRect.height/2);
+        turnsText.setPosition(sf::Vector2f(175.f, 130.f));
 
         // Move panels to the right
         float deltaTime = clock.restart().asSeconds();
         panel1.move(scrollSpeed*deltaTime, 0);
         panel2.move(scrollSpeed*deltaTime, 0);
         panel3.move(scrollSpeed*deltaTime, 0);
+
+        bg1.move(scrollSpeed*deltaTime, 0);
+        bg2.move(scrollSpeed*deltaTime, 0);
+        bg3.move(scrollSpeed*deltaTime, 0);
 
         // Loop the panels when they go off-screen
         if (panel1.getPosition().x > 600) {
@@ -818,6 +947,19 @@ int main() {
 
         if (panel3.getPosition().x > 600) {
             panel3.setPosition(panel1.getPosition().x - 300, 0);
+        }
+
+
+        if (bg1.getPosition().x > 750) {
+            bg1.setPosition(bg2.getPosition().x - 300, 400);
+        }
+
+        if (bg2.getPosition().x > 750) {
+            bg2.setPosition(bg3.getPosition().x - 300, 400);
+        }
+
+        if (bg3.getPosition().x > 750) {
+            bg3.setPosition(bg1.getPosition().x - 300, 400);
         }
 
         // Set the colors to the theme
@@ -860,8 +1002,10 @@ int main() {
             shopShelf.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-        if (!Grid::eraser_mode) {
+        if (!Grid::getEraserMode()) {
             eraser.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+        } else {
+            eraser.setColor(eraser.getTheme().hovering);
         }
         hint.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         settingsToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
@@ -889,6 +1033,11 @@ int main() {
         renderTexture.draw(panel1);
         renderTexture.draw(panel2);
         renderTexture.draw(panel3);
+        if (bg1.getTexture() != &ResourceManager::getTexture("placeholder")) {
+            renderTexture.draw(bg1);
+            renderTexture.draw(bg2);
+            renderTexture.draw(bg3);
+        }
         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Draws for an active sudoku game
             grid.display(renderTexture);
             for (Button& button : numberChangers) {
@@ -898,6 +1047,9 @@ int main() {
             hint.display(renderTexture);
             renderTexture.draw(scoreText);
             renderTexture.draw(timerText);
+            if (stateFlag == STATE_KRAZY) {
+                renderTexture.draw(turnsText);
+            }
         } else if (stateFlag == STATE_HOME) { // Draws for the home menu
             renderTexture.draw(title);
             renderTexture.draw(culScoreText);
@@ -917,6 +1069,7 @@ int main() {
             scrollerSlider.display(renderTexture);
         } else { // Draws for the shop
             shopShelf.display(renderTexture);
+            renderTexture.draw(shopPointsText);
         }
         easySwitch.display(renderTexture);
         mediumSwitch.display(renderTexture);
