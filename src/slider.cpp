@@ -5,6 +5,14 @@
 #include "resource_manager.hpp"
 #include "main.hpp"
 
+Slider::Slider() {
+    line.setPosition(sf::Vector2f(0.f,0.f));
+    line.setSize(sf::Vector2f(100.f, 10.f));
+    line.setFillColor(sf::Color::Black);
+    grip.setOrigin(grip.getWidth(), grip.getWidth());
+    grip.setPosition(sf::Vector2f(0, 0));
+}
+
 Slider::Slider(float length, sf::Vector2f position, float defaultSetting, sf::Color color)
     : length(length), initialPosition(position), defaultSetting(defaultSetting), grip(20.f,20.f,position.x,position.y,MEDIUM_BUTTON,"","homeFont",ShapeType::Circle)
     {

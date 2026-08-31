@@ -11,6 +11,7 @@
 #include "button.hpp"
 #include "resource_manager.hpp"
 #include "shop_manager.hpp"
+#include "main.hpp"
 
 int Item::counter = 0;
 
@@ -159,6 +160,10 @@ int Shop::getSize() {
     return items.size();
 }
 
+int Shop::getTotalItems() {
+    return items.size();
+}
+
 
 /// Shelf class definitions ///
 
@@ -167,20 +172,39 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
     {
         int quantity = columns * rows;
 
-        float additiveX = 0.f;
-        float additiveY = 0.f;
+        float additiveX = 0.f; // X axis distance from 0-indexed shelf button
+        float additiveY = 0.f; // Y axis distance from 0-indexed shelf button
 
         itemsPulled.resize(quantity);
 
+        bool flag = false;
+
         for (int i = 0; i < quantity; i++) {
+            // Calculate initial position of new button
             additiveX = (i % columns) * (gaps.x + displaySize.x);
             additiveY = ((i / columns) % rows) * (gaps.y + displaySize.y * 1.5f + 5.f);
 
+            // Place new button at position
             itemDisplay.emplace_back(Button(displaySize.x, displaySize.y, position.x + additiveX, position.y + additiveY, MEDIUM_BUTTON, "", "gameFont"));
             itemCaption.emplace_back(Button(displaySize.x, displaySize.y/2.f, position.x + additiveX, position.y + displaySize.y + 5.f + additiveY, MEDIUM_BUTTON, "", "gameFont"));
 
             itemCaption.at(i).deactivate();
+
+            if (position.x + additiveX >= WINDOW_WIDTH && !flag) {
+                flag = true;
+
+                initScreenRightmost = itemDisplay.at(i - rows).getOriginalPos().x;
+            }
         }
+
+        globalRightmost = itemDisplay.back().getOriginalPos().x;
+
+        float leftmost = itemDisplay.at(0).getOriginalPos().x;
+        float bottom = itemCaption.at(quantity/2).getOriginalPos().y + displaySize.y/2;
+        float sliderLength = initScreenRightmost + displaySize.x - leftmost;
+        
+        shopScroller = Slider(sliderLength, sf::Vector2f(leftmost, bottom+20.f), 0.f, sf::Color::Black);
+        shopScroller.deactivate();
     }
 
 void Shelf::display(sf::RenderTexture& renderTexture) {
@@ -192,6 +216,8 @@ void Shelf::display(sf::RenderTexture& renderTexture) {
             itemCaption.at(i).display(renderTexture);
         }
     }
+
+    shopScroller.display(renderTexture);
 }
 
 void Shelf::pullShop(int index) {
@@ -250,6 +276,8 @@ void Shelf::activate() {
             itemCaption.at(i).activate();
         }
     }
+
+    shopScroller.activate();
 }
 
 void Shelf::deactivate() {
@@ -259,6 +287,8 @@ void Shelf::deactivate() {
         itemDisplay.at(i).deactivate();
         itemCaption.at(i).deactivate();
     }
+
+    shopScroller.deactivate();
 }
 
 bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
@@ -323,6 +353,17 @@ void Shelf::updateHintCount() {
 
             break;
         }
+    }
+}
+
+void Shelf::scrollShelf(const sf::Event& event, sf::RenderWindow& window) {
+    shopScroller.handleEvent(event, window);
+
+    float xDistance = globalRightmost - initScreenRightmost;
+
+    for (int i = 0; i < Shop::getTotalItems(); i++) {
+        itemDisplay.at(i).setPosition(itemDisplay.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
+        itemCaption.at(i).setPosition(itemCaption.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
     }
 }
 

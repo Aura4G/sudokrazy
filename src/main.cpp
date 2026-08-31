@@ -21,6 +21,9 @@ GameState stateFlag = STATE_HOME;
 
 bool vsync = true;
 
+const uint16_t WINDOW_WIDTH = 600;
+const uint16_t WINDOW_HEIGHT = 800;
+
 void changeNumber(Button& button, int& number) {    
     try {
         number = std::stoi(button.text.getString().toAnsiString());
@@ -79,7 +82,7 @@ void applyBackground(std::vector<sf::RectangleShape*>& panels, std::vector<sf::S
 }
 
 bool isFullscreen = false;
-sf::Vector2f virtualSize(600.f, 800.f);
+sf::Vector2f virtualSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 sf::View gameView(sf::FloatRect(0.f, 0.f, virtualSize.x, virtualSize.y));
 
 std::unique_ptr<sf::RenderWindow> createWindow(bool fullscreen) {
@@ -373,8 +376,15 @@ int main() {
     Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
     Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
     Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
+    Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
+    Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
+    Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
+    Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
 
-    Shelf shopShelf(3, 2, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
+    const uint8_t ROWS = 2;
+    int columns = (Shop::getTotalItems() + ROWS - 1) / ROWS;
+
+    Shelf shopShelf(columns, ROWS, sf::Vector2f(50.f,200.f), sf::Vector2f(150.f, 150.f), sf::Vector2f(25.f, 40.f));
 
     // Load all purchases and equips from the shop AFTER the shop items have been added
     ShopManager::loadShop("shop.dat");
@@ -686,6 +696,7 @@ int main() {
             brightnessSlider.handleEvent(event, *window);
             contrastSlider.handleEvent(event, *window);
             scrollerSlider.handleEvent(event, *window);
+            shopShelf.scrollShelf(event, *window);
         }
 
         switch (stateFlag) { // Switch graphical themes depending on the game state

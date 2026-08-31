@@ -23,6 +23,10 @@ extern sf::View gameView;
 /// @brief Vsync status of the open game
 extern bool vsync;
 
+extern const uint16_t WINDOW_HEIGHT;
+
+extern const uint16_t WINDOW_WIDTH;
+
 /**
  * @brief Takes the text contents of a button and sets the number the player is using to it
  * @param button The number changer the player clicks on

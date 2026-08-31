@@ -15,7 +15,10 @@
 /// @brief An SFML Slider with appropriate functionality
 class Slider {
 public:
-    
+
+    /// @brief Default constructor for the slide class
+    Slider();
+
     /**
      * @brief Parameterised constructor for sliders with variable length, position and color
      *
@@ -76,7 +79,11 @@ public:
     /// @return The activity status of the slider
     bool isActive();
 
-    /// @brief Allows for dynamic display of slider information
+    /**
+     * @brief Allows for dynamic display of slider information
+     * @param before The text displaying before the percentage information (left-hand side of the percentage text)
+     * @param after The text displaying after the percentage information (right-hand side of the percentage text)
+    */
     void displayPercentage(std::string before, std::string after);
 
 private:

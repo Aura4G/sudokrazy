@@ -7,6 +7,7 @@
 #include <optional>
 #include <SFML/Graphics.hpp>
 #include "button.hpp"
+#include "slider.hpp"
 
 /**
  * This file and collection of classes handles the creation, usage and selection
@@ -153,6 +154,9 @@ public:
     /// @return The number of items in the shop
     static int getSize();
 
+    /// @return The total number of items in the shop
+    static int getTotalItems();
+
 private:
 
     /// @brief Every purchasable item available in the shop
@@ -209,6 +213,13 @@ public:
     /// @brief Updates the hint total text under the hint purchase button of the shop shelf
     void updateHintCount();
 
+    /**
+     * @brief Handles the slider's button movement and bounds according to player-triggered events
+     * @param event the polled event passed from main, where the window is being rendered
+     * @param window the rendered window the game is running on 
+    */
+    void scrollShelf(const sf::Event& event, sf::RenderWindow& window);
+
 private:
 
     /// @brief How many item columns are displayed along the x axis
@@ -237,6 +248,15 @@ private:
 
     /// @brief the number of times the quantity of shop items overflows the dimensions of the shelf
     int sections;
+
+    /// @brief Horizontal scroller for the shop shelf
+    Slider shopScroller;
+
+    /// @brief The X-position of the rightmost button on the top layer of the shop shelf visible when starting up the game
+    float initScreenRightmost;
+
+    /// @brief The X-position of the rightmost button of the entire shop shelf
+    float globalRightmost;
 
     /**
      * @brief Toggles the caption section of a button to become the equip/equipped functionality button
