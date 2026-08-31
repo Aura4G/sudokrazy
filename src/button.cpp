@@ -98,8 +98,14 @@ void Button::setTexture(const sf::Texture& newTexture, float padding) {
 void Button::setPosition(const sf::Vector2f& newPos) {
     frame.setPosition(newPos);
     circleFrame.setPosition(newPos);
-    text.setPosition(newPos + sf::Vector2f(width/2, height/2));
-    subject.setPosition(newPos + sf::Vector2f(width/2, height/2));
+    
+    if (shapeType == ShapeType::Rectangle) {
+        text.setPosition(newPos + sf::Vector2f(width/2, height/2));
+        subject.setPosition(newPos + sf::Vector2f(width/2, height/2));
+    } else {
+        text.setPosition(newPos);
+        subject.setPosition(newPos);
+    }
 }
 
 void Button::setOrigin(float x, float y) {

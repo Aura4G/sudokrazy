@@ -369,7 +369,7 @@ int main() {
 
 
     /* SHOP */
-    Button shopToggle(37.5f, 0.f, 470.f, 47.5f, REGULAR_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
+    Button shopToggle(37.5f, 0.f, 470.f, 47.5f, MEDIUM_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
     Shop::addItem(Item(20, "Hint", "lock"));
     Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
@@ -401,6 +401,10 @@ int main() {
     sf::Music& music = ResourceManager::getAudio("main theme");
     music.setLoop(true);
     music.play();
+
+
+    /* BACKGROUND VIEWER TOGGLE */
+    Button bgViewToggle(37.5f, 0.f, 390.f, 47.5f, EASY_BUTTON, "BG", "homeFont", ShapeType::Circle);
 
 
     // Points to a color theme that matches the game state
@@ -646,6 +650,11 @@ int main() {
                         prevState = stateFlag;
                         stateFlag = STATE_SHOP;
                     }
+                } else if (bgViewToggle.circleFrame.getGlobalBounds().contains(worldPos)) {
+                    if (bgViewToggle.isActive()) {
+                        prevState = stateFlag;
+                        stateFlag = STATE_BACKGROUND;
+                    }
                 }
 
                 for (Button& button : numberChangers) {
@@ -736,6 +745,10 @@ int main() {
                 currentTheme = &SHOP_THEME;
                 exit.setTheme(MEDIUM_BUTTON);
                 break;
+            case STATE_BACKGROUND:
+                currentTheme = &HOME_THEME;
+                exit.setTheme(REGULAR_BUTTON);
+                break;
         }
 
         if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Gameplay state
@@ -764,6 +777,7 @@ int main() {
             eraser.activate();
             hint.activate();
             settingsToggle.activate();
+            shopToggle.deactivate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -805,6 +819,7 @@ int main() {
             eraser.deactivate();
             hint.deactivate();
             settingsToggle.activate();
+            shopToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -837,6 +852,7 @@ int main() {
             eraser.deactivate();
             hint.deactivate();
             settingsToggle.deactivate();
+            shopToggle.deactivate();
             vsyncToggle.activate();
             fullscreenToggle.activate();
             volumeSlider.activate();
@@ -845,7 +861,7 @@ int main() {
             scrollerSlider.activate();
 
             shopShelf.deactivate();
-        } else { // Shop state
+        } else if (stateFlag == STATE_SHOP) { // Shop state
             // Deactivating menu buttons
             easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
             mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
@@ -869,6 +885,7 @@ int main() {
             eraser.deactivate();
             hint.deactivate();
             settingsToggle.activate();
+            shopToggle.deactivate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -877,6 +894,39 @@ int main() {
             scrollerSlider.deactivate();
 
             shopShelf.activate();
+        } else { // Background Viewer State (temp)
+            // Deactivating menu buttons
+            easySwitch.activateMovement(sf::Vector2f(-210.f,easySwitch.getOriginalPos().y), 600.f);
+            mediumSwitch.activateMovement(sf::Vector2f(610.f,mediumSwitch.getOriginalPos().y), 600.f);
+            hardSwitch.activateMovement(sf::Vector2f(-210.f,hardSwitch.getOriginalPos().y), 600.f);
+            krazySwitch.activateMovement(sf::Vector2f(610.f,krazySwitch.getOriginalPos().y), 600.f);
+
+            easySwitch.deactivate();
+            mediumSwitch.deactivate();
+            hardSwitch.deactivate();
+            krazySwitch.deactivate();
+
+            exit.setText("<-");
+
+            // Deactivating number choice buttons
+            for (Button& button : numberChangers) {
+                button.deactivate();
+            }
+
+            // Ensures no inputs on the invisible grid can be made when outside gameplay mode
+            grid.deactivate();
+            eraser.deactivate();
+            hint.deactivate();
+            settingsToggle.deactivate();
+            shopToggle.deactivate();
+            vsyncToggle.deactivate();
+            fullscreenToggle.deactivate();
+            volumeSlider.deactivate();
+            brightnessSlider.deactivate();
+            contrastSlider.deactivate();
+            scrollerSlider.deactivate();
+
+            shopShelf.deactivate();
         }
 
         music.setVolume(volumeSlider.getPercentage());
@@ -997,6 +1047,7 @@ int main() {
             }
 
             shopToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
+            bgViewToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         } else if (stateFlag >= STATE_EASY && stateFlag <= STATE_KRAZY) { // Ensures the buttons have hover visuals when playing the game and not on the home screen
             for (Button& button : numberChangers) {
                 if (button.isActive()) {
@@ -1009,7 +1060,7 @@ int main() {
         } else if (stateFlag == STATE_SETTINGS) { // Settings menu
             vsyncToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
             fullscreenToggle.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
-        } else { // Shop 
+        } else if (stateFlag == STATE_SHOP) { // Shop 
             shopShelf.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
         }
         exit.updateHover(window->mapPixelToCoords(sf::Mouse::getPosition(*window), gameView));
@@ -1034,6 +1085,7 @@ int main() {
         }
         settingsToggle.update(deltaTime);
         shopToggle.update(deltaTime);
+        bgViewToggle.update(deltaTime);
         vsyncToggle.update(deltaTime);
         fullscreenToggle.update(deltaTime);
 
@@ -1066,6 +1118,7 @@ int main() {
             renderTexture.draw(culScoreText);
             renderTexture.draw(pointsText);
             shopToggle.display(renderTexture);
+            bgViewToggle.display(renderTexture);
         } else if (stateFlag == STATE_SETTINGS) { // Draws for the settings menu
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);
@@ -1078,7 +1131,7 @@ int main() {
             brightnessSlider.display(renderTexture);
             contrastSlider.display(renderTexture);
             scrollerSlider.display(renderTexture);
-        } else { // Draws for the shop
+        } else if (stateFlag == STATE_SHOP) { // Draws for the shop
             shopShelf.display(renderTexture);
             renderTexture.draw(shopPointsText);
         }

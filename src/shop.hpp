@@ -34,6 +34,7 @@ public:
      * @param cost The item's cost to purchase
      * @param name The item's name
      * @param texture The item's preview image in the shop
+     * @param equipKey Utilised to find specific media in the resource manager the item unlocks/equips.
      * @param type The type of item it is
     */
     Item(int cost, std::string name, std::string texture = "placeholder", std::string equipKey = "hint", ItemType type = ItemType::Hint);
