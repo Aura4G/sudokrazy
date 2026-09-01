@@ -160,6 +160,15 @@ int Shop::getTotalItems() {
     return items.size();
 }
 
+bool Shop::hasOneBg() {
+    for (int i = 0; i < items.size(); i++) {
+        if (ShopManager::queryPurchases(i) && items.at(i).getType() == ItemType::Background) {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 /// Shelf class definitions ///
 

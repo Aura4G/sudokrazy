@@ -408,6 +408,8 @@ int main() {
 
     /* BACKGROUND VIEWER TOGGLE */
     Button bgViewToggle(37.5f, 0.f, 390.f, 47.5f, EASY_BUTTON, "BG", "homeFont", ShapeType::Circle);
+    bool enableBgView = Shop::hasOneBg();
+    if (!enableBgView) bgViewToggle.deactivate();
 
 
     // Points to a color theme that matches the game state
@@ -680,6 +682,7 @@ int main() {
 
                 if (shopShelf.updateShelf(worldPos)) {
                     applyBackground(panels, bgs);
+                    enableBgView = Shop::hasOneBg();
                 }
 
                 hint.setText(std::to_string(ShopManager::getHints()));
@@ -781,6 +784,7 @@ int main() {
             hint.activate();
             settingsToggle.activate();
             shopToggle.deactivate();
+            bgViewToggle.deactivate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -823,6 +827,7 @@ int main() {
             hint.deactivate();
             settingsToggle.activate();
             shopToggle.activate();
+            if (enableBgView) bgViewToggle.activate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -856,6 +861,7 @@ int main() {
             hint.deactivate();
             settingsToggle.deactivate();
             shopToggle.deactivate();
+            bgViewToggle.deactivate();
             vsyncToggle.activate();
             fullscreenToggle.activate();
             volumeSlider.activate();
@@ -889,6 +895,7 @@ int main() {
             hint.deactivate();
             settingsToggle.activate();
             shopToggle.deactivate();
+            bgViewToggle.deactivate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -922,6 +929,7 @@ int main() {
             hint.deactivate();
             settingsToggle.deactivate();
             shopToggle.deactivate();
+            bgViewToggle.deactivate();
             vsyncToggle.deactivate();
             fullscreenToggle.deactivate();
             volumeSlider.deactivate();
@@ -1121,7 +1129,7 @@ int main() {
             renderTexture.draw(culScoreText);
             renderTexture.draw(pointsText);
             shopToggle.display(renderTexture);
-            bgViewToggle.display(renderTexture);
+            if (enableBgView) bgViewToggle.display(renderTexture);
         } else if (stateFlag == STATE_SETTINGS) { // Draws for the settings menu
             renderTexture.draw(settingsTitle);
             renderTexture.draw(volumeText);

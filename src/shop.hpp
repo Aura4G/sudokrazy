@@ -155,6 +155,9 @@ public:
     /// @return The total number of items in the shop
     static int getTotalItems();
 
+    /// @return True if the player has purchased a background item
+    static bool hasOneBg();
+
 private:
 
     /// @brief Every purchasable item available in the shop
