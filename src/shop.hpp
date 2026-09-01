@@ -152,9 +152,6 @@ public:
 
     static std::optional<Item> getItemByID(int ID);
 
-    /// @return The number of items in the shop
-    static int getSize();
-
     /// @return The total number of items in the shop
     static int getTotalItems();
 
@@ -247,9 +244,6 @@ private:
     /// @brief Vector storing the item data for each item on the shelf
     std::vector<Item> itemsPulled;
 
-    /// @brief the number of times the quantity of shop items overflows the dimensions of the shelf
-    int sections;
-
     /// @brief Horizontal scroller for the shop shelf
     Slider shopScroller;
 
@@ -258,6 +252,9 @@ private:
 
     /// @brief The X-position of the rightmost button of the entire shop shelf
     float globalRightmost;
+
+    /// @brief Determines if the shop position of a shelf's button exceeds the window width, to enable and display the shop scroller
+    bool passed;
 
     /**
      * @brief Toggles the caption section of a button to become the equip/equipped functionality button

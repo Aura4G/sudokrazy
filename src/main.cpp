@@ -206,6 +206,12 @@ int main() {
     ResourceManager::loadTexture("beach2", "media/images/backgrounds/beach2.png");
     ResourceManager::loadTexture("beach3", "media/images/backgrounds/beach3.png");
 
+    // Spectral Stadium
+    ResourceManager::loadTexture("stadium-full", "media/images/backgrounds/stadium-full.png");
+    ResourceManager::loadTexture("stadium1", "media/images/backgrounds/stadium1.png");
+    ResourceManager::loadTexture("stadium2", "media/images/backgrounds/stadium2.png");
+    ResourceManager::loadTexture("stadium3", "media/images/backgrounds/stadium3.png");
+
     // Mod
     ResourceManager::loadTexture("test1", "media/images/backgrounds/test1.png");
     ResourceManager::loadTexture("test2", "media/images/backgrounds/test2.png");
@@ -375,10 +381,7 @@ int main() {
     Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
     Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
     Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
-    Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
-    Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
-    Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
-    Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
+    Shop::addItem(Item(10, "Spectral Stadium", "stadium-full", "stadium", ItemType::Background));
     Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
 
     const uint8_t ROWS = 2;

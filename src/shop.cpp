@@ -156,10 +156,6 @@ std::optional<Item> Shop::getItemByID(int ID) {
     return std::nullopt;
 }
 
-int Shop::getSize() {
-    return items.size();
-}
-
 int Shop::getTotalItems() {
     return items.size();
 }
@@ -177,7 +173,7 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
 
         itemsPulled.resize(quantity);
 
-        bool flag = false;
+        passed = false;
 
         for (int i = 0; i < quantity; i++) {
             // Calculate initial position of new button
@@ -190,8 +186,8 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
 
             itemCaption.at(i).deactivate();
 
-            if (position.x + additiveX >= WINDOW_WIDTH && !flag) {
-                flag = true;
+            if (position.x + additiveX >= WINDOW_WIDTH && !passed) {
+                passed = true;
 
                 initScreenRightmost = itemDisplay.at(i - rows).getOriginalPos().x;
             }
@@ -217,12 +213,13 @@ void Shelf::display(sf::RenderTexture& renderTexture) {
         }
     }
 
-    shopScroller.display(renderTexture);
+    if (passed) {
+        shopScroller.display(renderTexture);
+    }
 }
 
 void Shelf::pullShop(int index) {
     int maximum = columns * rows;
-    sections = Shop::getSize() / maximum + 1;
 
     for (int i = 0; i < maximum; i++) {
         auto optItem = Shop::getItem(index);
@@ -277,7 +274,9 @@ void Shelf::activate() {
         }
     }
 
-    shopScroller.activate();
+    if (passed) {
+        shopScroller.activate();
+    }
 }
 
 void Shelf::deactivate() {
@@ -357,13 +356,15 @@ void Shelf::updateHintCount() {
 }
 
 void Shelf::scrollShelf(const sf::Event& event, sf::RenderWindow& window) {
-    shopScroller.handleEvent(event, window);
+    if (passed) {
+        shopScroller.handleEvent(event, window);
 
-    float xDistance = globalRightmost - initScreenRightmost;
+        float xDistance = globalRightmost - initScreenRightmost;
 
-    for (int i = 0; i < Shop::getTotalItems(); i++) {
-        itemDisplay.at(i).setPosition(itemDisplay.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
-        itemCaption.at(i).setPosition(itemCaption.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
+        for (int i = 0; i < Shop::getTotalItems(); i++) {
+            itemDisplay.at(i).setPosition(itemDisplay.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
+            itemCaption.at(i).setPosition(itemCaption.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
+        }
     }
 }
 
