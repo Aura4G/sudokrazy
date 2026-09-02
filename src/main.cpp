@@ -1130,7 +1130,7 @@ int main() {
         // Apply shaders
         window->clear();
         sf::Sprite finalSprite(renderTexture.getTexture());
-        shader.setUniform("brightness", currentBrightness);
+        shader.setUniform("brightness", currentBrightness + 0.1f);
         shader.setUniform("contrast", contrast);
         window->draw(finalSprite, &shader);
         window->display();

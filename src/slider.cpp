@@ -59,9 +59,9 @@ void Slider::handleEvent(const sf::Event& event, sf::RenderWindow& window) {
 
         //The slider's grip button cannot leave the bounds of the slider itself.
         sf::FloatRect bounds = line.getGlobalBounds();
-        if (mousePos.x < bounds.left) {
+        if (grip.getPosition().x < bounds.left) {
             grip.setPosition(sf::Vector2f(bounds.left, initialPosition.y + line.getSize().y/2));
-        } else if (mousePos.x > bounds.left + bounds.width) {
+        } else if (grip.getPosition().x > bounds.left + bounds.width) {
             grip.setPosition(sf::Vector2f(bounds.left + bounds.width, initialPosition.y + line.getSize().y/2));
         }
     }
