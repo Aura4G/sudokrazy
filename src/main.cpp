@@ -187,36 +187,6 @@ int main() {
     ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
     ResourceManager::loadTexture("lock", "media/images/lock.png");
 
-    /* Backgrounds */
-    // Outside
-    ResourceManager::loadTexture("outside-full", "media/images/backgrounds/outside-full.png");
-    ResourceManager::loadTexture("outside1", "media/images/backgrounds/outside1.png");
-    ResourceManager::loadTexture("outside2", "media/images/backgrounds/outside2.png");
-    ResourceManager::loadTexture("outside3", "media/images/backgrounds/outside3.png");
-
-    // Space
-    ResourceManager::loadTexture("space-full", "media/images/backgrounds/space-full.png");
-    ResourceManager::loadTexture("space1", "media/images/backgrounds/space1.png");
-    ResourceManager::loadTexture("space2", "media/images/backgrounds/space2.png");
-    ResourceManager::loadTexture("space3", "media/images/backgrounds/space3.png");
-
-    // Beach
-    ResourceManager::loadTexture("beach-full", "media/images/backgrounds/beach-full.png");
-    ResourceManager::loadTexture("beach1", "media/images/backgrounds/beach1.png");
-    ResourceManager::loadTexture("beach2", "media/images/backgrounds/beach2.png");
-    ResourceManager::loadTexture("beach3", "media/images/backgrounds/beach3.png");
-
-    // Spectral Stadium
-    ResourceManager::loadTexture("stadium-full", "media/images/backgrounds/stadium-full.png");
-    ResourceManager::loadTexture("stadium1", "media/images/backgrounds/stadium1.png");
-    ResourceManager::loadTexture("stadium2", "media/images/backgrounds/stadium2.png");
-    ResourceManager::loadTexture("stadium3", "media/images/backgrounds/stadium3.png");
-
-    // Mod
-    ResourceManager::loadTexture("test1", "media/images/backgrounds/test1.png");
-    ResourceManager::loadTexture("test2", "media/images/backgrounds/test2.png");
-    ResourceManager::loadTexture("test3", "media/images/backgrounds/test3.png");
-
     /* Audio */
 
     ResourceManager::loadAudio("main theme", "media/music/sudokrazy_main.ogg");
@@ -377,12 +347,8 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, MEDIUM_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
-    Shop::addItem(Item(20, "Hint", "lock"));
-    Shop::addItem(Item(2, "Outdoor Theme", "outside-full", "outside", ItemType::Background));
-    Shop::addItem(Item(5, "Beach Theme", "beach-full", "beach", ItemType::Background));
-    Shop::addItem(Item(5, "Space Theme", "space-full", "space", ItemType::Background));
-    Shop::addItem(Item(10, "Spectral Stadium", "stadium-full", "stadium", ItemType::Background));
-    Shop::addItem(Item(20, "Mod Theme", "settings", "test", ItemType::Background));
+    Shop::addItem(Item(30, "Hint", "lock"));
+    Shop::retrieveItemsFromCsv("data/shop.csv");
 
     const uint8_t ROWS = 2;
     int columns = (Shop::getTotalItems() + ROWS - 1) / ROWS;

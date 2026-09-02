@@ -174,6 +174,31 @@ bool Shop::hasOneBg() {
 }
 
 bool Shop::retrieveItemsFromCsv(const std::string& filename) {
+    rapidcsv::Document doc(filename);
+
+    auto iToITLambda = [](const std::string& number, ItemType& val) { val = static_cast<ItemType>(std::stoi(number)); };
+
+    for (int i = 0; i < doc.GetRowCount(); i++) {
+        std::string name = doc.GetCell<std::string>("Name", i);
+        std::string display_name = doc.GetCell<std::string>("DisplayName", i);
+        std::string key = doc.GetCell<std::string>("Key", i);
+        int cost = doc.GetCell<int>("Cost", i);
+        ItemType type = doc.GetCell<ItemType>("Type", i, iToITLambda);
+
+        if (type == ItemType::Background) {
+            ResourceManager::loadTexture(key + "1", "media/images/backgrounds/" + key + "1.png");
+            ResourceManager::loadTexture(key + "2", "media/images/backgrounds/" + key + "2.png");
+            ResourceManager::loadTexture(key + "3", "media/images/backgrounds/" + key + "3.png");
+
+            if (display_name == "") {
+                addItem(Item(cost, name, "placeholder", key, type));
+            } else {
+                ResourceManager::loadTexture(display_name, "media/images/backgrounds/" + display_name + ".png");
+                addItem(Item(cost, name, display_name, key, type));
+            }
+        }
+    }
+
     return true;
 }
 
