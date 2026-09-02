@@ -174,7 +174,7 @@ bool Shop::hasOneBg() {
 }
 
 bool Shop::retrieveItemsFromCsv(const std::string& filename) {
-    
+    return true;
 }
 
 /// Shelf class definitions ///
@@ -341,7 +341,7 @@ bool Shelf::updateShelf(const sf::Vector2f& mousePos) {
                 toggleCaption(itemCaption.at(i), true);
 
                 for (int j = 0; j < maximum; j++) {
-                    if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID()) {
+                    if (itemsPulled.at(j).getType() == itemsPulled.at(i).getType() && itemsPulled.at(j).getID() != itemsPulled.at(i).getID() && itemsPulled.at(j).isPurchased()) {
                         itemsPulled.at(j).setEquip(false);
                         toggleCaption(itemCaption.at(j), false);
                     }
