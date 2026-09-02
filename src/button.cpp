@@ -1,8 +1,9 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <math.h>
-#include "button.hpp"
-#include "resource_manager.hpp"
+
+#include <sudokrazy/button.hpp>
+#include <sudokrazy/resource_manager.hpp>
 
 //Button Colour Themes
 

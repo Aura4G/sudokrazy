@@ -2,7 +2,6 @@
 #include <string>
 #include <filesystem>
 #include <vector>
-#include <SFML/System.hpp>
 #include <cstdlib>
 #include <fstream>
 
@@ -10,8 +9,10 @@
 #include <windows.h>
 #endif
 
-#include "record.hpp"
-#include "sudoku.hpp"
+#include <SFML/System.hpp>
+
+#include <sudokrazy/record.hpp>
+#include <sudokrazy/sudoku.hpp>
 
 
 std::vector<Record> SaveManager::records;

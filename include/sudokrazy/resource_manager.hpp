@@ -1,11 +1,12 @@
 #ifndef __RESOURCE_MANAGER_HPP__
 #define __RESOURCE_MANAGER_HPP__
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 #include <map>
 #include <string>
 #include <memory>
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 /**
  * Resource Management functions

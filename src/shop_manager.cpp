@@ -2,7 +2,6 @@
 #include <string>
 #include <filesystem>
 #include <vector>
-#include <SFML/System.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <algorithm>
@@ -11,8 +10,10 @@
 #include <windows.h>
 #endif
 
-#include "shop.hpp"
-#include "shop_manager.hpp"
+#include <SFML/System.hpp>
+
+#include <sudokrazy/shop.hpp>
+#include <sudokrazy/shop_manager.hpp>
 
 std::vector<int> ShopManager::purchases;
 

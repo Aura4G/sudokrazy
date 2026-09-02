@@ -3,9 +3,11 @@
 #include <map>
 #include <cerrno>
 #include <memory>
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include "resource_manager.hpp"
+
+#include <sudokrazy/resource_manager.hpp>
 
 std::map<std::string, sf::Font> ResourceManager::fonts;
 std::map<std::string, sf::Texture> ResourceManager::textures;

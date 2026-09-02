@@ -3,9 +3,10 @@
 
 #include <vector>
 #include <string>
+
 #include <SFML/System.hpp>
 
-#include "shop.hpp"
+#include <sudokrazy/shop.hpp>
 
 /**
  * The shop manager class provides the means for which shop items are logged as purchased upon the opening and closing of a game,

@@ -1,8 +1,10 @@
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include <cmath>
 #include <algorithm>
-#include "themes.hpp"
+
+#include <SFML/Graphics.hpp>
+
+#include <sudokrazy/themes.hpp>
 
 sf::Color updateColour(sf::Color colour, sf::Color targetColour, float dt) {
     auto stepTo = [&](sf::Uint8 cur, sf::Uint8 tgt) -> sf::Uint8 {

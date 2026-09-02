@@ -1,0 +1,6 @@
+itemID, name, display name, key, cost, type
+1, Outdoor Theme, outdoor-full, outdoor, 100, Background
+2, Beach Theme, beach-full, beach, 200, Background
+3, Space Theme, space-full, space, 500, Background
+4, Spectral Stadium, stadium-full, stadium, 1000, Background
+5, Mod Theme, , test, 768, Background

@@ -7,15 +7,15 @@
 #include <cerrno>
 #include <cmath>
 
-#include "themes.hpp"
-#include "grid.hpp"
-#include "main.hpp"
-#include "button.hpp"
-#include "resource_manager.hpp"
-#include "slider.hpp"
-#include "record.hpp"
-#include "shop.hpp"
-#include "shop_manager.hpp"
+#include <sudokrazy/themes.hpp>
+#include <sudokrazy/grid.hpp>
+#include <sudokrazy/main.hpp>
+#include <sudokrazy/button.hpp>
+#include <sudokrazy/resource_manager.hpp>
+#include <sudokrazy/slider.hpp>
+#include <sudokrazy/record.hpp>
+#include <sudokrazy/shop.hpp>
+#include <sudokrazy/shop_manager.hpp>
 
 GameState stateFlag = STATE_HOME;
 

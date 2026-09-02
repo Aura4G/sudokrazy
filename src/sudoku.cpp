@@ -5,8 +5,9 @@
 #include <iterator>
 #include <vector>
 #include <array>
-#include "sudoku.hpp"
-#include "main.hpp"
+
+#include <sudokrazy/sudoku.hpp>
+#include <sudokrazy/main.hpp>
 
 Board::Board() {
     //sets random seed

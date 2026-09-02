@@ -2,7 +2,8 @@
 #define __SLIDER_HPP__
 
 #include <SFML/Graphics.hpp>
-#include "button.hpp"
+
+#include <sudokrazy/button.hpp>
 
 /**
  * The Slider class allows for the creation of SFML-visualised sliders, used for a continuous selection

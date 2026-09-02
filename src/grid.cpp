@@ -5,11 +5,11 @@
 #include <vector>
 #include <array>
 
-#include "grid.hpp"
-#include "sudoku.hpp"
-#include "button.hpp"
-#include "main.hpp"
-#include "resource_manager.hpp"
+#include <sudokrazy/grid.hpp>
+#include <sudokrazy/sudoku.hpp>
+#include <sudokrazy/button.hpp>
+#include <sudokrazy/main.hpp>
+#include <sudokrazy/resource_manager.hpp>
 
 bool Grid::eraser_mode = false;
 

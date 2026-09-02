@@ -3,7 +3,8 @@
 
 #include <vector>
 #include <SFML/System.hpp>
-#include "sudoku.hpp"
+
+#include <sudokrazy/sudoku.hpp>
 
 /**
  * These classes provide the means for which players can log play-through efforts and various system

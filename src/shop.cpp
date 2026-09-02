@@ -3,15 +3,18 @@
 #include <vector>
 #include <map>
 #include <optional>
+
 #include <SFML/Graphics.hpp>
 
-#include "shop.hpp"
-#include "record.hpp"
-#include "sudoku.hpp"
-#include "button.hpp"
-#include "resource_manager.hpp"
-#include "shop_manager.hpp"
-#include "main.hpp"
+#include <sudokrazy/shop.hpp>
+#include <sudokrazy/record.hpp>
+#include <sudokrazy/sudoku.hpp>
+#include <sudokrazy/button.hpp>
+#include <sudokrazy/resource_manager.hpp>
+#include <sudokrazy/shop_manager.hpp>
+#include <sudokrazy/main.hpp>
+
+#include <rapidcsv/rapidcsv.h>
 
 int Item::counter = 0;
 
@@ -168,6 +171,10 @@ bool Shop::hasOneBg() {
     }
 
     return false;
+}
+
+bool Shop::retrieveItemsFromCsv(const std::string& filename) {
+    
 }
 
 /// Shelf class definitions ///

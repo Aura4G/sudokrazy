@@ -1,9 +1,11 @@
-#include <SFML/Graphics.hpp>
 #include <string>
-#include "slider.hpp"
-#include "button.hpp"
-#include "resource_manager.hpp"
-#include "main.hpp"
+
+#include <SFML/Graphics.hpp>
+
+#include <sudokrazy/slider.hpp>
+#include <sudokrazy/button.hpp>
+#include <sudokrazy/resource_manager.hpp>
+#include <sudokrazy/main.hpp>
 
 Slider::Slider() {
     line.setPosition(sf::Vector2f(0.f,0.f));

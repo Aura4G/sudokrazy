@@ -2,9 +2,10 @@
 #define __MAIN_HPP__
 
 #include <memory>
-#include "sudoku.hpp"
-#include "grid.hpp"
-#include "button.hpp"
+
+#include <sudokrazy/sudoku.hpp>
+#include <sudokrazy/grid.hpp>
+#include <sudokrazy/button.hpp>
 
 /**
  * Main render window functions

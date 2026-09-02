@@ -1,10 +1,12 @@
 #ifndef __GRID_HPP__
 #define __GRID_HPP__
 
-#include <SFML/Graphics.hpp>
 #include <vector>
-#include "sudoku.hpp"
-#include "button.hpp"
+
+#include <SFML/Graphics.hpp>
+
+#include <sudokrazy/sudoku.hpp>
+#include <sudokrazy/button.hpp>
 
 /**
  * 9*9 sudoku grid SFML visualisation and functionality

@@ -5,9 +5,11 @@
 #include <vector>
 #include <map>
 #include <optional>
+
 #include <SFML/Graphics.hpp>
-#include "button.hpp"
-#include "slider.hpp"
+
+#include <sudokrazy/button.hpp>
+#include <sudokrazy/slider.hpp>
 
 /**
  * This file and collection of classes handles the creation, usage and selection
@@ -157,6 +159,13 @@ public:
 
     /// @return True if the player has purchased a background item
     static bool hasOneBg();
+
+    /**
+     * @brief Finds a csv file in the data folder and turns each record into their own item object.
+     *        Also loads any media relevant to each object
+     * @return True if file retrieval and items entry were successful. False otherwise.
+    */
+    static bool retrieveItemsFromCsv(const std::string& filename);
 
 private:
 
