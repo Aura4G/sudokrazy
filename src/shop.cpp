@@ -232,10 +232,10 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
 
             itemCaption.at(i).deactivate();
 
-            if (position.x + additiveX >= WINDOW_WIDTH && !passed) {
+            if (position.x + displaySize.x + additiveX >= WINDOW_WIDTH && !passed) {
                 passed = true;
 
-                initScreenRightmost = itemDisplay.at(i - rows).getOriginalPos().x;
+                initScreenRightmost = itemDisplay.at(i-1).getOriginalPos().x;
             }
         }
 
