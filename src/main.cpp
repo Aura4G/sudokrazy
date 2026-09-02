@@ -186,6 +186,9 @@ int main() {
     ResourceManager::loadTexture("settings", "media/images/settings.png");
     ResourceManager::loadTexture("settings title", "media/images/settings_title.png");
     ResourceManager::loadTexture("lock", "media/images/lock.png");
+    ResourceManager::loadTexture("hint", "media/images/hint.png");
+    ResourceManager::loadTexture("shop", "media/images/shop.png");
+
 
     /* Audio */
 
@@ -268,6 +271,7 @@ int main() {
 
     // Hint button
     Button hint(37.5f, 0.f, 390.f, 47.5f, REGULAR_BUTTON, "0", "gameFont", ShapeType::Circle);
+    hint.setTexture(ResourceManager::getTexture("hint"), 10.f);
 
 
     /* SETTINGS MENU */
@@ -346,9 +350,10 @@ int main() {
 
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, MEDIUM_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
+    shopToggle.setTexture(ResourceManager::getTexture("shop"), 10.f);
 
     // Shop's first item will always be purchaseable hints
-    Shop::addItem(Item(30, "Hint", "lock"));
+    Shop::addItem(Item(30, "Hint", "hint"));
 
     // Backgrounds, Music etc. is retrieved from the shop csv
     Shop::retrieveItemsFromCsv("data/shop.csv");
