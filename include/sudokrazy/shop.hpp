@@ -162,7 +162,29 @@ public:
 
     /**
      * @brief Finds a csv file in the data folder and turns each record into their own item object.
-     *        Also loads any media relevant to each object
+     *        Also loads any media relevant to each object.
+     * 
+     *        If you wish to add your own items to the videogame, the instructions depend on the item type
+     *        you want to add, as their media is different.
+     * 
+     *        To add backgrounds, follow these steps:
+     * 
+     *        1) Create 3 300x800 png images that follow the naming convention "key(1/2/3).png". These make
+     *           up the 3 panels on the background of the game and will be displayed in the game when equipped.
+     * 
+     *        2) Place all of the images in .media/images/backgrounds.
+     * 
+     *        2) In the shop.csv file in the data folder, add a new record.
+     * 
+     *          - Name and Cost can be any value you want
+     * 
+     *          - If you've made a display image to go with the item (as seen in the shop), give DisplayName
+     *            the same value as the display image's file name *without the file extension.* The display
+     *            image also goes in .media/images/backgrounds/ 
+     * 
+     *          - Type must be 0
+     * 
+     * @param filename the name of the csv file being utilised for shop information
      * @return True if file retrieval and items entry were successful. False otherwise.
     */
     static bool retrieveItemsFromCsv(const std::string& filename);
@@ -195,9 +217,8 @@ public:
     void display(sf::RenderTexture& renderTexture);
 
     /**
-     * @brief takes the shop's contents from an index and applies them to the visualised shop shelf
-     *        until the shelf's limit is reached or the shop runs out of items from that index
-     * @param index the starting point for which the shelf is stocked with items
+     * @brief Takes the shop's contents from an index and applies them to the visualised shop shelf
+     * @param index the starting point for which the shelf is stocked with items, not used unless for particular cases.
     */
     void pullShop(int index = 0);
 

@@ -347,7 +347,10 @@ int main() {
     /* SHOP */
     Button shopToggle(37.5f, 0.f, 470.f, 47.5f, MEDIUM_BUTTON, "SHOP", "homeFont", ShapeType::Circle);
 
+    // Shop's first item will always be purchaseable hints
     Shop::addItem(Item(30, "Hint", "lock"));
+
+    // Backgrounds, Music etc. is retrieved from the shop csv
     Shop::retrieveItemsFromCsv("data/shop.csv");
 
     const uint8_t ROWS = 2;
@@ -375,6 +378,8 @@ int main() {
     /* BACKGROUND VIEWER TOGGLE */
     Button bgViewToggle(37.5f, 0.f, 390.f, 47.5f, EASY_BUTTON, "BG", "homeFont", ShapeType::Circle);
     bool enableBgView = Shop::hasOneBg();
+
+    // The button is only interactive and viewable if the user has at least one background to view.
     if (!enableBgView) bgViewToggle.deactivate();
 
 

@@ -184,7 +184,8 @@ public:
     */
     void update(float deltaTime);
 
-    /// @brief Prevents button cloning and dangling texture pointers
+    //Prevents button cloning and dangling texture pointers
+    
     Button(const Button&) = delete;
     Button& operator=(const Button&) = delete;
     Button(Button&&) = default;

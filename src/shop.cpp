@@ -165,6 +165,7 @@ int Shop::getTotalItems() {
 
 bool Shop::hasOneBg() {
     for (int i = 0; i < items.size(); i++) {
+        // Stops linear search once one item in the shop has been identified as purchased.
         if (ShopManager::queryPurchases(i) && items.at(i).getType() == ItemType::Background) {
             return true;
         }
@@ -174,8 +175,10 @@ bool Shop::hasOneBg() {
 }
 
 bool Shop::retrieveItemsFromCsv(const std::string& filename) {
+    // Use rapidcsv (credit to https://github.com/d99kris/rapidcsv to retrieve csv of shop items)
     rapidcsv::Document doc(filename);
 
+    // Lambda function to convert integer to ItemType enum
     auto iToITLambda = [](const std::string& number, ItemType& val) { val = static_cast<ItemType>(std::stoi(number)); };
 
     for (int i = 0; i < doc.GetRowCount(); i++) {
@@ -185,6 +188,8 @@ bool Shop::retrieveItemsFromCsv(const std::string& filename) {
         int cost = doc.GetCell<int>("Cost", i);
         ItemType type = doc.GetCell<ItemType>("Type", i, iToITLambda);
 
+        // Images of the same background must have the same name, followed by "1", "2" or "3" 
+        // depending on the position of the panel the image corresponds to
         if (type == ItemType::Background) {
             ResourceManager::loadTexture(key + "1", "media/images/backgrounds/" + key + "1.png");
             ResourceManager::loadTexture(key + "2", "media/images/backgrounds/" + key + "2.png");
@@ -240,6 +245,9 @@ Shelf::Shelf(int columns, int rows, sf::Vector2f position, sf::Vector2f displayS
         float bottom = itemCaption.at(quantity/2).getOriginalPos().y + displaySize.y/2;
         float sliderLength = initScreenRightmost + displaySize.x - leftmost;
         
+        // If there are enough shop items to trigger the shop scroller's activation and visualisation,
+        // The slider sits underneath the lowest row of the shop shelf, and extends between the left most column
+        // and the rightmost visible column.
         shopScroller = Slider(sliderLength, sf::Vector2f(leftmost, bottom+20.f), 0.f, sf::Color::Black);
         shopScroller.deactivate();
     }
@@ -254,6 +262,7 @@ void Shelf::display(sf::RenderTexture& renderTexture) {
         }
     }
 
+    // Only display the shop scroller if shelf elements start getting positioned offscreen
     if (passed) {
         shopScroller.display(renderTexture);
     }
@@ -315,6 +324,7 @@ void Shelf::activate() {
         }
     }
 
+    // Only activate the shop scroller for proper scrolling if shelf elements are initially positioned off-screen
     if (passed) {
         shopScroller.activate();
     }
@@ -397,11 +407,15 @@ void Shelf::updateHintCount() {
 }
 
 void Shelf::scrollShelf(const sf::Event& event, sf::RenderWindow& window) {
+    // Only handle slider movement and interaction if shop shelf is greater than the window width
     if (passed) {
         shopScroller.handleEvent(event, window);
 
+        // The x-axis distance between the rightmost item in the shelf and the item that appears rightmost on the game screen initially.
+        // This determines the maximum scroll distance the shop scroller will enact across all of the shop items.
         float xDistance = globalRightmost - initScreenRightmost;
 
+        // Slides items to the left depending on a factor returned by the percentage scrolled on the shop scroller.
         for (int i = 0; i < Shop::getTotalItems(); i++) {
             itemDisplay.at(i).setPosition(itemDisplay.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
             itemCaption.at(i).setPosition(itemCaption.at(i).getOriginalPos() - sf::Vector2f(xDistance * shopScroller.getPercentage()/100, 0.f));
