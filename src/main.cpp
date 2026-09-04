@@ -201,6 +201,7 @@ int main() {
     sf::Shader& shader = ResourceManager::getShader("shader");
     float currentBrightness = 1.0f; // Normal brightness
     float contrast = 1.0f; // Normal contrast
+    float hue = 0.f; // Normal hue
 
 
     /* Dynamic Background */
@@ -334,6 +335,20 @@ int main() {
     Slider contrastSlider(400.f, sf::Vector2f(100.f, 520.f), SaveManager::getContrast(), sf::Color::Black);
 
 
+    /* Hue */
+
+    sf::Text hueText;
+    hueText.setString("Hue:");
+    hueText.setFont(ResourceManager::getFont("gameFont"));
+    hueText.setCharacterSize(16);
+    hueText.setFillColor(sf::Color::Black);
+    hueText.setPosition(sf::Vector2f(100.f, 560.f));
+
+    // Changes the background scroll speed
+    // Retrieves the saved speed setting for the initial setting
+    Slider hueSlider(400.f, sf::Vector2f(100.f, 600.f), SaveManager::getHue(), sf::Color::Black);
+
+
     /* Bg Scroller */
 
     sf::Text scrollerText;
@@ -341,11 +356,11 @@ int main() {
     scrollerText.setFont(ResourceManager::getFont("gameFont"));
     scrollerText.setCharacterSize(16);
     scrollerText.setFillColor(sf::Color::Black);
-    scrollerText.setPosition(sf::Vector2f(100.f, 560.f));
+    scrollerText.setPosition(sf::Vector2f(100.f, 640.f));
 
     // Changes the background scroll speed
     // Retrieves the saved speed setting for the initial setting
-    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 600.f), SaveManager::getBSpeed(), sf::Color::Black);
+    Slider scrollerSlider(400.f, sf::Vector2f(100.f, 680.f), SaveManager::getBSpeed(), sf::Color::Black);
 
 
     /* SHOP */
@@ -686,6 +701,7 @@ int main() {
             volumeSlider.handleEvent(event, *window);
             brightnessSlider.handleEvent(event, *window);
             contrastSlider.handleEvent(event, *window);
+            hueSlider.handleEvent(event, *window);
             scrollerSlider.handleEvent(event, *window);
             shopShelf.scrollShelf(event, *window);
         }
@@ -766,6 +782,7 @@ int main() {
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
+            hueSlider.deactivate();
             scrollerSlider.deactivate();
 
             shopShelf.deactivate();
@@ -809,6 +826,7 @@ int main() {
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
+            hueSlider.deactivate();
             scrollerSlider.deactivate();
 
             shopShelf.deactivate();
@@ -843,6 +861,7 @@ int main() {
             volumeSlider.activate();
             brightnessSlider.activate();
             contrastSlider.activate();
+            hueSlider.activate();
             scrollerSlider.activate();
 
             shopShelf.deactivate();
@@ -877,6 +896,7 @@ int main() {
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
+            hueSlider.deactivate();
             scrollerSlider.deactivate();
 
             shopShelf.activate();
@@ -911,6 +931,7 @@ int main() {
             volumeSlider.deactivate();
             brightnessSlider.deactivate();
             contrastSlider.deactivate();
+            hueSlider.deactivate();
             scrollerSlider.deactivate();
 
             shopShelf.deactivate();
@@ -932,6 +953,12 @@ int main() {
         contrastSlider.displayPercentage("","%");
         if (contrastSlider.getDragging()) {
             SaveManager::setContrast(contrastSlider.getPercentage()/100);
+        }
+
+        hue = hueSlider.getPercentage()/100.f;
+        hueSlider.displayPercentage("","%");
+        if (hueSlider.getDragging()) {
+            SaveManager::setHue(hueSlider.getPercentage()/100);
         }
 
         scrollSpeed = scrollerSlider.getPercentage()*1.5f;
@@ -1111,12 +1138,14 @@ int main() {
             renderTexture.draw(volumeText);
             renderTexture.draw(brightnessText);
             renderTexture.draw(contrastText);
+            renderTexture.draw(hueText);
             renderTexture.draw(scrollerText);
             vsyncToggle.display(renderTexture);
             fullscreenToggle.display(renderTexture);
             volumeSlider.display(renderTexture);
             brightnessSlider.display(renderTexture);
             contrastSlider.display(renderTexture);
+            hueSlider.display(renderTexture);
             scrollerSlider.display(renderTexture);
         } else if (stateFlag == STATE_SHOP) { // Draws for the shop
             shopShelf.display(renderTexture);
@@ -1137,6 +1166,7 @@ int main() {
         sf::Sprite finalSprite(renderTexture.getTexture());
         shader.setUniform("brightness", currentBrightness + 0.1f);
         shader.setUniform("contrast", contrast);
+        shader.setUniform("hue", hue);
         window->draw(finalSprite, &shader);
         window->display();
     }

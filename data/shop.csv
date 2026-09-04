@@ -1,6 +1,7 @@
 ItemID,Name,DisplayName,Key,Cost,Type
 1,Outside Theme,outside-full,outside,100,0
-2,Beach Theme,beach-full,beach,200,0
-3,Space Theme,space-full,space,500,0
-4,Spectral Stadium,stadium-full,stadium,1000,0
-5,Mod Theme,,test,768,0
+2,Abstract Theme,abstract-full,abstract,250,0
+3,Beach Theme,beach-full,beach,500,0
+4,Space Theme,space-full,space,500,0
+5,Spectral Stadium,stadium-full,stadium,1000,0
+6,Mod Theme,,test,768,0

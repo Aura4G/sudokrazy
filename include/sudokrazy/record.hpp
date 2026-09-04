@@ -141,6 +141,18 @@ public:
     static void setContrast(float newContrast);
 
     /**
+     * @brief Used when starting the game, to set the hue specified in the save file
+     * @return The hue of the game window
+    */
+    static float getHue();
+
+    /**
+     * @brief Changes the hue variable that'll be present in the settings save
+     * @param newHue the new hue value
+    */
+    static void setHue(float newHue);
+
+    /**
      * @brief Used when starting the game, to set the background scroll speed specified in the save file
      * @return The scroll speed of the background
     */
@@ -233,6 +245,9 @@ private:
 
     /// @brief The colour contrast of the window
     static float contrast;
+
+    /// @brief The hue shift of the window
+    static float hue;
 
     /// @brief The speed of the scrolling background
     static float backgroundSpeed;
